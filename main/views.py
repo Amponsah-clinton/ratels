@@ -6541,49 +6541,182 @@ def member_subscription_invoice_pdf(request, subscription_id):
             "invoice_number": invoice_number,
             "logo_url": logo_url,
         }
-        html = render_to_string("member/invoice_pdf.html", context)
         from io import BytesIO
         try:
-            from xhtml2pdf import pisa
+            from reportlab.lib.pagesizes import A4
+            from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+            from reportlab.lib.units import mm
+            from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, TableStyle, Spacer
+            from reportlab.lib import colors
+            from reportlab.lib.enums import TA_LEFT, TA_RIGHT, TA_CENTER
         except ImportError:
-            print("[Member Invoice PDF] xhtml2pdf not installed. Returning HTML for print.")
+            html = render_to_string("member/invoice_pdf.html", context)
             response = HttpResponse(html, content_type="text/html; charset=utf-8")
             response["Content-Disposition"] = f'inline; filename="invoice-{invoice_number}.html"'
             return response
 
-        def link_callback(uri, rel):
-            # xhtml2pdf expects a string (file path or URI), not a tuple
-            if uri.startswith("http://") or uri.startswith("https://"):
-                try:
-                    r = requests.get(uri, timeout=5)
-                    if r.status_code == 200 and r.content:
-                        import tempfile
-                        ext = ".png" if "png" in (uri or "") else ".jpg"
-                        with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as tmp:
-                            tmp.write(r.content)
-                            return tmp.name
-                except Exception:
-                    pass
-            return uri
-
-        result = BytesIO()
-        # xhtml2pdf expects src as str, not bytes
-        pisa_status = pisa.CreatePDF(
-            html,
-            result,
-            encoding="utf-8",
-            link_callback=link_callback,
+        buffer = BytesIO()
+        doc = SimpleDocTemplate(
+            buffer,
+            pagesize=A4,
+            rightMargin=15 * mm,
+            leftMargin=15 * mm,
+            topMargin=18 * mm,
+            bottomMargin=18 * mm,
         )
-        if getattr(pisa_status, "err", True):
-            print("[Member Invoice PDF] pisa.CreatePDF reported errors.")
-            response = HttpResponse(html, content_type="text/html; charset=utf-8")
-            response["Content-Disposition"] = f'inline; filename="invoice-{invoice_number}.html"'
-            return response
-        pdf_bytes = result.getvalue()
-        if not pdf_bytes:
-            response = HttpResponse(html, content_type="text/html; charset=utf-8")
-            response["Content-Disposition"] = f'inline; filename="invoice-{invoice_number}.html"'
-            return response
+        styles = getSampleStyleSheet()
+        title_style = ParagraphStyle(
+            name="InvoiceTitle",
+            parent=styles["Heading1"],
+            fontSize=24,
+            spaceAfter=6,
+        )
+        heading_style = ParagraphStyle(
+            name="CompanyName",
+            parent=styles["Normal"],
+            fontSize=18,
+            fontName="Helvetica-Bold",
+            spaceAfter=2,
+        )
+        sub_style = ParagraphStyle(
+            name="Sub",
+            parent=styles["Normal"],
+            fontSize=9,
+            textColor=colors.HexColor("#6b7280"),
+        )
+        normal_style = styles["Normal"]
+        normal_style.fontSize = 10
+        meta_style = ParagraphStyle(
+            name="Meta",
+            parent=styles["Normal"],
+            fontSize=9,
+            textColor=colors.HexColor("#4b5563"),
+        )
+        section_label = ParagraphStyle(
+            name="SectionLabel",
+            parent=styles["Normal"],
+            fontSize=8.5,
+            fontName="Helvetica-Bold",
+            textColor=colors.HexColor("#6b7280"),
+            spaceAfter=6,
+        )
+
+        story = []
+        # Header row: company left, INVOICE + meta right
+        header_data = [
+            [
+                Paragraph("RATEL Movement", heading_style),
+                Paragraph("INVOICE", title_style),
+            ],
+            [
+                Paragraph("Membership Invoice", sub_style),
+                Paragraph(
+                    f'<b>Invoice #:</b> {invoice_number}<br/><b>Date:</b> {invoice_date}',
+                    meta_style,
+                ),
+            ],
+        ]
+        header_table = Table(header_data, colWidths=[doc.width / 2, doc.width / 2])
+        header_table.setStyle(
+            TableStyle([
+                ("ALIGN", (0, 0), (0, -1), "LEFT"),
+                ("ALIGN", (1, 0), (1, -1), "RIGHT"),
+                ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                ("LINEBELOW", (0, 0), (-1, -1), 3, colors.HexColor("#111827")),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 16),
+            ])
+        )
+        story.append(header_table)
+        story.append(Spacer(1, 20))
+
+        # Bill To
+        story.append(Paragraph("BILL TO", section_label))
+        bill_lines = [
+            Paragraph(f"<b>{context['member_name']}</b>", normal_style),
+            Paragraph(context["member_email"], normal_style),
+            Paragraph(f"Member ID: {context['member_id']}", normal_style),
+        ]
+        for p in bill_lines:
+            story.append(p)
+        story.append(Spacer(1, 18))
+
+        # Items table
+        sub = context["subscription"]
+        months = sub["months_subscribed"]
+        months_label = "month" if months == 1 else "months"
+        items_data = [
+            ["Description", "Period", "Duration", "Amount"],
+            [
+                f"Membership Subscription<br/><font size=8 color='#6b7280'>Payment via {sub['payment_method']}</font>",
+                f"{sub['start_date']}<br/>to {sub['end_date']}",
+                f"<b>{months}</b><br/><font size=8 color='#6b7280'>{months_label}</font>",
+                f"GHS {sub['amount_paid']}",
+            ],
+            ["TOTAL PAID", "", "", f"GHS {sub['amount_paid']}"],
+        ]
+        items_table = Table(
+            items_data,
+            colWidths=[doc.width * 0.38, doc.width * 0.28, doc.width * 0.12, doc.width * 0.22],
+        )
+        items_table.setStyle(
+            TableStyle([
+                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                ("FONTSIZE", (0, 0), (-1, 0), 8.5),
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#f3f4f6")),
+                ("ALIGN", (0, 0), (0, -1), "LEFT"),
+                ("ALIGN", (1, 0), (1, -1), "LEFT"),
+                ("ALIGN", (2, 0), (2, -1), "CENTER"),
+                ("ALIGN", (3, 0), (3, -1), "RIGHT"),
+                ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                ("FONTSIZE", (0, 1), (-1, 1), 10),
+                ("FONTSIZE", (0, 2), (-1, 2), 11),
+                ("FONTNAME", (0, 2), (-1, 2), "Helvetica-Bold"),
+                ("LINEABOVE", (0, 2), (-1, 2), 2, colors.HexColor("#e5e7eb")),
+                ("TOPPADDING", (0, 0), (-1, -1), 9),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 11),
+                ("GRID", (0, 0), (-1, 1), 1, colors.HexColor("#e5e7eb")),
+            ])
+        )
+        story.append(items_table)
+        story.append(Spacer(1, 18))
+
+        # Payment info
+        pay_data = [
+            ["Payment Reference:", sub["payment_reference"]],
+            ["Payment Status:", str(sub["status"]).upper()],
+        ]
+        pay_table = Table(pay_data, colWidths=[doc.width * 0.45, doc.width * 0.52])
+        pay_table.setStyle(
+            TableStyle([
+                ("ALIGN", (0, 0), (0, -1), "LEFT"),
+                ("ALIGN", (1, 0), (1, -1), "RIGHT"),
+                ("FONTSIZE", (0, 0), (-1, -1), 9.5),
+                ("FONTNAME", (1, 0), (1, -1), "Helvetica-Bold"),
+                ("LINEABOVE", (0, 0), (-1, 0), 1, colors.HexColor("#e5e7eb")),
+                ("LINEBELOW", (0, -1), (-1, -1), 1, colors.HexColor("#e5e7eb")),
+                ("TOPPADDING", (0, 0), (-1, -1), 12),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+            ])
+        )
+        story.append(pay_table)
+        story.append(Spacer(1, 24))
+
+        # Footer
+        year = invoice_date.split()[-1] if invoice_date else ""
+        footer_style = ParagraphStyle(
+            name="Footer",
+            parent=styles["Normal"],
+            fontSize=8.5,
+            textColor=colors.HexColor("#6b7280"),
+            alignment=TA_CENTER,
+            spaceAfter=3,
+        )
+        story.append(Paragraph("This is an official invoice for membership subscription paid to RATEL Movement.", footer_style))
+        story.append(Paragraph("Thank you for your continued support and membership.", footer_style))
+        story.append(Paragraph(f"© {year} RATEL Movement. All rights reserved.", ParagraphStyle(name="FooterCopy", parent=footer_style, fontSize=8, textColor=colors.HexColor("#9ca3af"))))
+
+        doc.build(story)
+        pdf_bytes = buffer.getvalue()
         filename = f"invoice-{invoice_number}.pdf".replace(" ", "-")
         response = HttpResponse(pdf_bytes, content_type="application/pdf")
         response["Content-Disposition"] = f'attachment; filename="{filename}"'
