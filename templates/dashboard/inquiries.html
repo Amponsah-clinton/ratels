@@ -1,0 +1,965 @@
+{% extends "dashboard/base_dashboard.html" %}
+
+{% block title %}Contact Inquiries{% endblock %}
+
+{% block content %}
+<div class="md-space-y-6">
+
+    <!-- Page Header -->
+    <div class="md-page-header-row">
+        <div>
+            <h1 class="md-page-title">Contact Inquiries</h1>
+            <p class="md-page-subtitle">Manage and respond to all contact submissions</p>
+        </div>
+        <div class="header-stats">
+            <div class="stat-badge new">{{ stats.new }} New</div>
+            <div class="stat-badge in-progress">{{ stats.in_progress }} In Progress</div>
+            <div class="stat-badge total">{{ stats.total }} Total</div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-row">
+        <div class="filter-tabs">
+            <button class="filter-tab active" data-filter="all">All</button>
+            <button class="filter-tab" data-filter="new">New</button>
+            <button class="filter-tab" data-filter="in_progress">In Progress</button>
+            <button class="filter-tab" data-filter="replied">Replied</button>
+            <button class="filter-tab" data-filter="resolved">Resolved</button>
+        </div>
+        <div class="filter-types">
+            <select id="typeFilter" onchange="filterByType(this.value)">
+                <option value="">All Types</option>
+                <option value="general">General Contact</option>
+                <option value="media">Media Enquiries</option>
+                <option value="secure_tip">Secure Tips</option>
+                <option value="encrypted">Encrypted Contact</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Inquiries List -->
+    <div class="inquiries-list" id="inquiriesList">
+        {% for inquiry in inquiries %}
+        <div class="inquiry-card" data-status="{{ inquiry.status }}" data-type="{{ inquiry.inquiry_type }}">
+            <div class="inquiry-header">
+                <div class="inquiry-type-badge {{ inquiry.inquiry_type }}">
+                    {% if inquiry.inquiry_type == 'general' %}General{% endif %}
+                    {% if inquiry.inquiry_type == 'media' %}Media{% endif %}
+                    {% if inquiry.inquiry_type == 'secure_tip' %}Secure Tip{% endif %}
+                    {% if inquiry.inquiry_type == 'encrypted' %}Encrypted{% endif %}
+                </div>
+                <div class="inquiry-meta">
+                    <span class="inquiry-date">{{ inquiry.created_at|date:"M d, Y H:i" }}</span>
+                    {% if inquiry.urgency_level and inquiry.urgency_level != 'normal' %}
+                    <span class="urgency-indicator {{ inquiry.urgency_level }}">{{ inquiry.urgency_level|title }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="inquiry-body">
+                <div class="inquiry-from">
+                    {% if inquiry.is_anonymous %}
+                    <span class="anonymous-badge">Anonymous</span>
+                    {% if inquiry.tip_reference_code %}
+                    <span class="ref-code">Ref: {{ inquiry.tip_reference_code }}</span>
+                    {% endif %}
+                    {% else %}
+                    <strong>{{ inquiry.full_name|default:"No name" }}</strong>
+                    {% if inquiry.email %}
+                    <span class="inquiry-email">{{ inquiry.email }}</span>
+                    {% endif %}
+                    {% endif %}
+                </div>
+
+                {% if inquiry.subject %}
+                <h4 class="inquiry-subject">{{ inquiry.subject }}</h4>
+                {% endif %}
+
+                <p class="inquiry-message">{{ inquiry.message|truncatechars:200 }}</p>
+
+                {% if inquiry.media_outlet %}
+                <div class="inquiry-detail">
+                    <strong>Media Outlet:</strong> {{ inquiry.media_outlet }}
+                </div>
+                {% endif %}
+
+                {% if inquiry.preferred_secure_channel %}
+                <div class="inquiry-detail">
+                    <strong>Secure Channel:</strong> {{ inquiry.preferred_secure_channel|title }}
+                    {% if inquiry.secure_contact_handle %}
+                    - {{ inquiry.secure_contact_handle }}
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="inquiry-footer">
+                <div class="inquiry-status status-{{ inquiry.status }}">
+                    <span class="status-dot"></span>
+                    {{ inquiry.status|title }}
+                </div>
+                <div class="inquiry-actions">
+                    <button class="action-btn view-btn" onclick="viewInquiry('{{ inquiry.id }}')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                        View
+                    </button>
+                    {% if inquiry.email and not inquiry.is_anonymous %}
+                    <button class="action-btn reply-btn" onclick="openReplyModal('{{ inquiry.id }}', '{{ inquiry.email|escapejs }}', '{{ inquiry.full_name|escapejs }}', '{{ inquiry.subject|escapejs }}')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 17 4 12 9 7"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/></svg>
+                        Reply
+                    </button>
+                    {% endif %}
+                    <button class="action-btn status-btn" onclick="openStatusModal('{{ inquiry.id }}', '{{ inquiry.status }}')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                        Status
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-state">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <h3>No Inquiries Yet</h3>
+            <p>Contact submissions will appear here when received.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+
+<!-- View Inquiry Modal -->
+<div class="modal-backdrop" id="viewModal">
+    <div class="modal-container modal-lg">
+        <div class="modal-header">
+            <h3>Inquiry Details</h3>
+            <button class="modal-close" onclick="closeModal('viewModal')">&times;</button>
+        </div>
+        <div class="modal-body" id="viewModalContent">
+            <!-- Content loaded dynamically -->
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="md-btn md-btn-secondary" onclick="closeModal('viewModal')">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- Reply Modal -->
+<div class="modal-backdrop" id="replyModal">
+    <div class="modal-container modal-lg">
+        <div class="modal-header">
+            <h3>Reply to Inquiry</h3>
+            <button class="modal-close" onclick="closeModal('replyModal')">&times;</button>
+        </div>
+        <form id="replyForm" method="POST" action="{% url 'dashboard_inquiry_reply' %}">
+            {% csrf_token %}
+            <input type="hidden" name="inquiry_id" id="replyInquiryId">
+            <div class="modal-body">
+                <div class="reply-to-info">
+                    <strong>To:</strong> <span id="replyToName"></span> &lt;<span id="replyToEmail"></span>&gt;
+                </div>
+
+                <div class="form-group">
+                    <label>Subject</label>
+                    <input type="text" name="reply_subject" id="replySubject" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Message <span class="required">*</span></label>
+                    <textarea name="reply_message" id="replyMessage" rows="10" required placeholder="Type your reply here..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="mark_as_replied" checked>
+                        <span>Mark inquiry as "Replied" after sending</span>
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="md-btn md-btn-secondary" onclick="closeModal('replyModal')">Cancel</button>
+                <button type="submit" class="md-btn md-btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" x2="11" y1="2" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    Send Reply
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Status Modal -->
+<div class="modal-backdrop" id="statusModal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3>Update Status</h3>
+            <button class="modal-close" onclick="closeModal('statusModal')">&times;</button>
+        </div>
+        <form id="statusForm" method="POST" action="{% url 'dashboard_inquiry_status' %}">
+            {% csrf_token %}
+            <input type="hidden" name="inquiry_id" id="statusInquiryId">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Status</label>
+                    <div class="status-options">
+                        <label class="status-option">
+                            <input type="radio" name="status" value="new">
+                            <span class="status-badge new">New</span>
+                        </label>
+                        <label class="status-option">
+                            <input type="radio" name="status" value="in_progress">
+                            <span class="status-badge in-progress">In Progress</span>
+                        </label>
+                        <label class="status-option">
+                            <input type="radio" name="status" value="replied">
+                            <span class="status-badge replied">Replied</span>
+                        </label>
+                        <label class="status-option">
+                            <input type="radio" name="status" value="resolved">
+                            <span class="status-badge resolved">Resolved</span>
+                        </label>
+                        <label class="status-option">
+                            <input type="radio" name="status" value="archived">
+                            <span class="status-badge archived">Archived</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Internal Notes</label>
+                    <textarea name="internal_notes" rows="3" placeholder="Add internal notes (not visible to sender)..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="md-btn md-btn-secondary" onclick="closeModal('statusModal')">Cancel</button>
+                <button type="submit" class="md-btn md-btn-primary">Update Status</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+/* Header Stats */
+.header-stats {
+    display: flex;
+    gap: 12px;
+}
+
+.stat-badge {
+    padding: 8px 16px;
+    border-radius: 100px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.stat-badge.new { background: #fef3c7; color: #92400e; }
+.stat-badge.in-progress { background: #e0f2fe; color: #0369a1; }
+.stat-badge.total { background: #f1f5f9; color: #475569; }
+
+/* Filters */
+.filters-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.filter-tabs {
+    display: flex;
+    gap: 8px;
+}
+
+.filter-tab {
+    padding: 8px 16px;
+    border: none;
+    background: transparent;
+    color: #64748b;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.filter-tab:hover {
+    background: #f1f5f9;
+}
+
+.filter-tab.active {
+    background: #0f172a;
+    color: #ffffff;
+}
+
+.filter-types select {
+    padding: 8px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    background: #ffffff;
+    cursor: pointer;
+}
+
+/* Inquiries List */
+.inquiries-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.inquiry-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.2s;
+}
+
+.inquiry-card:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.inquiry-card.hidden {
+    display: none;
+}
+
+/* Inquiry Header */
+.inquiry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.inquiry-type-badge {
+    padding: 4px 12px;
+    border-radius: 100px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.inquiry-type-badge.general { background: #e0f2fe; color: #0369a1; }
+.inquiry-type-badge.media { background: #f3e8ff; color: #7c3aed; }
+.inquiry-type-badge.secure_tip { background: #dcfce7; color: #166534; }
+.inquiry-type-badge.encrypted { background: #fef3c7; color: #92400e; }
+
+.inquiry-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.inquiry-date {
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+.urgency-indicator {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.urgency-indicator.high { background: #fef3c7; color: #92400e; }
+.urgency-indicator.critical { background: #fee2e2; color: #991b1b; }
+
+/* Inquiry Body */
+.inquiry-body {
+    margin-bottom: 16px;
+}
+
+.inquiry-from {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.inquiry-from strong {
+    font-size: 1rem;
+    color: #0f172a;
+}
+
+.inquiry-email {
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+.anonymous-badge {
+    padding: 2px 8px;
+    background: #f1f5f9;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #64748b;
+}
+
+.ref-code {
+    font-size: 0.8rem;
+    color: #64748b;
+    font-family: monospace;
+}
+
+.inquiry-subject {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin: 8px 0;
+}
+
+.inquiry-message {
+    font-size: 0.9rem;
+    color: #475569;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.inquiry-detail {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin-top: 8px;
+}
+
+.inquiry-detail strong {
+    color: #374151;
+}
+
+/* Inquiry Footer */
+.inquiry-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 16px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.inquiry-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.status-new .status-dot { background: #f59e0b; }
+.status-in_progress .status-dot { background: #3b82f6; }
+.status-replied .status-dot { background: #8b5cf6; }
+.status-resolved .status-dot { background: #10b981; }
+.status-archived .status-dot { background: #94a3b8; }
+
+.inquiry-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.action-btn:hover {
+    border-color: #cbd5e1;
+    background: #f8fafc;
+}
+
+.action-btn.reply-btn:hover {
+    border-color: #3b82f6;
+    color: #3b82f6;
+}
+
+/* Modal Styles */
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 24px;
+}
+
+.modal-backdrop.active {
+    display: flex;
+}
+
+.modal-container {
+    background: #ffffff;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-container.modal-lg {
+    max-width: 700px;
+}
+
+.modal-container form {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e2e8f0;
+    flex-shrink: 0;
+}
+
+.modal-header h3 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin: 0;
+}
+
+.modal-close {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: #f1f5f9;
+    border-radius: 8px;
+    font-size: 1.25rem;
+    color: #64748b;
+    cursor: pointer;
+}
+
+.modal-body {
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 24px;
+    border-top: 1px solid #e2e8f0;
+    flex-shrink: 0;
+}
+
+/* Reply Modal Specific */
+.reply-to-info {
+    padding: 12px 16px;
+    background: #f8fafc;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+}
+
+/* Status Options */
+.status-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.status-option {
+    cursor: pointer;
+}
+
+.status-option input {
+    display: none;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+}
+
+.status-badge.new { background: #fef3c7; color: #92400e; }
+.status-badge.in-progress { background: #e0f2fe; color: #0369a1; }
+.status-badge.replied { background: #f3e8ff; color: #7c3aed; }
+.status-badge.resolved { background: #dcfce7; color: #166534; }
+.status-badge.archived { background: #f1f5f9; color: #64748b; }
+
+.status-option input:checked + .status-badge {
+    border-color: currentColor;
+}
+
+/* Form Elements */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 8px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #0f172a;
+    box-shadow: 0 0 0 3px rgba(15,23,42,0.1);
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.checkbox-label input {
+    width: 18px;
+    height: 18px;
+    accent-color: #0f172a;
+}
+
+.required {
+    color: #dc2626;
+}
+
+/* Buttons */
+.md-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+}
+
+.md-btn-primary {
+    background: #0f172a;
+    color: #ffffff;
+}
+
+.md-btn-primary:hover {
+    background: #1e293b;
+}
+
+.md-btn-secondary {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.md-btn-secondary:hover {
+    background: #e2e8f0;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 80px 24px;
+    background: #ffffff;
+    border: 1px dashed #e2e8f0;
+    border-radius: 12px;
+}
+
+.empty-state svg {
+    color: #94a3b8;
+    margin-bottom: 16px;
+}
+
+.empty-state h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #374151;
+    margin: 0 0 8px 0;
+}
+
+.empty-state p {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin: 0;
+}
+
+/* View Modal Content */
+.inquiry-detail-section {
+    margin-bottom: 24px;
+}
+
+.inquiry-detail-section h4 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    margin: 0 0 12px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.inquiry-detail-row {
+    display: flex;
+    margin-bottom: 8px;
+}
+
+.inquiry-detail-row strong {
+    width: 140px;
+    flex-shrink: 0;
+    font-size: 0.875rem;
+    color: #64748b;
+}
+
+.inquiry-detail-row span {
+    font-size: 0.875rem;
+    color: #0f172a;
+}
+
+.inquiry-full-message {
+    background: #f8fafc;
+    padding: 16px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: #374151;
+    white-space: pre-wrap;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .filters-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filter-tabs {
+        overflow-x: auto;
+        padding-bottom: 4px;
+    }
+
+    .header-stats {
+        display: none;
+    }
+
+    .inquiry-footer {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .inquiry-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+</style>
+
+<script>
+// Filter functionality
+document.querySelectorAll('.filter-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        filterInquiries();
+    });
+});
+
+function filterByType(type) {
+    filterInquiries();
+}
+
+function filterInquiries() {
+    const statusFilter = document.querySelector('.filter-tab.active').dataset.filter;
+    const typeFilter = document.getElementById('typeFilter').value;
+
+    document.querySelectorAll('.inquiry-card').forEach(card => {
+        const cardStatus = card.dataset.status;
+        const cardType = card.dataset.type;
+
+        let showByStatus = statusFilter === 'all' || cardStatus === statusFilter;
+        let showByType = !typeFilter || cardType === typeFilter;
+
+        if (showByStatus && showByType) {
+            card.classList.remove('hidden');
+        } else {
+            card.classList.add('hidden');
+        }
+    });
+}
+
+// Modal functions
+function openModal(modalId) {
+    document.getElementById(modalId).classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+// View inquiry
+function viewInquiry(id) {
+    fetch('{% url "dashboard_inquiry_get" %}?id=' + id)
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                const item = data.item;
+                let html = `
+                    <div class="inquiry-detail-section">
+                        <h4>Contact Information</h4>
+                        <div class="inquiry-detail-row"><strong>Type:</strong> <span>${item.inquiry_type}</span></div>
+                        ${item.full_name ? `<div class="inquiry-detail-row"><strong>Name:</strong> <span>${item.full_name}</span></div>` : ''}
+                        ${item.email ? `<div class="inquiry-detail-row"><strong>Email:</strong> <span>${item.email}</span></div>` : ''}
+                        ${item.phone ? `<div class="inquiry-detail-row"><strong>Phone:</strong> <span>${item.phone}</span></div>` : ''}
+                        ${item.organization ? `<div class="inquiry-detail-row"><strong>Organization:</strong> <span>${item.organization}</span></div>` : ''}
+                        ${item.media_outlet ? `<div class="inquiry-detail-row"><strong>Media Outlet:</strong> <span>${item.media_outlet}</span></div>` : ''}
+                        ${item.is_anonymous ? `<div class="inquiry-detail-row"><strong>Anonymous:</strong> <span>Yes (Ref: ${item.tip_reference_code || 'N/A'})</span></div>` : ''}
+                    </div>
+                    <div class="inquiry-detail-section">
+                        <h4>Message</h4>
+                        ${item.subject ? `<div class="inquiry-detail-row"><strong>Subject:</strong> <span>${item.subject}</span></div>` : ''}
+                        <div class="inquiry-full-message">${item.message || 'No message'}</div>
+                    </div>
+                    ${item.preferred_secure_channel ? `
+                    <div class="inquiry-detail-section">
+                        <h4>Secure Contact</h4>
+                        <div class="inquiry-detail-row"><strong>Channel:</strong> <span>${item.preferred_secure_channel}</span></div>
+                        ${item.secure_contact_handle ? `<div class="inquiry-detail-row"><strong>Handle:</strong> <span>${item.secure_contact_handle}</span></div>` : ''}
+                        ${item.pgp_public_key ? `<div class="inquiry-detail-row"><strong>PGP Key:</strong> <span>Provided</span></div>` : ''}
+                    </div>
+                    ` : ''}
+                    ${item.reply_message ? `
+                    <div class="inquiry-detail-section">
+                        <h4>Reply Sent</h4>
+                        <div class="inquiry-detail-row"><strong>Replied At:</strong> <span>${item.replied_at || 'N/A'}</span></div>
+                        <div class="inquiry-full-message">${item.reply_message}</div>
+                    </div>
+                    ` : ''}
+                    ${item.internal_notes ? `
+                    <div class="inquiry-detail-section">
+                        <h4>Internal Notes</h4>
+                        <div class="inquiry-full-message">${item.internal_notes}</div>
+                    </div>
+                    ` : ''}
+                `;
+                document.getElementById('viewModalContent').innerHTML = html;
+                openModal('viewModal');
+            }
+        });
+}
+
+// Reply modal
+function openReplyModal(id, email, name, subject) {
+    document.getElementById('replyInquiryId').value = id;
+    document.getElementById('replyToEmail').textContent = email;
+    document.getElementById('replyToName').textContent = name || 'Unknown';
+    document.getElementById('replySubject').value = 'Re: ' + (subject || 'Your inquiry to RATEL Movement');
+    openModal('replyModal');
+}
+
+// Status modal
+function openStatusModal(id, currentStatus) {
+    document.getElementById('statusInquiryId').value = id;
+    // Check the current status radio
+    const radio = document.querySelector(`input[name="status"][value="${currentStatus}"]`);
+    if (radio) radio.checked = true;
+    openModal('statusModal');
+}
+
+// Form submissions with AJAX
+document.getElementById('replyForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+
+    try {
+        const response = await fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        const data = await response.json();
+
+        if (data.success) {
+            alert('Reply sent successfully!');
+            closeModal('replyModal');
+            location.reload();
+        } else {
+            alert('Error: ' + (data.error || 'Failed to send reply'));
+        }
+    } catch (error) {
+        alert('Network error. Please try again.');
+    }
+});
+
+document.getElementById('statusForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+
+    try {
+        const response = await fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        const data = await response.json();
+
+        if (data.success) {
+            closeModal('statusModal');
+            location.reload();
+        } else {
+            alert('Error: ' + (data.error || 'Failed to update status'));
+        }
+    } catch (error) {
+        alert('Network error. Please try again.');
+    }
+});
+
+// Close modal on backdrop click
+document.querySelectorAll('.modal-backdrop').forEach(modal => {
+    modal.addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    });
+});
+</script>
+{% endblock %}

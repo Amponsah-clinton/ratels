@@ -1,0 +1,944 @@
+{% extends "member/base_member.html" %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Profile Header */
+    .profile-header {
+        background: #fff;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1.5rem;
+    }
+    @media (max-width: 768px) {
+        .profile-header {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+    }
+
+    .profile-header-left {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+        flex: 1;
+    }
+    @media (max-width: 768px) {
+        .profile-header-left {
+            flex-direction: column;
+        }
+    }
+
+    .profile-info h1 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0 0 0.25rem 0;
+    }
+    .profile-info-email {
+        color: #64748b;
+        font-size: 0.9rem;
+        margin: 0 0 0.75rem 0;
+    }
+    .profile-info-badges {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    @media (max-width: 768px) {
+        .profile-info-badges {
+            justify-content: center;
+        }
+    }
+    .info-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.35rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+    .info-badge.verified {
+        background: #dcfce7;
+        color: #166534;
+    }
+    .info-badge.member-id {
+        background: #0f172a;
+        color: #fff;
+        font-family: 'Courier New', monospace;
+        letter-spacing: 0.03em;
+    }
+    .info-badge i {
+        width: 12px;
+        height: 12px;
+    }
+    .profile-header-actions {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+    }
+    @media (max-width: 768px) {
+        .profile-header-actions {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+    .btn-edit-profile {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.625rem 1.25rem;
+        background: #1e293b;
+        color: #fff;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border: none;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: background 0.2s;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .btn-edit-profile:hover {
+        background: #334155;
+        color: #fff;
+    }
+    .btn-edit-profile i {
+        width: 16px;
+        height: 16px;
+    }
+
+    /* Profile Photo Upload */
+    .profile-photo-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    .profile-photo-wrapper {
+        position: relative;
+    }
+    .profile-photo {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #64748b;
+        border: 3px solid #e2e8f0;
+        overflow: hidden;
+    }
+    .profile-photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .photo-upload-btn {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 32px;
+        height: 32px;
+        background: #1e293b;
+        border: 2px solid #fff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .photo-upload-btn:hover {
+        background: #334155;
+    }
+    .photo-upload-btn i {
+        width: 14px;
+        height: 14px;
+        color: #fff;
+    }
+    .photo-upload-btn input {
+        display: none;
+    }
+    .photo-hint {
+        font-size: 0.7rem;
+        color: #94a3b8;
+        text-align: center;
+    }
+    .photo-save-btn {
+        display: none;
+        margin-top: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: #16a34a;
+        color: #fff;
+        font-size: 0.8rem;
+        font-weight: 500;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .photo-save-btn:hover {
+        background: #15803d;
+    }
+    .photo-save-btn.show {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+    .photo-save-btn i {
+        width: 14px;
+        height: 14px;
+    }
+    .photo-save-btn.saving {
+        background: #64748b;
+        cursor: not-allowed;
+    }
+
+    /* Toast notification */
+    .toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .toast {
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 0.9rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        animation: slideIn 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    .toast.success {
+        background: #166534;
+        color: #fff;
+    }
+    .toast.error {
+        background: #991b1b;
+        color: #fff;
+    }
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
+
+    /* Cards Grid */
+    .profile-cards-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+    @media (max-width: 1024px) {
+        .profile-cards-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .profile-card {
+        background: #fff;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+    }
+    .profile-card.full-width {
+        grid-column: 1 / -1;
+    }
+    .profile-card-header {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .profile-card-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 0;
+    }
+    .profile-card-title i {
+        width: 18px;
+        height: 18px;
+        color: #64748b;
+    }
+    .profile-card-body {
+        padding: 1.25rem;
+    }
+
+    /* Form Styles */
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+    .form-group:last-child {
+        margin-bottom: 0;
+    }
+    .form-label {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #475569;
+        margin-bottom: 0.5rem;
+    }
+    .form-input {
+        width: 100%;
+        padding: 0.625rem 0.875rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        color: #1e293b;
+        transition: all 0.2s;
+        box-sizing: border-box;
+    }
+    .form-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    .form-input:disabled {
+        background: #f8fafc;
+        color: #64748b;
+    }
+    .form-select {
+        width: 100%;
+        padding: 0.625rem 0.875rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        color: #1e293b;
+        background: #fff;
+        cursor: pointer;
+        box-sizing: border-box;
+    }
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+    @media (max-width: 640px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+    }
+    .info-text {
+        font-size: 0.75rem;
+        color: #64748b;
+        margin-top: 0.35rem;
+    }
+
+    /* Buttons */
+    .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.625rem 1.25rem;
+        background: #1e293b;
+        color: #fff;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .btn-primary:hover {
+        background: #334155;
+    }
+    .btn-primary i {
+        width: 16px;
+        height: 16px;
+    }
+    .btn-secondary {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.625rem 1.25rem;
+        background: #fff;
+        color: #475569;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .btn-secondary:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+    }
+    .form-actions {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    /* Member Info Grid */
+    .member-info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+    @media (max-width: 640px) {
+        .member-info-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    .member-info-item {
+        padding: 1rem;
+        background: #f8fafc;
+        border-radius: 8px;
+    }
+    .member-info-label {
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #94a3b8;
+        margin-bottom: 0.25rem;
+    }
+    .member-info-value {
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: #1e293b;
+    }
+
+    /* Notification Options */
+    .notification-option {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        cursor: pointer;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .notification-option:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+    .notification-option:first-child {
+        padding-top: 0;
+    }
+    .notification-option input {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+        accent-color: #1e293b;
+    }
+    .notification-option-text strong {
+        display: block;
+        font-size: 0.9rem;
+        color: #1e293b;
+        font-weight: 500;
+    }
+    .notification-option-text span {
+        font-size: 0.8rem;
+        color: #64748b;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- CSRF Token for AJAX -->
+{% csrf_token %}
+
+<!-- Profile Header with Photo Upload -->
+<div class="profile-header">
+    <div class="profile-header-left">
+        <div class="profile-photo-section">
+            <div class="profile-photo-wrapper">
+                <div class="profile-photo" id="profilePhoto">
+                    {% if profile_image_url %}
+                        <img src="{{ profile_image_url }}" alt="Profile Photo" id="photoPreview">
+                    {% else %}
+                        <span id="photoInitials">{{ member_initials|default:"M" }}</span>
+                    {% endif %}
+                </div>
+                <label class="photo-upload-btn" title="Upload Photo">
+                    <i data-lucide="camera"></i>
+                    <input type="file" id="photoInput" accept="image/*" onchange="previewPhoto(this)">
+                </label>
+            </div>
+            <span class="photo-hint">Click to upload photo</span>
+            <button type="button" class="photo-save-btn" id="photoSaveBtn" onclick="saveProfilePhoto()">
+                <i data-lucide="upload"></i>
+                <span class="btn-text">Save Photo</span>
+            </button>
+        </div>
+        <div class="profile-info">
+            <h1>{{ member_name|default:"Member Name" }}</h1>
+            <p class="profile-info-email">{{ member_email|default:"member@example.com" }}</p>
+            <div class="profile-info-badges">
+                <span class="info-badge verified">
+                    <i data-lucide="shield-check"></i>
+                    Verified Member
+                </span>
+                <span class="info-badge member-id">
+                    <i data-lucide="fingerprint"></i>
+                    {{ member_id|default:"RATEL-NG-LAG-000001" }}
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="profile-header-actions">
+        <a href="#profileForm" class="btn-edit-profile">
+            <i data-lucide="pencil"></i>
+            Edit profile
+        </a>
+    </div>
+</div>
+
+<!-- Profile Cards Grid -->
+<div class="profile-cards-grid">
+    <!-- Member Information -->
+    <div class="profile-card">
+        <div class="profile-card-header">
+            <h3 class="profile-card-title">
+                <i data-lucide="id-card"></i>
+                Member Information
+            </h3>
+        </div>
+        <div class="profile-card-body">
+            <div class="member-info-grid">
+                <div class="member-info-item">
+                    <div class="member-info-label">Country</div>
+                    <div class="member-info-value">{{ member_country|default:"Nigeria" }}</div>
+                </div>
+                <div class="member-info-item">
+                    <div class="member-info-label">State</div>
+                    <div class="member-info-value">{{ member_state|default:"Lagos" }}</div>
+                </div>
+                <div class="member-info-item">
+                    <div class="member-info-label">Local Government</div>
+                    <div class="member-info-value">{{ member_lga|default:"Ikeja" }}</div>
+                </div>
+                <div class="member-info-item">
+                    <div class="member-info-label">Member Since</div>
+                    <div class="member-info-value">{{ member_joined|default:"January 2024" }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Account Stats -->
+    <div class="profile-card">
+        <div class="profile-card-header">
+            <h3 class="profile-card-title">
+                <i data-lucide="bar-chart-3"></i>
+                Account Overview
+            </h3>
+        </div>
+        <div class="profile-card-body">
+            <div class="member-info-grid">
+                <div class="member-info-item">
+                    <div class="member-info-label">Status</div>
+                    <div class="member-info-value">{{ member_type|default:"Nigerian" }}</div>
+                </div>
+                <div class="member-info-item">
+                    <div class="member-info-label">Year Joined</div>
+                    <div class="member-info-value">{{ member_since|default:"2024" }}</div>
+                </div>
+                <div class="member-info-item">
+                    <div class="member-info-label">Member Number</div>
+                    <div class="member-info-value">#{{ member_number|default:"3" }}</div>
+                </div>
+                <div class="member-info-item">
+                    <div class="member-info-label">Account Status</div>
+                    <div class="member-info-value" style="color:#16a34a;">Active</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Personal Information -->
+    <div class="profile-card full-width">
+        <div class="profile-card-header">
+            <h3 class="profile-card-title">
+                <i data-lucide="user"></i>
+                Personal Information
+            </h3>
+        </div>
+        <div class="profile-card-body">
+            <form id="profileForm" class="profile-edit-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">First Name</label>
+                        <input type="text" class="form-input" name="first_name" value="{{ member_first_name|default:'' }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Last Name</label>
+                        <input type="text" class="form-input" name="last_name" value="{{ member_last_name|default:'' }}">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" class="form-input" name="email" value="{{ member_email|default:'' }}" disabled>
+                        <p class="info-text">Contact support to change your email address.</p>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone Number</label>
+                        <input type="tel" class="form-input" name="phone" value="{{ member_phone|default:'' }}" placeholder="+234 XXX XXX XXXX">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Nationality</label>
+                        <select class="form-select" name="nationality">
+                            <option value="nigerian" {% if member_nationality == 'nigerian' %}selected{% endif %}>Nigerian</option>
+                            <option value="foreigner" {% if member_nationality == 'foreigner' %}selected{% endif %}>Non-Nigerian</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Location / City</label>
+                        <input type="text" class="form-input" name="location" value="{{ member_location|default:'' }}" placeholder="e.g., Lagos, Nigeria">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">
+                        <i data-lucide="save"></i>
+                        Save Changes
+                    </button>
+                    <button type="button" class="btn-secondary" onclick="document.getElementById('profileForm').reset()">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Security Settings -->
+    <div class="profile-card">
+        <div class="profile-card-header">
+            <h3 class="profile-card-title">
+                <i data-lucide="lock"></i>
+                Security
+            </h3>
+        </div>
+        <div class="profile-card-body">
+            <form id="passwordForm">
+                <div class="form-group">
+                    <label class="form-label">Current Password <span style="color:#ef4444;">*</span></label>
+                    <div style="position:relative;">
+                        <input type="password" class="form-input" id="currentPassword" name="current_password" placeholder="Enter current password" required style="padding-right:45px;">
+                        <button type="button" onclick="togglePasswordVisibility('currentPassword')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#64748b;">
+                            <i data-lucide="eye" style="width:18px;height:18px;"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">New Password <span style="color:#ef4444;">*</span></label>
+                    <div style="position:relative;">
+                        <input type="password" class="form-input" id="newPassword" name="new_password" placeholder="Enter new password (min. 8 characters)" required minlength="8" style="padding-right:45px;">
+                        <button type="button" onclick="togglePasswordVisibility('newPassword')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#64748b;">
+                            <i data-lucide="eye" style="width:18px;height:18px;"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Confirm New Password <span style="color:#ef4444;">*</span></label>
+                    <div style="position:relative;">
+                        <input type="password" class="form-input" id="confirmPassword" name="confirm_password" placeholder="Confirm new password" required style="padding-right:45px;">
+                        <button type="button" onclick="togglePasswordVisibility('confirmPassword')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#64748b;">
+                            <i data-lucide="eye" style="width:18px;height:18px;"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">
+                        <i data-lucide="lock"></i>
+                        Update Password
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification Preferences -->
+    <div class="profile-card">
+        <div class="profile-card-header">
+            <h3 class="profile-card-title">
+                <i data-lucide="bell"></i>
+                Notifications
+            </h3>
+        </div>
+        <div class="profile-card-body">
+            <label class="notification-option">
+                <input type="checkbox" checked>
+                <span class="notification-option-text">
+                    <strong>Email Notifications</strong>
+                    <span>Receive announcements via email</span>
+                </span>
+            </label>
+            <label class="notification-option">
+                <input type="checkbox">
+                <span class="notification-option-text">
+                    <strong>SMS Notifications</strong>
+                    <span>Receive urgent alerts via SMS</span>
+                </span>
+            </label>
+            <label class="notification-option">
+                <input type="checkbox" checked>
+                <span class="notification-option-text">
+                    <strong>Event Reminders</strong>
+                    <span>Get notified about events</span>
+                </span>
+            </label>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<!-- Toast container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// Toast notification
+function showToast(message, type) {
+    var container = document.getElementById('toastContainer');
+    var toast = document.createElement('div');
+    toast.className = 'toast ' + type;
+    toast.innerHTML = (type === 'success' ? '&#10003; ' : '&#10007; ') + message;
+    container.appendChild(toast);
+
+    setTimeout(function() {
+        toast.style.animation = 'slideOut 0.3s ease forwards';
+        setTimeout(function() {
+            if (toast.parentNode) toast.parentNode.removeChild(toast);
+        }, 300);
+    }, 4000);
+}
+
+// CSRF token helper
+function getCsrfToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]')?.value ||
+           document.cookie.split(';').find(c => c.trim().startsWith('csrftoken='))?.split('=')[1] || '';
+}
+
+// Profile form submission
+document.getElementById('profileForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var formData = new FormData(this);
+
+    fetch('/member/profile/update/', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': getCsrfToken()
+        },
+        credentials: 'same-origin'
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+        if (data.success) {
+            showToast('Profile updated successfully!', 'success');
+        } else {
+            showToast(data.error || 'Failed to update profile', 'error');
+        }
+    })
+    .catch(function(error) {
+        showToast('Network error. Please try again.', 'error');
+    });
+});
+
+// Password form submission
+document.getElementById('passwordForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var form = this;
+    var formData = new FormData(form);
+    var submitBtn = form.querySelector('button[type="submit"]');
+    var originalBtnText = submitBtn.innerHTML;
+
+    var currentPass = formData.get('current_password');
+    var newPass = formData.get('new_password');
+    var confirmPass = formData.get('confirm_password');
+
+    // Validation
+    if (!currentPass) {
+        showToast('Please enter your current password', 'error');
+        return;
+    }
+
+    if (!newPass) {
+        showToast('Please enter a new password', 'error');
+        return;
+    }
+
+    if (!confirmPass) {
+        showToast('Please confirm your new password', 'error');
+        return;
+    }
+
+    if (newPass !== confirmPass) {
+        showToast('New passwords do not match', 'error');
+        return;
+    }
+
+    if (newPass.length < 8) {
+        showToast('New password must be at least 8 characters', 'error');
+        return;
+    }
+
+    // Show loading state
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i data-lucide="loader-2" class="animate-spin"></i> Updating...';
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+
+    fetch('/member/profile/password/', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': getCsrfToken()
+        },
+        credentials: 'same-origin'
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnText;
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+
+        if (data.success) {
+            showToast('Password updated successfully!', 'success');
+            form.reset();
+        } else {
+            showToast(data.error || 'Failed to update password', 'error');
+        }
+    })
+    .catch(function(error) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnText;
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+        console.error('Password update error:', error);
+        showToast('Network error. Please try again.', 'error');
+    });
+});
+
+// Photo preview
+function previewPhoto(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const photoDiv = document.getElementById('profilePhoto');
+            const initials = document.getElementById('photoInitials');
+            let img = document.getElementById('photoPreview');
+
+            if (initials) {
+                initials.style.display = 'none';
+            }
+
+            if (!img) {
+                img = document.createElement('img');
+                img.id = 'photoPreview';
+                img.alt = 'Profile Photo';
+                photoDiv.appendChild(img);
+            }
+
+            img.src = e.target.result;
+            img.style.display = 'block';
+
+            // Show the save button
+            document.getElementById('photoSaveBtn').classList.add('show');
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+// Save profile photo
+function saveProfilePhoto() {
+    var input = document.getElementById('photoInput');
+    if (!input.files || !input.files[0]) {
+        showToast('Please select a photo first', 'error');
+        return;
+    }
+
+    var btn = document.getElementById('photoSaveBtn');
+    var btnText = btn.querySelector('.btn-text');
+    var originalText = btnText.textContent;
+
+    btn.classList.add('saving');
+    btn.disabled = true;
+    btnText.textContent = 'Saving...';
+
+    var formData = new FormData();
+    formData.append('profile_image', input.files[0]);
+
+    fetch('/member/profile/photo/', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': getCsrfToken()
+        },
+        credentials: 'same-origin'
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+        btn.classList.remove('saving');
+        btn.disabled = false;
+        btnText.textContent = originalText;
+
+        if (data.success) {
+            showToast('Profile photo updated successfully!', 'success');
+            btn.classList.remove('show');
+            // Update the preview with the new URL if returned
+            if (data.image_url) {
+                var img = document.getElementById('photoPreview');
+                if (img) img.src = data.image_url;
+            }
+        } else {
+            showToast(data.error || 'Failed to upload photo', 'error');
+        }
+    })
+    .catch(function(error) {
+        btn.classList.remove('saving');
+        btn.disabled = false;
+        btnText.textContent = originalText;
+        showToast('Network error. Please try again.', 'error');
+    });
+}
+
+// Toggle password visibility
+function togglePasswordVisibility(inputId) {
+    var input = document.getElementById(inputId);
+    var icon = input.parentElement.querySelector('i');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.setAttribute('data-lucide', 'eye-off');
+    } else {
+        input.type = 'password';
+        icon.setAttribute('data-lucide', 'eye');
+    }
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+// Reinitialize lucide icons after page load
+if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+}
+</script>
+{% endblock %}

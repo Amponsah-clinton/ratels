@@ -1,0 +1,625 @@
+{% extends "dashboard/base_dashboard.html" %}
+
+{% block title %}Announcements Management{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    .page-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+    }
+    .page-subtitle {
+        font-size: 0.9rem;
+        color: #64748b;
+        margin: 0.25rem 0 0 0;
+    }
+
+    .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.625rem 1.25rem;
+        background: #1e293b;
+        color: #fff;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .btn-primary:hover {
+        background: #334155;
+    }
+
+    .filter-tabs {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .filter-tab {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #64748b;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    .filter-tab:hover {
+        background: #f1f5f9;
+        color: #334155;
+    }
+    .filter-tab.active {
+        background: #1e293b;
+        color: #fff;
+        border-color: #1e293b;
+    }
+
+    .announcement-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+        transition: all 0.2s;
+    }
+    .announcement-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    .announcement-card.pinned {
+        border-left: 4px solid #f59e0b;
+    }
+    .announcement-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 0.75rem;
+    }
+    .announcement-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .announcement-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+    }
+    .meta-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.8rem;
+        color: #64748b;
+    }
+    .announcement-summary {
+        font-size: 0.9rem;
+        color: #475569;
+        line-height: 1.6;
+        margin: 0;
+    }
+    .announcement-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.2rem 0.6rem;
+        font-size: 0.7rem;
+        font-weight: 600;
+        border-radius: 50px;
+        text-transform: uppercase;
+    }
+    .badge-all { background: #dbeafe; color: #1e40af; }
+    .badge-nigerians { background: #dcfce7; color: #166534; }
+    .badge-foreigners { background: #fef3c7; color: #92400e; }
+    .badge-high { background: #fee2e2; color: #991b1b; }
+    .badge-normal { background: #f1f5f9; color: #475569; }
+    .badge-pinned { background: #fef3c7; color: #92400e; }
+
+    .btn-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border: 1px solid #e5e7eb;
+        background: #fff;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .btn-icon:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+    }
+    .btn-icon.danger:hover {
+        background: #fef2f2;
+        border-color: #fecaca;
+        color: #dc2626;
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+    }
+    .modal-overlay.active {
+        display: flex;
+    }
+    .modal-content {
+        background: #fff;
+        border-radius: 16px;
+        width: 100%;
+        max-width: 650px;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .modal-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+    }
+    .modal-close {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #64748b;
+        padding: 0.25rem;
+    }
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+    .form-label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+    .form-input, .form-select, .form-textarea {
+        width: 100%;
+        padding: 0.625rem 0.875rem;
+        font-size: 0.9rem;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        background: #fff;
+        transition: all 0.2s;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+        outline: none;
+        border-color: #1e293b;
+        box-shadow: 0 0 0 3px rgba(30,41,59,0.1);
+    }
+    .form-textarea {
+        resize: vertical;
+        min-height: 120px;
+    }
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+    @media (max-width: 640px) {
+        .form-row { grid-template-columns: 1fr; }
+    }
+
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .form-checkbox {
+        width: 18px;
+        height: 18px;
+        accent-color: #1e293b;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 0.75rem;
+        justify-content: flex-end;
+        padding-top: 1rem;
+        border-top: 1px solid #e5e7eb;
+        margin-top: 1.5rem;
+    }
+    .btn-cancel {
+        padding: 0.625rem 1.25rem;
+        background: #fff;
+        color: #64748b;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+    .btn-cancel:hover {
+        background: #f8fafc;
+        color: #1e293b;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        background: #f8fafc;
+        border-radius: 12px;
+        border: 2px dashed #e2e8f0;
+    }
+    .empty-state-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+    }
+    .empty-state-text {
+        color: #64748b;
+        margin-bottom: 1.5rem;
+    }
+
+    .recipient-selector {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    .recipient-option {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .recipient-option:hover {
+        border-color: #cbd5e1;
+    }
+    .recipient-option.selected {
+        border-color: #1e293b;
+        background: #f8fafc;
+    }
+    .recipient-option input {
+        display: none;
+    }
+    .recipient-icon {
+        width: 20px;
+        height: 20px;
+        color: #64748b;
+    }
+    .recipient-option.selected .recipient-icon {
+        color: #1e293b;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Internal Announcements</h1>
+        <p class="page-subtitle">Manage announcements for members</p>
+    </div>
+    <button type="button" class="btn-primary" onclick="openModal()">
+        <i data-lucide="plus" style="width:18px;height:18px;"></i>
+        New Announcement
+    </button>
+</div>
+
+<!-- Filter Tabs -->
+<div class="filter-tabs">
+    <a href="{% url 'dashboard_announcements' %}" class="filter-tab {% if not current_filter %}active{% endif %}">All</a>
+    <a href="{% url 'dashboard_announcements' %}?filter=all_members" class="filter-tab {% if current_filter == 'all_members' %}active{% endif %}">All Members</a>
+    <a href="{% url 'dashboard_announcements' %}?filter=nigerians" class="filter-tab {% if current_filter == 'nigerians' %}active{% endif %}">Nigerians Only</a>
+    <a href="{% url 'dashboard_announcements' %}?filter=foreigners" class="filter-tab {% if current_filter == 'foreigners' %}active{% endif %}">Foreigners Only</a>
+</div>
+
+<!-- Announcements List -->
+{% if announcements %}
+    {% for ann in announcements %}
+    <div class="announcement-card {% if ann.is_pinned %}pinned{% endif %}">
+        <div class="announcement-header">
+            <h3 class="announcement-title">
+                {% if ann.is_pinned %}
+                <i data-lucide="pin" style="width:16px;height:16px;color:#f59e0b;"></i>
+                {% endif %}
+                {{ ann.title }}
+            </h3>
+            <div class="announcement-actions">
+                <button type="button" class="btn-icon" onclick="editAnnouncement('{{ ann.id }}')" title="Edit">
+                    <i data-lucide="pencil" style="width:14px;height:14px;"></i>
+                </button>
+                <button type="button" class="btn-icon danger" onclick="deleteAnnouncement('{{ ann.id }}', '{{ ann.title|escapejs }}')" title="Delete">
+                    <i data-lucide="trash-2" style="width:14px;height:14px;"></i>
+                </button>
+            </div>
+        </div>
+        <div class="announcement-meta">
+            <span class="badge badge-{% if ann.recipient_type == 'all_members' %}all{% elif ann.recipient_type == 'nigerians' %}nigerians{% else %}foreigners{% endif %}">
+                {% if ann.recipient_type == 'all_members' %}All Members{% elif ann.recipient_type == 'nigerians' %}Nigerians{% else %}Foreigners{% endif %}
+            </span>
+            <span class="badge badge-{{ ann.priority }}">{{ ann.priority }}</span>
+            {% if ann.is_pinned %}<span class="badge badge-pinned">Pinned</span>{% endif %}
+            <span class="meta-item">
+                <i data-lucide="user" style="width:12px;height:12px;"></i>
+                {{ ann.author_name|default:"Admin" }}
+            </span>
+            <span class="meta-item">
+                <i data-lucide="calendar" style="width:12px;height:12px;"></i>
+                {{ ann.created_at|slice:":10" }}
+            </span>
+        </div>
+        <p class="announcement-summary">{{ ann.summary|default:ann.content|truncatewords:30 }}</p>
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="empty-state">
+        <h3 class="empty-state-title">No Announcements Yet</h3>
+        <p class="empty-state-text">Create your first announcement to communicate with members.</p>
+        <button type="button" class="btn-primary" onclick="openModal()">
+            <i data-lucide="plus" style="width:18px;height:18px;"></i>
+            Create Announcement
+        </button>
+    </div>
+{% endif %}
+
+<!-- Add/Edit Modal -->
+<div class="modal-overlay" id="announcementModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modalTitle">New Announcement</h3>
+            <button type="button" class="modal-close" onclick="closeModal()">
+                <i data-lucide="x" style="width:20px;height:20px;"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="announcementForm" method="POST" action="{% url 'dashboard_announcements_save' %}">
+                {% csrf_token %}
+                <input type="hidden" name="announcement_id" id="announcementId">
+
+                <div class="form-group">
+                    <label class="form-label">Title *</label>
+                    <input type="text" name="title" id="annTitle" class="form-input" required placeholder="Announcement title">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Recipients *</label>
+                    <div class="recipient-selector">
+                        <label class="recipient-option" id="opt-all">
+                            <input type="radio" name="recipient_type" value="all_members" checked>
+                            <svg class="recipient-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            <span>All Members</span>
+                        </label>
+                        <label class="recipient-option" id="opt-ng">
+                            <input type="radio" name="recipient_type" value="nigerians">
+                            <svg class="recipient-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                            <span>Nigerians Only</span>
+                        </label>
+                        <label class="recipient-option" id="opt-foreign">
+                            <input type="radio" name="recipient_type" value="foreigners">
+                            <svg class="recipient-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                            <span>Foreigners Only</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Category</label>
+                        <select name="category" id="annCategory" class="form-select">
+                            <option value="general">General</option>
+                            <option value="urgent">Urgent</option>
+                            <option value="meeting">Meeting</option>
+                            <option value="event">Event</option>
+                            <option value="resources">Resources</option>
+                            <option value="regional">Regional</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Priority</label>
+                        <select name="priority" id="annPriority" class="form-select">
+                            <option value="normal">Normal</option>
+                            <option value="high">High</option>
+                            <option value="low">Low</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Summary</label>
+                    <input type="text" name="summary" id="annSummary" class="form-input" placeholder="Brief summary (optional)">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Content *</label>
+                    <textarea name="content" id="annContent" class="form-textarea" required placeholder="Full announcement content..."></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Author Name</label>
+                        <input type="text" name="author_name" id="annAuthor" class="form-input" placeholder="e.g., Leadership Council">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Author Role</label>
+                        <input type="text" name="author_role" id="annRole" class="form-input" placeholder="e.g., Strategic Committee">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" name="is_pinned" id="annPinned" class="form-checkbox">
+                        <label for="annPinned">Pin this announcement (appears at top)</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" name="is_active" id="annActive" class="form-checkbox" checked>
+                        <label for="annActive">Active (visible to members)</label>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">
+                        <i data-lucide="save" style="width:16px;height:16px;"></i>
+                        Save Announcement
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Recipient selector styling
+    document.querySelectorAll('.recipient-option input').forEach(input => {
+        input.addEventListener('change', function() {
+            document.querySelectorAll('.recipient-option').forEach(opt => opt.classList.remove('selected'));
+            if (this.checked) {
+                this.closest('.recipient-option').classList.add('selected');
+            }
+        });
+        if (input.checked) {
+            input.closest('.recipient-option').classList.add('selected');
+        }
+    });
+
+    function openModal() {
+        document.getElementById('modalTitle').textContent = 'New Announcement';
+        document.getElementById('announcementForm').reset();
+        document.getElementById('announcementId').value = '';
+        document.getElementById('annActive').checked = true;
+        document.querySelectorAll('.recipient-option').forEach(opt => opt.classList.remove('selected'));
+        document.getElementById('opt-all').classList.add('selected');
+        document.querySelector('input[value="all_members"]').checked = true;
+        document.getElementById('announcementModal').classList.add('active');
+        lucide.createIcons();
+    }
+
+    function closeModal() {
+        document.getElementById('announcementModal').classList.remove('active');
+    }
+
+    async function editAnnouncement(id) {
+        try {
+            const response = await fetch('{% url "dashboard_announcements_get" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ id })
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                const ann = data.announcement;
+                document.getElementById('modalTitle').textContent = 'Edit Announcement';
+                document.getElementById('announcementId').value = ann.id;
+                document.getElementById('annTitle').value = ann.title || '';
+                document.getElementById('annSummary').value = ann.summary || '';
+                document.getElementById('annContent').value = ann.content || '';
+                document.getElementById('annCategory').value = ann.category || 'general';
+                document.getElementById('annPriority').value = ann.priority || 'normal';
+                document.getElementById('annAuthor').value = ann.author_name || '';
+                document.getElementById('annRole').value = ann.author_role || '';
+                document.getElementById('annPinned').checked = ann.is_pinned;
+                document.getElementById('annActive').checked = ann.is_active;
+
+                // Set recipient type
+                const recipientType = ann.recipient_type || 'all_members';
+                document.querySelector(`input[value="${recipientType}"]`).checked = true;
+                document.querySelectorAll('.recipient-option').forEach(opt => opt.classList.remove('selected'));
+                document.querySelector(`input[value="${recipientType}"]`).closest('.recipient-option').classList.add('selected');
+
+                document.getElementById('announcementModal').classList.add('active');
+                lucide.createIcons();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        } catch (error) {
+            alert('Error loading announcement: ' + error.message);
+        }
+    }
+
+    async function deleteAnnouncement(id, title) {
+        if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;
+
+        try {
+            const response = await fetch('{% url "dashboard_announcements_delete" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ id })
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        } catch (error) {
+            alert('Error deleting: ' + error.message);
+        }
+    }
+
+    document.getElementById('announcementModal').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeModal();
+    });
+</script>
+{% endblock %}

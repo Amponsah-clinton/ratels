@@ -1,0 +1,1349 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Messages Management - Dashboard{% endblock %}
+
+{% block page_title %}Share the Message{% endblock %}
+{% block page_subtitle %}Create shareable content for members to distribute{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Stats Grid */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 1.5rem;
+        border: 1px solid #e5e7eb;
+        transition: all 0.2s ease;
+    }
+
+    .stat-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .stat-card .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+    }
+
+    .stat-card .stat-icon.blue { background: #dbeafe; color: #2563eb; }
+    .stat-card .stat-icon.green { background: #dcfce7; color: #16a34a; }
+    .stat-card .stat-icon.purple { background: #f3e8ff; color: #9333ea; }
+    .stat-card .stat-icon.orange { background: #ffedd5; color: #ea580c; }
+
+    .stat-card .stat-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-card .stat-label {
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+
+    /* Category Tabs */
+    .category-tabs {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.5rem;
+        padding: 0.5rem;
+        background: #f9fafb;
+        border-radius: 12px;
+    }
+
+    .category-tab {
+        padding: 0.75rem 1.25rem;
+        border-radius: 8px;
+        border: none;
+        background: transparent;
+        color: #6b7280;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .category-tab:hover {
+        background: #fff;
+        color: #374151;
+    }
+
+    .category-tab.active {
+        background: #fff;
+        color: #2563eb;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .category-tab .count {
+        background: #e5e7eb;
+        color: #374151;
+        padding: 0.125rem 0.5rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+    }
+
+    .category-tab.active .count {
+        background: #dbeafe;
+        color: #2563eb;
+    }
+
+    /* Messages Grid */
+    .messages-container {
+        background: #fff;
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+        overflow: hidden;
+    }
+
+    .messages-container .messages-header {
+        overflow: visible;
+    }
+
+    .messages-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+        position: relative;
+        z-index: 1;
+    }
+
+    .messages-header h3 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #111827;
+    }
+
+    .add-message-btn {
+        display: flex !important;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.625rem 1rem;
+        background: #2563eb !important;
+        color: #fff !important;
+        border: none;
+        border-radius: 8px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.2s ease;
+        visibility: visible !important;
+        opacity: 1 !important;
+        position: relative;
+        z-index: 10;
+    }
+
+    .add-message-btn:hover {
+        background: #1d4ed8 !important;
+    }
+
+    .add-message-btn i {
+        width: 16px;
+        height: 16px;
+    }
+
+    .messages-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 1.5rem;
+        padding: 1.5rem;
+    }
+
+    /* Message Card */
+    .message-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.2s ease;
+    }
+
+    .message-card:hover {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .message-card.featured {
+        border-color: #fbbf24;
+        box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.2);
+    }
+
+    .message-card-media {
+        position: relative;
+        height: 180px;
+        background: #f3f4f6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .message-card-media img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .message-card-media .media-placeholder {
+        color: #9ca3af;
+    }
+
+    .message-card-media .featured-badge {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        background: #fbbf24;
+        color: #78350f;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .message-card-media .type-badge {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: rgba(0, 0, 0, 0.6);
+        color: #fff;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+    }
+
+    .message-card-body {
+        padding: 1.25rem;
+    }
+
+    .message-card-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 0.5rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .message-card-description {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-bottom: 1rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .message-card-stats {
+        display: flex;
+        gap: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #f3f4f6;
+        margin-bottom: 1rem;
+    }
+
+    .message-card-stat {
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+        font-size: 0.75rem;
+        color: #6b7280;
+    }
+
+    .message-card-stat i {
+        width: 14px;
+        height: 14px;
+    }
+
+    .message-card-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .message-card-actions button {
+        flex: 1;
+        padding: 0.5rem;
+        border: 1px solid #e5e7eb;
+        background: #fff;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.375rem;
+    }
+
+    .message-card-actions button:hover {
+        background: #f9fafb;
+    }
+
+    .message-card-actions button.edit-btn {
+        color: #2563eb;
+        border-color: #dbeafe;
+    }
+
+    .message-card-actions button.edit-btn:hover {
+        background: #eff6ff;
+    }
+
+    .message-card-actions button.delete-btn {
+        color: #dc2626;
+        border-color: #fee2e2;
+    }
+
+    .message-card-actions button.delete-btn:hover {
+        background: #fef2f2;
+    }
+
+    /* Text-only Message Card */
+    .message-card-text-preview {
+        height: 180px;
+        padding: 1.25rem;
+        background: #f8fafc;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: relative;
+    }
+
+    .message-card-text-preview .text-content {
+        font-size: 0.9375rem;
+        line-height: 1.6;
+        color: #374151;
+        display: -webkit-box;
+        -webkit-line-clamp: 5;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .message-card-text-preview .quote-icon {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        color: #d1d5db;
+        width: 24px;
+        height: 24px;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+
+    .empty-state-icon {
+        width: 64px;
+        height: 64px;
+        background: #f3f4f6;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        color: #9ca3af;
+    }
+
+    .empty-state h3 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+        color: #6b7280;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .modal-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .modal-container {
+        background: #fff;
+        border-radius: 16px;
+        width: 90%;
+        max-width: 700px;
+        max-height: 90vh;
+        overflow: hidden;
+        transform: scale(0.9);
+        transition: transform 0.3s ease;
+    }
+
+    .modal-overlay.active .modal-container {
+        transform: scale(1);
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .modal-header h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #111827;
+    }
+
+    .modal-close {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        border: none;
+        background: #f3f4f6;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6b7280;
+        transition: all 0.2s ease;
+    }
+
+    .modal-close:hover {
+        background: #e5e7eb;
+        color: #374151;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+        overflow-y: auto;
+        max-height: calc(90vh - 140px);
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 0.9375rem;
+        transition: all 0.2s ease;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .form-group .form-hint {
+        font-size: 0.75rem;
+        color: #6b7280;
+        margin-top: 0.375rem;
+    }
+
+    /* File Upload Area */
+    .file-upload-area {
+        border: 2px dashed #e5e7eb;
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .file-upload-area:hover {
+        border-color: #2563eb;
+        background: #f8fafc;
+    }
+
+    .file-upload-area.has-file {
+        border-color: #22c55e;
+        background: #f0fdf4;
+    }
+
+    .file-upload-area input {
+        display: none;
+    }
+
+    .file-upload-icon {
+        width: 48px;
+        height: 48px;
+        background: #f3f4f6;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        color: #6b7280;
+    }
+
+    .file-upload-area h4 {
+        font-size: 0.9375rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.25rem;
+    }
+
+    .file-upload-area p {
+        font-size: 0.8125rem;
+        color: #6b7280;
+    }
+
+    .file-preview {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: #f9fafb;
+        border-radius: 8px;
+        margin-top: 1rem;
+    }
+
+    .file-preview img {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    .file-preview-info {
+        flex: 1;
+    }
+
+    .file-preview-info .filename {
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 0.25rem;
+    }
+
+    .file-preview-info .filesize {
+        font-size: 0.75rem;
+        color: #6b7280;
+    }
+
+    .file-preview-remove {
+        padding: 0.5rem;
+        background: none;
+        border: none;
+        color: #dc2626;
+        cursor: pointer;
+    }
+
+    /* Toggle Switch */
+    .toggle-group {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .toggle-switch {
+        position: relative;
+        width: 44px;
+        height: 24px;
+    }
+
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: #e5e7eb;
+        border-radius: 24px;
+        transition: 0.3s;
+    }
+
+    .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background: #fff;
+        border-radius: 50%;
+        transition: 0.3s;
+    }
+
+    .toggle-switch input:checked + .toggle-slider {
+        background: #2563eb;
+    }
+
+    .toggle-switch input:checked + .toggle-slider:before {
+        transform: translateX(20px);
+    }
+
+    .toggle-label {
+        font-size: 0.875rem;
+        color: #374151;
+    }
+
+    /* Modal Footer */
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+        padding: 1.25rem 1.5rem;
+        border-top: 1px solid #e5e7eb;
+        background: #f9fafb;
+    }
+
+    .btn-cancel {
+        padding: 0.75rem 1.5rem;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .btn-cancel:hover {
+        background: #f3f4f6;
+    }
+
+    .btn-save {
+        padding: 0.75rem 1.5rem;
+        background: #2563eb;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-save:hover {
+        background: #1d4ed8;
+    }
+
+    .btn-save:disabled {
+        background: #93c5fd;
+        cursor: not-allowed;
+    }
+
+    /* Hashtags Input */
+    .hashtags-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        padding: 0.5rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        min-height: 44px;
+    }
+
+    .hashtag-tag {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.5rem;
+        background: #dbeafe;
+        color: #1e40af;
+        border-radius: 4px;
+        font-size: 0.8125rem;
+    }
+
+    .hashtag-tag button {
+        background: none;
+        border: none;
+        color: #3b82f6;
+        cursor: pointer;
+        padding: 0;
+        display: flex;
+    }
+
+    .hashtags-input {
+        border: none !important;
+        padding: 0.25rem !important;
+        flex: 1;
+        min-width: 100px;
+    }
+
+    .hashtags-input:focus {
+        box-shadow: none !important;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+
+        .messages-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .modal-container {
+            width: 95%;
+            max-height: 95vh;
+        }
+
+        .messages-header {
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .add-message-btn {
+            display: flex !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Stats Grid -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon blue">
+            <i data-lucide="file-text"></i>
+        </div>
+        <div class="stat-value">{{ total_messages }}</div>
+        <div class="stat-label">Total Messages</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon green">
+            <i data-lucide="share-2"></i>
+        </div>
+        <div class="stat-value">{{ total_shares }}</div>
+        <div class="stat-label">Total Shares</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon purple">
+            <i data-lucide="download"></i>
+        </div>
+        <div class="stat-value">{{ total_downloads }}</div>
+        <div class="stat-label">Total Downloads</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon orange">
+            <i data-lucide="copy"></i>
+        </div>
+        <div class="stat-value">{{ total_copies }}</div>
+        <div class="stat-label">Total Copies</div>
+    </div>
+</div>
+
+<!-- Category Tabs -->
+<div class="category-tabs">
+    <button class="category-tab active" data-category="all">
+        <i data-lucide="grid-3x3"></i>
+        All
+        <span class="count">{{ total_messages }}</span>
+    </button>
+    <button class="category-tab" data-category="pre_written">
+        <i data-lucide="file-text"></i>
+        Pre-Written
+        <span class="count">{{ category_counts.pre_written|default:0 }}</span>
+    </button>
+    <button class="category-tab" data-category="quotes">
+        <i data-lucide="quote"></i>
+        Quotes
+        <span class="count">{{ category_counts.quotes|default:0 }}</span>
+    </button>
+    <button class="category-tab" data-category="posters">
+        <i data-lucide="image"></i>
+        Posters
+        <span class="count">{{ category_counts.posters|default:0 }}</span>
+    </button>
+    <button class="category-tab" data-category="videos">
+        <i data-lucide="video"></i>
+        Videos
+        <span class="count">{{ category_counts.videos|default:0 }}</span>
+    </button>
+    <button class="category-tab" data-category="toolkits">
+        <i data-lucide="briefcase"></i>
+        Toolkits
+        <span class="count">{{ category_counts.toolkits|default:0 }}</span>
+    </button>
+    <button class="category-tab" data-category="hashtags">
+        <i data-lucide="hash"></i>
+        Hashtags
+        <span class="count">{{ category_counts.hashtags|default:0 }}</span>
+    </button>
+</div>
+
+<!-- Messages Container -->
+<div class="messages-container">
+    <div class="messages-header">
+        <h3>Shareable Content</h3>
+        <button class="add-message-btn" onclick="openMessageModal()">
+            <i data-lucide="plus"></i>
+            Add Message
+        </button>
+    </div>
+
+    {% if messages_list %}
+    <div class="messages-grid" id="messagesGrid">
+        {% for message in messages_list %}
+        <div class="message-card {% if message.is_featured %}featured{% endif %}" data-category="{{ message.category }}" data-id="{{ message.id }}">
+            {% if message.media_url %}
+            <div class="message-card-media">
+                {% if message.content_type == 'video' %}
+                <video src="{{ message.media_url }}" muted></video>
+                {% else %}
+                <img src="{{ message.media_url }}" alt="{{ message.title }}">
+                {% endif %}
+                {% if message.is_featured %}
+                <span class="featured-badge">Featured</span>
+                {% endif %}
+                <span class="type-badge">
+                    {% if message.content_type == 'video' %}
+                    <i data-lucide="video" style="width:12px;height:12px;"></i>
+                    {% elif message.content_type == 'poster' %}
+                    <i data-lucide="image" style="width:12px;height:12px;"></i>
+                    {% endif %}
+                    {{ message.content_type|title }}
+                </span>
+            </div>
+            {% elif message.text_content %}
+            <div class="message-card-text-preview">
+                <i data-lucide="quote" class="quote-icon"></i>
+                {% if message.is_featured %}
+                <span class="featured-badge" style="position:absolute;top:12px;left:12px;">Featured</span>
+                {% endif %}
+                <span class="type-badge" style="position:absolute;top:12px;right:12px;">
+                    {% if message.content_type == 'quote_card' %}
+                    <i data-lucide="quote" style="width:12px;height:12px;"></i>
+                    {% elif message.content_type == 'hashtag' %}
+                    <i data-lucide="hash" style="width:12px;height:12px;"></i>
+                    {% else %}
+                    <i data-lucide="file-text" style="width:12px;height:12px;"></i>
+                    {% endif %}
+                    {{ message.content_type|title }}
+                </span>
+                <p class="text-content">{{ message.text_content }}</p>
+            </div>
+            {% else %}
+            <div class="message-card-media">
+                <div class="media-placeholder">
+                    <i data-lucide="image-off" style="width:48px;height:48px;"></i>
+                </div>
+            </div>
+            {% endif %}
+            <div class="message-card-body">
+                <h4 class="message-card-title">{{ message.title }}</h4>
+                <p class="message-card-description">{{ message.description|default:"No description" }}</p>
+                <div class="message-card-stats">
+                    <span class="message-card-stat">
+                        <i data-lucide="share-2"></i>
+                        {{ message.share_count }} shares
+                    </span>
+                    <span class="message-card-stat">
+                        <i data-lucide="download"></i>
+                        {{ message.download_count }} downloads
+                    </span>
+                    <span class="message-card-stat">
+                        <i data-lucide="copy"></i>
+                        {{ message.copy_count }} copies
+                    </span>
+                </div>
+                <div class="message-card-actions">
+                    <button class="edit-btn" onclick="editMessage('{{ message.id }}')">
+                        <i data-lucide="pencil"></i>
+                        Edit
+                    </button>
+                    <button class="delete-btn" onclick="deleteMessage('{{ message.id }}', '{{ message.title|escapejs }}')">
+                        <i data-lucide="trash-2"></i>
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon">
+            <i data-lucide="message-square-plus"></i>
+        </div>
+        <h3>No messages yet</h3>
+        <p>Create your first shareable message for members to distribute.</p>
+        <button class="add-message-btn" onclick="openMessageModal()">
+            <i data-lucide="plus"></i>
+            Add Message
+        </button>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Message Modal -->
+<div class="modal-overlay" id="messageModal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3 id="modalTitle">Add New Message</h3>
+            <button class="modal-close" onclick="closeMessageModal()">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        <form id="messageForm" enctype="multipart/form-data">
+            <input type="hidden" name="message_id" id="messageId">
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="contentType">Content Type</label>
+                        <select name="content_type" id="contentType" onchange="toggleMediaField()">
+                            <option value="text">Text Message</option>
+                            <option value="quote_card">Quote Card</option>
+                            <option value="poster">Poster/Banner</option>
+                            <option value="video">Video Clip</option>
+                            <option value="toolkit">Social Media Toolkit</option>
+                            <option value="hashtag">Hashtags & Slogans</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <select name="category" id="category">
+                            <option value="pre_written">Pre-Written Messages</option>
+                            <option value="quotes">Quote Cards</option>
+                            <option value="posters">Posters & Banners</option>
+                            <option value="videos">Video Clips</option>
+                            <option value="toolkits">Social Media Toolkits</option>
+                            <option value="hashtags">Hashtags & Slogans</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="title">Title</label>
+                    <input type="text" name="title" id="title" required placeholder="Enter message title">
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="description">Description</label>
+                    <textarea name="description" id="description" rows="2" placeholder="Brief description of this content"></textarea>
+                </div>
+
+                <div class="form-group full-width" id="textContentGroup">
+                    <label for="textContent">Message Content</label>
+                    <textarea name="text_content" id="textContent" rows="4" placeholder="Enter the message text that members can copy and share"></textarea>
+                    <p class="form-hint">This text will be available for members to copy and share directly.</p>
+                </div>
+
+                <div class="form-group full-width" id="mediaUploadGroup" style="display:none;">
+                    <label>Media File</label>
+                    <div class="file-upload-area" id="fileUploadArea" onclick="document.getElementById('mediaFile').click()">
+                        <input type="file" name="media_file" id="mediaFile" accept="image/*,video/*" onchange="handleFileSelect(event)">
+                        <div class="file-upload-icon">
+                            <i data-lucide="upload-cloud"></i>
+                        </div>
+                        <h4>Click to upload or drag and drop</h4>
+                        <p>PNG, JPG, GIF, MP4 (max. 50MB)</p>
+                    </div>
+                    <div class="file-preview" id="filePreview" style="display:none;">
+                        <img id="previewImg" src="" alt="Preview">
+                        <div class="file-preview-info">
+                            <div class="filename" id="previewFilename"></div>
+                            <div class="filesize" id="previewFilesize"></div>
+                        </div>
+                        <button type="button" class="file-preview-remove" onclick="removeFile()">
+                            <i data-lucide="x"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="campaignSlogan">Campaign Slogan</label>
+                        <input type="text" name="campaign_slogan" id="campaignSlogan" placeholder="e.g., 'Neutrality is Complicity'">
+                    </div>
+                    <div class="form-group">
+                        <label for="callToAction">Call to Action</label>
+                        <input type="text" name="call_to_action" id="callToAction" placeholder="e.g., 'Join the Movement'">
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Hashtags</label>
+                    <div class="hashtags-container" id="hashtagsContainer" onclick="document.getElementById('hashtagInput').focus()">
+                        <input type="text" class="hashtags-input" id="hashtagInput" placeholder="Type hashtag and press Enter">
+                    </div>
+                    <input type="hidden" name="hashtags" id="hashtagsHidden">
+                    <p class="form-hint">Press Enter to add each hashtag</p>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="whatsappText">WhatsApp Text</label>
+                        <textarea name="whatsapp_text" id="whatsappText" rows="2" placeholder="Custom text for WhatsApp sharing"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="twitterText">Twitter/X Text</label>
+                        <textarea name="twitter_text" id="twitterText" rows="2" maxlength="280" placeholder="Custom text for Twitter (max 280 chars)"></textarea>
+                        <p class="form-hint"><span id="twitterCharCount">0</span>/280 characters</p>
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="telegramText">Telegram Text</label>
+                    <textarea name="telegram_text" id="telegramText" rows="2" placeholder="Custom text for Telegram sharing"></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Display Order</label>
+                        <input type="number" name="display_order" id="displayOrder" value="0" min="0">
+                        <p class="form-hint">Lower numbers appear first</p>
+                    </div>
+                    <div class="form-group">
+                        <div class="toggle-group" style="margin-top:1.5rem;">
+                            <label class="toggle-switch">
+                                <input type="checkbox" name="is_featured" id="isFeatured">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-label">Featured Message</span>
+                        </div>
+                        <div class="toggle-group" style="margin-top:0.75rem;">
+                            <label class="toggle-switch">
+                                <input type="checkbox" name="is_active" id="isActive" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-label">Active</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" onclick="closeMessageModal()">Cancel</button>
+                <button type="submit" class="btn-save" id="saveBtn">
+                    <i data-lucide="save"></i>
+                    Save Message
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    let hashtags = [];
+    let selectedFile = null;
+    let existingMediaUrl = null;
+
+    // Category filtering
+    document.querySelectorAll('.category-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+
+            const category = this.dataset.category;
+            const cards = document.querySelectorAll('.message-card');
+
+            cards.forEach(card => {
+                if (category === 'all' || card.dataset.category === category) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    });
+
+    // Modal functions
+    function openMessageModal() {
+        document.getElementById('messageModal').classList.add('active');
+        document.getElementById('modalTitle').textContent = 'Add New Message';
+        document.getElementById('messageForm').reset();
+        document.getElementById('messageId').value = '';
+        hashtags = [];
+        renderHashtags();
+        existingMediaUrl = null;
+        toggleMediaField();
+        lucide.createIcons();
+    }
+
+    function closeMessageModal() {
+        document.getElementById('messageModal').classList.remove('active');
+        selectedFile = null;
+        document.getElementById('filePreview').style.display = 'none';
+        document.getElementById('fileUploadArea').classList.remove('has-file');
+    }
+
+    function toggleMediaField() {
+        const contentType = document.getElementById('contentType').value;
+        const textGroup = document.getElementById('textContentGroup');
+        const mediaGroup = document.getElementById('mediaUploadGroup');
+
+        if (['poster', 'video', 'toolkit'].includes(contentType)) {
+            textGroup.style.display = 'none';
+            mediaGroup.style.display = 'block';
+        } else {
+            textGroup.style.display = 'block';
+            mediaGroup.style.display = 'none';
+        }
+    }
+
+    // File handling
+    function handleFileSelect(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        selectedFile = file;
+        const preview = document.getElementById('filePreview');
+        const uploadArea = document.getElementById('fileUploadArea');
+        const previewImg = document.getElementById('previewImg');
+
+        if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImg.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        } else {
+            previewImg.src = '';
+        }
+
+        document.getElementById('previewFilename').textContent = file.name;
+        document.getElementById('previewFilesize').textContent = formatFileSize(file.size);
+
+        preview.style.display = 'flex';
+        uploadArea.classList.add('has-file');
+    }
+
+    function removeFile() {
+        selectedFile = null;
+        document.getElementById('mediaFile').value = '';
+        document.getElementById('filePreview').style.display = 'none';
+        document.getElementById('fileUploadArea').classList.remove('has-file');
+    }
+
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // Hashtags
+    document.getElementById('hashtagInput').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            let value = this.value.trim();
+            if (value) {
+                if (!value.startsWith('#')) value = '#' + value;
+                if (!hashtags.includes(value)) {
+                    hashtags.push(value);
+                    renderHashtags();
+                }
+                this.value = '';
+            }
+        }
+    });
+
+    function renderHashtags() {
+        const container = document.getElementById('hashtagsContainer');
+        const input = document.getElementById('hashtagInput');
+
+        container.querySelectorAll('.hashtag-tag').forEach(tag => tag.remove());
+
+        hashtags.forEach((tag, index) => {
+            const tagEl = document.createElement('span');
+            tagEl.className = 'hashtag-tag';
+            tagEl.innerHTML = `${tag} <button type="button" onclick="removeHashtag(${index})"><i data-lucide="x" style="width:12px;height:12px;"></i></button>`;
+            container.insertBefore(tagEl, input);
+        });
+
+        document.getElementById('hashtagsHidden').value = JSON.stringify(hashtags);
+        lucide.createIcons();
+    }
+
+    function removeHashtag(index) {
+        hashtags.splice(index, 1);
+        renderHashtags();
+    }
+
+    // Twitter character count
+    document.getElementById('twitterText').addEventListener('input', function() {
+        document.getElementById('twitterCharCount').textContent = this.value.length;
+    });
+
+    // Edit message
+    function editMessage(id) {
+        fetch(`{% url 'dashboard_messages_get' %}?id=${id}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const msg = data.message;
+                    document.getElementById('messageModal').classList.add('active');
+                    document.getElementById('modalTitle').textContent = 'Edit Message';
+                    document.getElementById('messageId').value = msg.id;
+                    document.getElementById('contentType').value = msg.content_type;
+                    document.getElementById('category').value = msg.category;
+                    document.getElementById('title').value = msg.title;
+                    document.getElementById('description').value = msg.description || '';
+                    document.getElementById('textContent').value = msg.text_content || '';
+                    document.getElementById('campaignSlogan').value = msg.campaign_slogan || '';
+                    document.getElementById('callToAction').value = msg.call_to_action || '';
+                    document.getElementById('whatsappText').value = msg.whatsapp_text || '';
+                    document.getElementById('twitterText').value = msg.twitter_text || '';
+                    document.getElementById('telegramText').value = msg.telegram_text || '';
+                    document.getElementById('displayOrder').value = msg.display_order || 0;
+                    document.getElementById('isFeatured').checked = msg.is_featured;
+                    document.getElementById('isActive').checked = msg.is_active;
+
+                    hashtags = msg.hashtags || [];
+                    renderHashtags();
+
+                    existingMediaUrl = msg.media_url;
+                    toggleMediaField();
+
+                    document.getElementById('twitterCharCount').textContent = (msg.twitter_text || '').length;
+                    lucide.createIcons();
+                }
+            });
+    }
+
+    // Delete message
+    function deleteMessage(id, title) {
+        if (confirm(`Are you sure you want to delete "${title}"?`)) {
+            fetch('{% url "dashboard_messages_delete" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ id: id })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            });
+        }
+    }
+
+    // Form submission
+    document.getElementById('messageForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const saveBtn = document.getElementById('saveBtn');
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<i data-lucide="loader-2" class="animate-spin"></i> Saving...';
+
+        const formData = new FormData(this);
+        formData.set('hashtags', JSON.stringify(hashtags));
+
+        if (selectedFile) {
+            formData.set('media_file', selectedFile);
+        }
+
+        try {
+            const response = await fetch('{% url "dashboard_messages_save" %}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + data.error);
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '<i data-lucide="save"></i> Save Message';
+                lucide.createIcons();
+            }
+        } catch (error) {
+            alert('Error saving message');
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = '<i data-lucide="save"></i> Save Message';
+            lucide.createIcons();
+        }
+    });
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+        lucide.createIcons();
+    });
+</script>
+{% endblock %}

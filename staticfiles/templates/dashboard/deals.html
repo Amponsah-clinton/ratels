@@ -1,0 +1,106 @@
+{% extends "dashboard/base_dashboard.html" %}
+
+{% block title %}Deals Pipeline{% endblock %}
+
+{% block content %}
+<div class="md-space-y-6">
+
+    <!-- Page Header -->
+    <div class="md-page-header-row">
+        <div>
+            <h1 class="md-page-title">Deals Pipeline</h1>
+            <p class="md-page-subtitle">Track your sales opportunities</p>
+        </div>
+        <button class="md-btn md-btn-primary md-btn-sm">
+            <i data-lucide="plus" style="width:16px;height:16px;"></i>
+            Add Deal
+        </button>
+    </div>
+
+    <!-- Pipeline Columns -->
+    <div class="md-grid md-grid-4">
+
+        <!-- Qualified -->
+        <div class="md-kanban-column">
+            <div class="md-kanban-header">QUALIFIED</div>
+            <div class="md-card">
+                <div class="md-card-content" style="padding-top:16px;">
+                    <div class="md-kanban-card-title">Enterprise Solution</div>
+                    <div class="md-kanban-card-subtitle">Acme Corporation</div>
+                    <div class="md-kanban-card-amount">
+                        <i data-lucide="dollar-sign" style="width:14px;height:14px;"></i>
+                        <span>$45,000</span>
+                    </div>
+                </div>
+            </div>
+            <div class="md-card">
+                <div class="md-card-content" style="padding-top:16px;">
+                    <div class="md-kanban-card-title">Cloud Migration</div>
+                    <div class="md-kanban-card-subtitle">Tech Solutions</div>
+                    <div class="md-kanban-card-amount">
+                        <i data-lucide="dollar-sign" style="width:14px;height:14px;"></i>
+                        <span>$32,000</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Proposal -->
+        <div class="md-kanban-column">
+            <div class="md-kanban-header">PROPOSAL</div>
+            <div class="md-card">
+                <div class="md-card-content" style="padding-top:16px;">
+                    <div class="md-kanban-card-title">CRM Implementation</div>
+                    <div class="md-kanban-card-subtitle">InnovateCo</div>
+                    <div class="md-kanban-card-amount">
+                        <i data-lucide="dollar-sign" style="width:14px;height:14px;"></i>
+                        <span>$28,500</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Negotiation -->
+        <div class="md-kanban-column">
+            <div class="md-kanban-header">NEGOTIATION</div>
+            <div class="md-card">
+                <div class="md-card-content" style="padding-top:16px;">
+                    <div class="md-kanban-card-title">Data Analytics Platform</div>
+                    <div class="md-kanban-card-subtitle">DataCorp</div>
+                    <div class="md-kanban-card-amount">
+                        <i data-lucide="dollar-sign" style="width:14px;height:14px;"></i>
+                        <span>$67,000</span>
+                    </div>
+                </div>
+            </div>
+            <div class="md-card">
+                <div class="md-card-content" style="padding-top:16px;">
+                    <div class="md-kanban-card-title">Mobile App Development</div>
+                    <div class="md-kanban-card-subtitle">StartupXYZ</div>
+                    <div class="md-kanban-card-amount">
+                        <i data-lucide="dollar-sign" style="width:14px;height:14px;"></i>
+                        <span>$52,000</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Closed Won -->
+        <div class="md-kanban-column">
+            <div class="md-kanban-header">CLOSED WON</div>
+            <div class="md-card">
+                <div class="md-card-content" style="padding-top:16px;">
+                    <div class="md-kanban-card-title">Website Redesign</div>
+                    <div class="md-kanban-card-subtitle">DesignHub</div>
+                    <div class="md-kanban-card-amount">
+                        <i data-lucide="dollar-sign" style="width:14px;height:14px;"></i>
+                        <span>$18,000</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

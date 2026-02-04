@@ -1,0 +1,367 @@
+{% extends "dashboard/base_dashboard.html" %}
+
+{% block title %}Images - Media Vault{% endblock %}
+
+{% block content %}
+<div class="md-space-y-6">
+
+    <!-- Page Header -->
+    <div class="md-vault-header">
+        <div class="md-vault-header-content">
+            <h1 class="md-page-title">Images</h1>
+            <p class="md-page-subtitle">Evidence images and campaign visuals</p>
+        </div>
+        <div class="md-vault-header-actions">
+            <div class="md-view-toggle">
+                <button class="md-view-btn active" id="gridViewBtn" onclick="setView('grid')">
+                    <i data-lucide="grid-3x3" style="width:18px;height:18px;"></i>
+                </button>
+                <button class="md-view-btn" id="listViewBtn" onclick="setView('list')">
+                    <i data-lucide="list" style="width:18px;height:18px;"></i>
+                </button>
+            </div>
+            <button class="md-btn md-btn-primary md-btn-sm" onclick="openUploadModal()">
+                <i data-lucide="plus" style="width:16px;height:16px;"></i>
+                Add Image
+            </button>
+        </div>
+    </div>
+
+    <!-- Category Tabs -->
+    <div class="md-vault-tabs">
+        <button class="md-vault-tab {% if not current_category or current_category == 'all' %}active{% endif %}" onclick="filterCategory('all')">
+            All Images
+        </button>
+        <button class="md-vault-tab {% if current_category == 'evidence' %}active{% endif %}" onclick="filterCategory('evidence')">
+            Evidence Images
+        </button>
+        <button class="md-vault-tab {% if current_category == 'campaign_visuals' %}active{% endif %}" onclick="filterCategory('campaign_visuals')">
+            Campaign Visuals
+        </button>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="md-filter-bar">
+        <div class="md-filter-search">
+            <span class="md-filter-search-icon">
+                <i data-lucide="search"></i>
+            </span>
+            <input type="text" class="md-filter-search-input" placeholder="Search images..." id="searchInput" onkeyup="searchMedia()">
+        </div>
+        <select class="md-filter-select" id="sortSelect" onchange="sortMedia()">
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="title">Title A-Z</option>
+        </select>
+    </div>
+
+    <!-- Image Grid -->
+    <div class="md-media-grid" id="mediaGrid">
+        {% if images %}
+            {% for image in images %}
+            <div class="md-media-card" data-title="{{ image.title|lower }}" data-category="{{ image.category }}" data-date="{{ image.created_at|date:'Y-m-d' }}">
+                <div class="md-media-thumb md-image-thumb">
+                    <img src="{{ image.file_url }}" alt="{{ image.title }}" loading="lazy">
+                    <span class="md-media-badge {{ image.category }}">{{ image.category|cut:"_"|title }}</span>
+                    <a href="{{ image.file_url }}" target="_blank" class="md-media-play" style="background:rgba(0,0,0,0.7);">
+                        <i data-lucide="maximize-2" style="color:#fff;margin:0;"></i>
+                    </a>
+                </div>
+                <div class="md-media-body">
+                    <h3 class="md-media-title">{{ image.title }}</h3>
+                    <p class="md-media-desc">{{ image.description|default:"No description" }}</p>
+                    <div class="md-media-meta">
+                        <span class="md-media-meta-item">
+                            <i data-lucide="calendar"></i>
+                            {{ image.created_at|date:"M d, Y" }}
+                        </span>
+                        {% if image.location %}
+                        <span class="md-media-meta-item">
+                            <i data-lucide="map-pin"></i>
+                            {{ image.location }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="md-media-actions">
+                    <a href="{{ image.file_url }}" target="_blank" class="md-media-action-btn primary">
+                        <i data-lucide="eye"></i>
+                        View
+                    </a>
+                    <a href="{{ image.file_url }}" download class="md-media-action-btn secondary">
+                        <i data-lucide="download"></i>
+                    </a>
+                    <button class="md-media-action-btn danger" onclick="deleteMedia('{{ image.id }}', 'image')">
+                        <i data-lucide="trash-2"></i>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="md-empty-state" style="grid-column: 1 / -1;">
+                <i data-lucide="image-off" class="md-empty-icon"></i>
+                <h3 class="md-empty-title">No images yet</h3>
+                <p class="md-empty-desc">Upload evidence images and campaign visuals to document important moments. Supported formats: JPG, PNG, WebP, GIF</p>
+                <button class="md-btn md-btn-primary" onclick="openUploadModal()">
+                    <i data-lucide="upload" style="width:18px;height:18px;"></i>
+                    Upload Image
+                </button>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- List View -->
+    <div class="md-media-list" id="mediaList" style="display:none;">
+        {% if images %}
+            {% for image in images %}
+            <div class="md-media-list-item" data-title="{{ image.title|lower }}" data-category="{{ image.category }}" data-date="{{ image.created_at|date:'Y-m-d' }}">
+                <div class="md-media-list-thumb">
+                    <img src="{{ image.thumbnail_url|default:image.file_url }}" alt="{{ image.title }}">
+                </div>
+                <div class="md-media-list-content">
+                    <div class="md-media-list-title">{{ image.title }}</div>
+                    <div class="md-media-list-meta">
+                        <span class="md-media-badge {{ image.category }}" style="position:static;">{{ image.category|cut:"_"|title }}</span>
+                        <span>{{ image.created_at|date:"M d, Y" }}</span>
+                        {% if image.location %}<span>{{ image.location }}</span>{% endif %}
+                    </div>
+                </div>
+                <div class="md-flex md-gap-2">
+                    <a href="{{ image.file_url }}" target="_blank" class="md-media-action-btn primary">
+                        <i data-lucide="eye"></i>
+                    </a>
+                    <button class="md-media-action-btn danger" onclick="deleteMedia('{{ image.id }}', 'image')">
+                        <i data-lucide="trash-2"></i>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- Upload Modal -->
+<div class="md-modal-overlay" id="uploadModal">
+    <div class="md-modal">
+        <div class="md-modal-header">
+            <h2 class="md-modal-title">Add New Image</h2>
+            <button class="md-modal-close" onclick="closeUploadModal()">
+                <i data-lucide="x" style="width:20px;height:20px;"></i>
+            </button>
+        </div>
+        <form method="POST" action="{% url 'dashboard_media_images_save' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="md-modal-body">
+                <div class="md-space-y-4">
+                    <div class="md-form-group full-width">
+                        <label class="md-form-label">Title *</label>
+                        <input type="text" name="title" class="md-form-input" placeholder="Enter image title" required>
+                    </div>
+                    <div class="md-form-row">
+                        <div class="md-form-group">
+                            <label class="md-form-label">Category *</label>
+                            <select name="category" class="md-form-select" required>
+                                <option value="">Select category</option>
+                                <option value="evidence">Evidence Images</option>
+                                <option value="campaign_visuals">Campaign Visuals</option>
+                            </select>
+                        </div>
+                        <div class="md-form-group">
+                            <label class="md-form-label">Photographer</label>
+                            <input type="text" name="photographer" class="md-form-input" placeholder="e.g., John Doe">
+                        </div>
+                    </div>
+                    <div class="md-form-group full-width">
+                        <label class="md-form-label">Description</label>
+                        <textarea name="description" class="md-form-textarea" placeholder="Describe what's in the image..."></textarea>
+                    </div>
+                    <div class="md-form-group full-width">
+                        <label class="md-form-label">Image File *</label>
+                        <div class="md-upload-zone" id="imageDropZone" onclick="document.getElementById('imageFile').click()">
+                            <i data-lucide="upload-cloud" class="md-upload-icon"></i>
+                            <p class="md-upload-text">Click to upload or drag and drop</p>
+                            <p class="md-upload-hint">JPG, PNG, WebP, GIF up to 20MB</p>
+                        </div>
+                        <input type="file" name="image_file" id="imageFile" accept="image/*" style="display:none;" onchange="handleFileSelect(this, 'imageDropZone')">
+                    </div>
+                    <div class="md-form-row">
+                        <div class="md-form-group">
+                            <label class="md-form-label">Captured Date</label>
+                            <input type="date" name="captured_date" class="md-form-input">
+                        </div>
+                        <div class="md-form-group">
+                            <label class="md-form-label">Location</label>
+                            <input type="text" name="location" class="md-form-input" placeholder="e.g., Abuja, Nigeria">
+                        </div>
+                    </div>
+                    <div class="md-form-group full-width">
+                        <label class="md-form-label">Source</label>
+                        <input type="text" name="source" class="md-form-input" placeholder="e.g., Field Team">
+                    </div>
+                    <div class="md-form-group full-width">
+                        <label class="md-form-label">Alt Text (for accessibility)</label>
+                        <input type="text" name="alt_text" class="md-form-input" placeholder="Describe the image for screen readers">
+                    </div>
+                </div>
+            </div>
+            <div class="md-modal-footer">
+                <button type="button" class="md-btn md-btn-outline" onclick="closeUploadModal()">Cancel</button>
+                <button type="submit" class="md-btn md-btn-primary">
+                    <i data-lucide="upload" style="width:16px;height:16px;"></i>
+                    Upload Image
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Image Lightbox -->
+<div class="md-modal-overlay" id="lightboxModal" onclick="closeLightbox()">
+    <div style="max-width:90vw;max-height:90vh;position:relative;">
+        <button class="md-modal-close" style="position:absolute;top:-40px;right:0;background:rgba(0,0,0,0.5);" onclick="closeLightbox()">
+            <i data-lucide="x" style="width:20px;height:20px;color:#fff;"></i>
+        </button>
+        <img id="lightboxImage" src="" alt="" style="max-width:100%;max-height:90vh;border-radius:8px;">
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    function setView(view) {
+        const grid = document.getElementById('mediaGrid');
+        const list = document.getElementById('mediaList');
+        const gridBtn = document.getElementById('gridViewBtn');
+        const listBtn = document.getElementById('listViewBtn');
+
+        if (view === 'grid') {
+            grid.style.display = 'grid';
+            list.style.display = 'none';
+            gridBtn.classList.add('active');
+            listBtn.classList.remove('active');
+        } else {
+            grid.style.display = 'none';
+            list.style.display = 'flex';
+            gridBtn.classList.remove('active');
+            listBtn.classList.add('active');
+        }
+        localStorage.setItem('imageViewMode', view);
+    }
+
+    const savedView = localStorage.getItem('imageViewMode');
+    if (savedView) setView(savedView);
+
+    function filterCategory(category) {
+        const url = new URL(window.location.href);
+        if (category === 'all') {
+            url.searchParams.delete('category');
+        } else {
+            url.searchParams.set('category', category);
+        }
+        window.location.href = url.toString();
+    }
+
+    function searchMedia() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        const cards = document.querySelectorAll('.md-media-card, .md-media-list-item');
+        cards.forEach(card => {
+            const title = card.getAttribute('data-title');
+            card.style.display = title.includes(query) ? '' : 'none';
+        });
+    }
+
+    function sortMedia() {
+        const sort = document.getElementById('sortSelect').value;
+        const grid = document.getElementById('mediaGrid');
+        const cards = Array.from(grid.querySelectorAll('.md-media-card'));
+
+        cards.sort((a, b) => {
+            if (sort === 'newest') {
+                return new Date(b.getAttribute('data-date')) - new Date(a.getAttribute('data-date'));
+            } else if (sort === 'oldest') {
+                return new Date(a.getAttribute('data-date')) - new Date(b.getAttribute('data-date'));
+            } else {
+                return a.getAttribute('data-title').localeCompare(b.getAttribute('data-title'));
+            }
+        });
+        cards.forEach(card => grid.appendChild(card));
+    }
+
+    function openUploadModal() {
+        document.getElementById('uploadModal').classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeUploadModal() {
+        document.getElementById('uploadModal').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    document.getElementById('uploadModal').addEventListener('click', function(e) {
+        if (e.target === this) closeUploadModal();
+    });
+
+    function openLightbox(src) {
+        document.getElementById('lightboxImage').src = src;
+        document.getElementById('lightboxModal').classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+        document.getElementById('lightboxModal').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    function handleFileSelect(input, zoneId) {
+        const zone = document.getElementById(zoneId);
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                zone.innerHTML = `
+                    <img src="${e.target.result}" style="max-width:100%;max-height:150px;border-radius:8px;margin-bottom:8px;">
+                    <p class="md-upload-text">${file.name}</p>
+                    <p class="md-upload-hint">${(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                `;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    const dropZone = document.getElementById('imageDropZone');
+    if (dropZone) {
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, e => { e.preventDefault(); e.stopPropagation(); }, false);
+        });
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
+        });
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
+        });
+        dropZone.addEventListener('drop', function(e) {
+            document.getElementById('imageFile').files = e.dataTransfer.files;
+            handleFileSelect(document.getElementById('imageFile'), 'imageDropZone');
+        }, false);
+    }
+
+    function deleteMedia(id, type) {
+        if (confirm('Are you sure you want to delete this ' + type + '?')) {
+            fetch('{% url "dashboard_media_images_delete" %}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                body: JSON.stringify({ id: id })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) window.location.reload();
+                else alert('Failed to delete: ' + (data.error || 'Unknown error'));
+            });
+        }
+    }
+
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+</script>
+{% endblock %}

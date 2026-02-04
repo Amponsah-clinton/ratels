@@ -1,0 +1,1017 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <!-- basic -->
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <!-- mobile metas -->
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+      <!-- site metas -->
+      <title>{% block title %}Ratel Movement{% endblock %}</title>
+      <meta name="keywords" content="">
+      <meta name="description" content="">
+      <meta name="author" content="">
+      <!-- bootstrap css -->
+      <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
+      <!-- style css -->
+      <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+      <!-- Responsive-->
+      <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+      <!-- favicon -->
+      <link rel="icon" href="https://res.cloudinary.com/dmqizfpyz/image/upload/v1769424497/mmm_lyzhlw.png" type="image/png" />
+      <!-- Scrollbar Custom CSS -->
+      <link rel="stylesheet" href="{% static 'css/jquery.mCustomScrollbar.min.css' %}">
+      <!-- Tweaks for older IEs-->
+      <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+      <!-- owl stylesheets --> 
+      <link rel="stylesheet" href="{% static 'css/owl.carousel.min.css' %}">
+      <link rel="stylesheet" href="{% static 'css/owl.theme.default.min.css' %}">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css" media="screen">
+      {% block extra_css %}{% endblock %}
+      {% block extra_head %}{% endblock %}
+   </head>
+   <body>
+<!-- Orbit Pulse Loader -->
+<div id="site-loader" class="orbit-loader" aria-label="Loading">
+  <div class="orbit-frame"></div>
+  <!-- orbiting tiles -->
+  <span class="orbit-tile"></span>
+  <span class="orbit-tile"></span>
+  <span class="orbit-tile"></span>
+  <span class="orbit-tile"></span>
+  <!-- pulse + logo -->
+  <div class="pulse-badge">
+    <div class="orbit-logo">
+      <img src="https://res.cloudinary.com/dmqizfpyz/image/upload/v1769424497/mmm_lyzhlw.png" alt="Ratel Logo"/>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* =====================================================
+     ORBIT PULSE LOADER
+     ===================================================== */
+  :root {
+    --ink: #111827;
+    --line: #e5e7eb;
+    --bg: #ffffff;
+  }
+
+  #site-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--bg);
+    z-index: 99999;
+    display: grid;
+    place-items: center;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+  }
+
+  #site-loader.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .orbit-loader {
+    width: 260px;
+    height: 260px;
+    position: relative;
+    display: grid;
+    place-items: center;
+  }
+
+  /* subtle outer frame */
+  .orbit-frame {
+    position: absolute;
+    inset: 0;
+    border-radius: 60px;
+    border: 1px solid var(--line);
+    background: #fff;
+  }
+
+  /* ===== ORBIT TILES ===== */
+  .orbit-tile {
+    position: absolute;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: #fff;
+    border: 1px solid rgba(17, 24, 39, 0.25);
+    box-shadow: 0 16px 40px rgba(17, 24, 39, 0.12);
+    animation: orbit 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    opacity: 0.45;
+  }
+
+  .orbit-tile:nth-child(2) { animation-delay: 0ms; }
+  .orbit-tile:nth-child(3) { animation-delay: 300ms; }
+  .orbit-tile:nth-child(4) { animation-delay: 600ms; }
+  .orbit-tile:nth-child(5) { animation-delay: 900ms; }
+
+  @keyframes orbit {
+    0%   { transform: translate(0, -82px) scale(0.95); opacity: 0.35; }
+    25%  { transform: translate(82px, 0) scale(1); opacity: 0.9; }
+    50%  { transform: translate(0, 82px) scale(0.95); opacity: 0.35; }
+    75%  { transform: translate(-82px, 0) scale(1); opacity: 0.9; }
+    100% { transform: translate(0, -82px) scale(0.95); opacity: 0.35; }
+  }
+
+  /* ===== PULSE BADGE ===== */
+  .pulse-badge {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    display: grid;
+    place-items: center;
+    z-index: 2;
+  }
+
+  .pulse-badge::before,
+  .pulse-badge::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 36px;
+    border: 1px solid rgba(17, 24, 39, 0.28);
+    opacity: 0;
+    animation: pulse 2.6s ease-out infinite;
+  }
+
+  .pulse-badge::after {
+    animation-delay: 800ms;
+  }
+
+  @keyframes pulse {
+    0%   { transform: scale(0.82); opacity: 0; }
+    20%  { opacity: 0.55; }
+    100% { transform: scale(1.15); opacity: 0; }
+  }
+
+  /* ===== LOGO CORE ===== */
+  .orbit-logo {
+    width: 120px;
+    height: 120px;
+    border-radius: 32px;
+    border: 1px solid var(--line);
+    background: #fff;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 22px 56px rgba(17, 24, 39, 0.16);
+    animation: breath 2.6s ease-in-out infinite;
+  }
+
+  .orbit-logo img {
+    width: 82px;
+    height: 82px;
+    object-fit: contain;
+    filter: grayscale(1) contrast(1.1);
+    opacity: 0.95;
+  }
+
+  @keyframes breath {
+    0%, 100% { transform: scale(0.98); }
+    50% { transform: scale(1.03); }
+  }
+
+   .nav-link{
+      font-size: 14.5px !important;
+   }
+
+   /* =====================================================
+      NAVBAR DROPDOWN OVERFLOW FIX
+      ===================================================== */
+   /* Ensure header containers allow dropdown overflow */
+   .header_section {
+      overflow: visible !important;
+   }
+
+   .header_section .container-fluid,
+   .header_section .header_main {
+      overflow: visible !important;
+   }
+
+   .header_section .navbar {
+      overflow: visible !important;
+   }
+
+   .header_section .navbar-collapse {
+      overflow: visible !important;
+   }
+
+   /* Dropdown menu styling */
+   .navbar .dropdown-menu {
+      position: absolute !important;
+      top: 100% !important;
+      left: 0 !important;
+      z-index: 9999 !important;
+      display: none;
+      min-width: 200px;
+      padding: 10px 0;
+      margin: 0;
+      background: #ffffff;
+      border: 1px solid rgba(0,0,0,0.1);
+      border-radius: 8px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+   }
+
+   .navbar .dropdown-menu.show {
+      display: block !important;
+   }
+
+   .navbar .dropdown-item {
+      padding: 10px 20px;
+      font-size: 14px;
+      color: #333;
+      transition: all 0.2s ease;
+   }
+
+   .navbar .dropdown-item:hover {
+      background: #f8f9fa;
+      color: #080c50;
+   }
+
+   /* Ensure dropdown parent has relative positioning */
+   .navbar .nav-item.dropdown {
+      position: relative !important;
+   }
+
+   /* =====================================================
+      USER AVATAR DROPDOWN - Premium Design
+      ===================================================== */
+   #userAvatarDropdown {
+      position: relative !important;
+      display: flex !important;
+      align-items: center;
+   }
+
+   #userAvatarDropdown .nav-item {
+      list-style: none;
+   }
+
+   .nav-avatar-btn {
+      display: flex !important;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.375rem 0.5rem !important;
+      background: transparent !important;
+      border: 1.5px solid #e2e8f0 !important;
+      border-radius: 12px !important;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      font-family: inherit;
+      margin: 0;
+      outline: none;
+      color: inherit !important;
+      text-decoration: none !important;
+      line-height: 1.5;
+   }
+
+   .nav-avatar-btn:hover {
+      background: #f8fafc !important;
+      border-color: #cbd5e1 !important;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      color: inherit !important;
+   }
+
+   .nav-avatar-btn:focus {
+      outline: 2px solid #3b82f6;
+      outline-offset: 2px;
+   }
+
+   .nav-avatar-btn[aria-expanded="true"] {
+      background: #f1f5f9 !important;
+      border-color: #94a3b8 !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+   }
+
+   .nav-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      overflow: hidden;
+      position: relative;
+   }
+
+   .nav-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+   }
+
+   .nav-avatar.has-image .avatar-initials {
+      display: none;
+   }
+
+   .nav-avatar.has-image img {
+      display: block;
+   }
+
+   .avatar-initials {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 0.02em;
+      line-height: 1;
+   }
+
+   .avatar-chevron {
+      color: #64748b;
+      transition: transform 0.2s ease;
+      flex-shrink: 0;
+   }
+
+   .nav-avatar-btn[aria-expanded="true"] .avatar-chevron {
+      transform: rotate(180deg);
+   }
+
+   .nav-avatar-menu {
+      position: absolute !important;
+      top: calc(100% + 8px) !important;
+      right: 0 !important;
+      left: auto !important;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+      min-width: 240px;
+      display: none;
+      z-index: 10000 !important;
+      overflow: hidden;
+      animation: slideDownFade 0.2s ease-out;
+      margin: 0;
+   }
+
+   @keyframes slideDownFade {
+      from {
+         opacity: 0;
+         transform: translateY(-8px);
+      }
+      to {
+         opacity: 1;
+         transform: translateY(0);
+      }
+   }
+
+   .nav-avatar-menu.show {
+      display: block;
+   }
+
+   .avatar-menu-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem;
+      background: #fafbfc;
+      border-bottom: 1px solid #f1f5f9;
+   }
+
+   .avatar-menu-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      overflow: hidden;
+   }
+
+   .avatar-menu-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+   }
+
+   .avatar-menu-avatar.has-image .avatar-initials {
+      display: none;
+   }
+
+   .avatar-menu-avatar.has-image img {
+      display: block;
+   }
+
+   .avatar-menu-avatar .avatar-initials {
+      font-size: 1.125rem;
+   }
+
+   .avatar-menu-info {
+      flex: 1;
+      min-width: 0;
+   }
+
+   .avatar-menu-name {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      color: #0f172a;
+      line-height: 1.3;
+      margin-bottom: 0.125rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+   }
+
+   .avatar-menu-email {
+      font-size: 0.8125rem;
+      color: #64748b;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+   }
+
+   .avatar-menu-divider {
+      height: 1px;
+      background: #f1f5f9;
+      margin: 0.5rem 0;
+   }
+
+   .avatar-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      color: #334155;
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.15s ease;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+   }
+
+   .avatar-menu-item:hover {
+      background: #f8fafc;
+      color: #0f172a;
+   }
+
+   .avatar-menu-item svg {
+      color: #64748b;
+      flex-shrink: 0;
+   }
+
+   .avatar-menu-item:hover svg {
+      color: #334155;
+   }
+
+   .avatar-menu-item.logout-item {
+      color: #dc2626;
+   }
+
+   .avatar-menu-item.logout-item:hover {
+      background: #fef2f2;
+      color: #b91c1c;
+   }
+
+   .avatar-menu-item.logout-item svg {
+      color: #dc2626;
+   }
+
+   .avatar-menu-item.logout-item:hover svg {
+      color: #b91c1c;
+   }
+
+   /* Mobile adjustments */
+   @media (max-width: 991px) {
+      .nav-avatar-menu {
+         right: 0 !important;
+         left: auto !important;
+         min-width: 200px;
+      }
+
+      .nav-avatar-btn {
+         padding: 0.25rem 0.375rem !important;
+      }
+
+      .nav-avatar {
+         width: 32px;
+         height: 32px;
+      }
+
+      .avatar-initials {
+         font-size: 0.75rem;
+      }
+
+      #userAvatarDropdown {
+         margin-left: auto;
+      }
+   }
+
+   /* Mobile dropdown adjustments */
+   @media (max-width: 991px) {
+      .navbar-collapse {
+         max-height: 80vh;
+         overflow-y: auto !important;
+         overflow-x: visible !important;
+      }
+
+      .navbar .dropdown-menu {
+         position: static !important;
+         float: none;
+         width: 100%;
+         box-shadow: none;
+         border: none;
+         background: #f8f9fa;
+         border-radius: 0;
+         padding: 0;
+         margin: 0;
+      }
+
+      .navbar .dropdown-item {
+         padding: 10px 30px;
+      }
+   }
+
+   /* Ensure nav labels always show with first letter of each word capitalized */
+   .navbar-expand-lg .navbar-nav .nav-link,
+   .navbar-expand-lg .navbar-nav .dropdown-toggle,
+   .navbar .dropdown-menu .dropdown-item,
+   .nav-link.nav-auth-btn span {
+      text-transform: capitalize !important;
+   }
+</style>
+      <div class="header_section">
+         <div class="container-fluid header_main">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+               <a class="logo navbar-brand d-flex align-items-center" href="{% url 'index' %}">
+                  <img src="https://res.cloudinary.com/dmqizfpyz/image/upload/v1769424497/mmm_lyzhlw.png" alt="Ratel logo" style="height:60px; width:auto; margin-right:10px;">
+                  <div class="d-flex flex-column justify-content-center">
+                     <span style="font-size:26px; font-weight:700; line-height:1; color:#000;">Ratel</span>
+                     <span style="font-size:14px; font-weight:500; line-height:1.2; color:#555;">Movement</span>
+                  </div>
+               </a>
+               <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+               <span class="navbar-toggler-icon"></span>
+               </button>
+               <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                  <ul class="navbar-nav ml-auto">
+                     <li class="nav-item">
+                        <a class="nav-link" href="{% url 'index' %}">Home</a>
+                     </li>
+
+                     <!-- About Us dropdown -->
+                     <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="{% url 'about' %}" id="aboutDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                           About Us
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="aboutDropdown">
+                           <a class="dropdown-item" href="{% url 'about_ratel' %}">About Ratel</a>
+                           <a class="dropdown-item" href="{% url 'mission_vision' %}">Mission &amp; Vision</a>
+                           <a class="dropdown-item" href="{% url 'ideology' %}">Ideology</a>
+                           <a class="dropdown-item" href="{% url 'faqs' %}">FAQs</a>
+                        </div>
+                     </li>
+
+                     <!-- Media Vault dropdown -->
+                     <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="{% url 'media_vault' %}" id="mediaDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                           Media Vault
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="mediaDropdown">
+                           <a class="dropdown-item" href="{% url 'media_videos' %}">Videos</a>
+                           <a class="dropdown-item" href="{% url 'media_audios' %}">Audios</a>
+                           <a class="dropdown-item" href="{% url 'media_images' %}">Images</a>
+                           <a class="dropdown-item" href="{% url 'media_documents' %}">Documents</a>
+                        </div>
+                     </li>
+
+                     <!-- Standalone pages -->
+                     <li class="nav-item">
+                        <a class="nav-link" href="{% url 'resources' %}">Resources</a>
+                     </li>
+
+                     <!-- Our People dropdown -->
+                     <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="ourPeopleDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                           Our People
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="ourPeopleDropdown">
+                           <a class="dropdown-item" href="{% url 'membership' %}">Membership</a>
+                           <a class="dropdown-item" href="{% url 'leadership' %}">Leadership</a>
+                           <a class="dropdown-item" href="{% url 'suspended_members' %}">Suspended Members</a>
+                           <a class="dropdown-item" href="{% url 'banned_accounts' %}">Banned Accounts</a>
+                        </div>
+                     </li>
+
+                     <li class="nav-item">
+                        <a class="nav-link" href="{% url 'messages' %}">Messages</a>
+                     </li>
+                     <li class="nav-item">
+                        <a class="nav-link" href="{% url 'contact' %}">Contact</a>
+                     </li>
+                     {% if user.is_authenticated %}
+                     <!-- User Avatar Dropdown -->
+                     <li class="nav-item" id="userAvatarDropdown" style="position: relative; display: flex; align-items: center;">
+                        <button class="nav-avatar-btn" id="userAvatarBtn" type="button" aria-haspopup="true" aria-expanded="false" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.375rem 0.5rem; background: transparent; border: 1.5px solid #e2e8f0; border-radius: 12px; cursor: pointer;">
+                           <div class="nav-avatar" id="navAvatar" style="width: 36px; height: 36px; border-radius: 10px; background: #0f172a; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                              <img id="navAvatarImg" src="" alt="Profile" style="display:none; width: 100%; height: 100%; object-fit: cover;">
+                              {% if user.first_name or user.last_name %}
+                                 <span class="avatar-initials" style="font-size: 0.875rem; font-weight: 700; color: #ffffff; letter-spacing: 0.02em; line-height: 1;">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>
+                              {% else %}
+                                 <span class="avatar-initials" style="font-size: 0.875rem; font-weight: 700; color: #ffffff; letter-spacing: 0.02em; line-height: 1;">{{ user.username|first|upper }}</span>
+                              {% endif %}
+                           </div>
+                           <svg class="avatar-chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #64748b; transition: transform 0.2s ease;"><polyline points="6 9 12 15 18 9"/></svg>
+                        </button>
+                        <div class="nav-avatar-menu" id="navAvatarMenu" style="position: absolute; top: calc(100% + 8px); right: 0; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12); min-width: 240px; display: none; z-index: 10000; overflow: hidden;">
+                           <div class="avatar-menu-header">
+                              <div class="avatar-menu-avatar" id="avatarMenuAvatar">
+                                 <img id="avatarMenuImg" src="" alt="Profile" style="display:none;">
+                                 {% if user.first_name or user.last_name %}
+                                    <span class="avatar-initials">{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>
+                                 {% else %}
+                                    <span class="avatar-initials">{{ user.username|first|upper }}</span>
+                                 {% endif %}
+                              </div>
+                              <div class="avatar-menu-info">
+                                 <div class="avatar-menu-name">
+                                    {% if user.first_name or user.last_name %}
+                                       {{ user.first_name }} {{ user.last_name }}
+                                    {% else %}
+                                       {{ user.username }}
+                                    {% endif %}
+                                 </div>
+                                 <div class="avatar-menu-email">{{ user.email }}</div>
+                              </div>
+                           </div>
+                           <div class="avatar-menu-divider"></div>
+                           <a href="{% url 'member_dashboard' %}" class="avatar-menu-item">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                              <span>Dashboard</span>
+                           </a>
+                           <a href="{% url 'member_profile' %}" class="avatar-menu-item">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                              <span>Profile</span>
+                           </a>
+                           <div class="avatar-menu-divider"></div>
+                           <a href="{% url 'auth_logout' %}" class="avatar-menu-item logout-item">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                              <span>Logout</span>
+                           </a>
+                        </div>
+                     </li>
+                     {% else %}
+                     <li class="nav-item">
+                        <a class="nav-link nav-auth-btn" href="{% url 'auth' %}">
+                           <span>Login/Signup</span>
+                        </a>
+                     </li>
+                     {% endif %}
+                  </ul>
+               </div>
+            </nav>
+         </div>
+      </div>
+      <!-- header section end -->
+
+      <!-- Clear float from header for proper content flow -->
+      <div style="clear:both;"></div>
+      {% block content %}{% endblock %}
+
+      <!-- footer section start -->
+      <div class="footer_section layout_padding" style="background-color:#111; color:#f4f4f4; padding:40px 0 20px 0;">
+         <div class="container text-center">
+            <h4 style="letter-spacing:1px; text-transform:uppercase; margin-bottom:20px;">FOOTER (STRATEGIC, NOT SOFT)</h4>
+            <div class="d-flex flex-wrap justify-content-center" style="gap:16px; font-size:14px;">
+               <a href="#" style="color:#f4f4f4; text-decoration:none;">Manifesto</a>
+               <a href="#" style="color:#f4f4f4; text-decoration:none;">Statements</a>
+               <a href="#" style="color:#f4f4f4; text-decoration:none;">Resources</a>
+               <a href="#" style="color:#f4f4f4; text-decoration:none;">Privacy Policy</a>
+               <a href="#" style="color:#f4f4f4; text-decoration:none;">Data Protection Notice</a>
+            </div>
+            <p style="margin-top:24px; font-weight:600; font-size:13px; letter-spacing:1px; text-transform:uppercase;">“Neutrality Is Complicity.”</p>
+            <p style="margin-top:8px; font-size:12px; color:#cccccc;">
+               &copy; 2026 Ratel Movement. Developed by
+               <a href="https://metascholar.academicdigital.space/" target="_blank" rel="noopener" style="color:#ffffff; text-decoration:underline;">
+                  Metascholar Consult Limited
+               </a>.
+            </p>
+         </div>
+      </div>
+      <!-- footer section end -->
+
+      <!-- Donate modal (flat UI, no gradients) -->
+      <div id="donateModalBackdrop" class="donate-modal-backdrop" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.6); z-index:10000; align-items:center; justify-content:center; padding:1rem;">
+         <div class="donate-modal-card" style="background:#fff; border:1px solid #e2e8f0; border-radius:12px; max-width:420px; width:100%; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); overflow:hidden;">
+            <div style="padding:1.25rem 1.5rem; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
+               <h3 style="margin:0; font-size:1.2rem; font-weight:600; color:#0f172a;">Donate</h3>
+               <button type="button" id="donateModalClose" aria-label="Close" style="width:36px; height:36px; border:none; background:#f1f5f9; color:#475569; border-radius:8px; cursor:pointer; font-size:1.25rem; line-height:1;">&times;</button>
+            </div>
+            <form id="donateForm" style="padding:1.5rem;">
+               {% csrf_token %}
+               <label style="display:block; font-size:0.875rem; font-weight:500; color:#334155; margin-bottom:0.5rem;">Amount (GHS)</label>
+               <input type="number" id="donateAmount" name="amount" min="1" step="1" value="50" required style="width:100%; padding:0.6rem 0.75rem; border:1px solid #e2e8f0; border-radius:8px; font-size:1rem; margin-bottom:1rem;">
+               <label style="display:block; font-size:0.875rem; font-weight:500; color:#334155; margin-bottom:0.5rem;">Display</label>
+               <div style="margin-bottom:1rem;">
+                  <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer; margin-bottom:0.35rem;">
+                     <input type="radio" name="donate_anonymous" value="1" checked> <span>Donate anonymously</span>
+                  </label>
+                  <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer;">
+                     <input type="radio" name="donate_anonymous" value="0"> <span>Show my details</span>
+                  </label>
+               </div>
+               <div id="donateDetailsFields" style="display:none; margin-bottom:1rem;">
+                  <label style="display:block; font-size:0.875rem; font-weight:500; color:#334155; margin-bottom:0.5rem;">Your name</label>
+                  <input type="text" id="donateName" name="donor_name" placeholder="Full name" style="width:100%; padding:0.6rem 0.75rem; border:1px solid #e2e8f0; border-radius:8px; font-size:0.95rem; margin-bottom:0.75rem;">
+                  <label style="display:block; font-size:0.875rem; font-weight:500; color:#334155; margin-bottom:0.5rem;">Email</label>
+                  <input type="email" id="donateEmail" name="donor_email" placeholder="email@example.com" style="width:100%; padding:0.6rem 0.75rem; border:1px solid #e2e8f0; border-radius:8px; font-size:0.95rem;">
+               </div>
+               <p id="donateError" style="display:none; color:#b91c1c; font-size:0.875rem; margin-bottom:0.75rem;"></p>
+               <button type="submit" id="donateSubmitBtn" style="width:100%; padding:0.75rem 1rem; background:#0f172a; color:#fff; border:none; border-radius:8px; font-weight:600; font-size:0.95rem; cursor:pointer;">Donate</button>
+            </form>
+         </div>
+      </div>
+
+      <!-- Javascript files-->
+      <script src="{% static 'js/jquery.min.js' %}"></script>
+      <script src="{% static 'js/popper.min.js' %}"></script>
+      <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+      <script src="{% static 'js/jquery-3.0.0.min.js' %}"></script>
+      <script src="{% static 'js/plugin.js' %}"></script>
+      <!-- sidebar -->
+      <script src="{% static 'js/jquery.mCustomScrollbar.concat.min.js' %}"></script>
+      <script src="{% static 'js/custom.js' %}"></script>
+      <!-- javascript --> 
+      <script src="{% static 'js/owl.carousel.js' %}"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+      <script src="https://js.paystack.co/v1/inline.js"></script>
+      <script>
+      (function() {
+         function initDonateModal() {
+            var backdrop = document.getElementById('donateModalBackdrop');
+            var form = document.getElementById('donateForm');
+            var donateBtn = document.getElementById('navDonateBtn');
+            var closeBtn = document.getElementById('donateModalClose');
+            var amountInput = document.getElementById('donateAmount');
+            var anonymousRadios = document.querySelectorAll('input[name="donate_anonymous"]');
+            var detailsFields = document.getElementById('donateDetailsFields');
+            var donateName = document.getElementById('donateName');
+            var donateEmail = document.getElementById('donateEmail');
+            var donateError = document.getElementById('donateError');
+            var submitBtn = document.getElementById('donateSubmitBtn');
+            var paystackKey = '{{ paystack_public_key|default:""|escapejs }}';
+
+            function showDonateModal() {
+               if (backdrop) { backdrop.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+            }
+            function hideDonateModal() {
+               if (backdrop) { backdrop.style.display = 'none'; document.body.style.overflow = ''; }
+            }
+            function toggleDetails() {
+               var el = document.querySelector('input[name="donate_anonymous"][value="0"]');
+               if (detailsFields) detailsFields.style.display = (el && el.checked) ? 'block' : 'none';
+            }
+            if (donateBtn) donateBtn.addEventListener('click', showDonateModal);
+            window.openDonateModal = showDonateModal;
+            if (closeBtn) closeBtn.addEventListener('click', hideDonateModal);
+            if (backdrop) backdrop.addEventListener('click', function(e) { if (e.target === backdrop) hideDonateModal(); });
+            if (anonymousRadios && anonymousRadios.length) { for (var i = 0; i < anonymousRadios.length; i++) { anonymousRadios[i].addEventListener('change', toggleDetails); } }
+            toggleDetails();
+
+            if (form) {
+               form.addEventListener('submit', function(e) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (donateError) { donateError.style.display = 'none'; donateError.textContent = ''; }
+                  var amount = parseFloat(amountInput ? amountInput.value : 0, 10);
+                  if (!amount || amount < 1 || isNaN(amount)) {
+                     if (donateError) { donateError.textContent = 'Please enter a valid amount (at least 1 GHS).'; donateError.style.display = 'block'; }
+                     return false;
+                  }
+                  var anon1 = document.querySelector('input[name="donate_anonymous"][value="1"]');
+                  var isAnonymous = anon1 ? anon1.checked : true;
+                  // Paystack requires a valid email; use org noreply for anonymous (we store empty donor_email in DB)
+                  var email = 'ratelmovement+anonymous@gmail.com';
+                  var name = '';
+                  if (!isAnonymous) {
+                     name = (donateName && donateName.value) ? donateName.value.trim() : '';
+                     var em = (donateEmail && donateEmail.value) ? donateEmail.value.trim() : '';
+                     if (!em) { if (donateError) { donateError.textContent = 'Please enter your email.'; donateError.style.display = 'block'; } return false; }
+                     email = em;
+                  }
+                  if (!paystackKey || paystackKey.length < 10) {
+                     if (donateError) { donateError.textContent = 'Payment is not configured. Please contact support.'; donateError.style.display = 'block'; }
+                     return false;
+                  }
+                  var amountPesewas = Math.round(amount * 100);
+                  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Opening…'; }
+                  if (typeof PaystackPop === 'undefined') {
+                     if (submitBtn) submitBtn.disabled = false;
+                     if (submitBtn) submitBtn.textContent = 'Donate';
+                     if (donateError) { donateError.textContent = 'Paystack did not load. Check your connection or disable ad blockers.'; donateError.style.display = 'block'; }
+                     return false;
+                  }
+                  try {
+                     var handler = PaystackPop.setup({
+                        key: paystackKey,
+                        email: email,
+                        amount: amountPesewas,
+                        currency: 'GHS',
+                        ref: 'DON-' + Date.now(),
+                        onClose: function() { if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Donate'; } },
+                        callback: function(res) {
+                           var ref = (res && res.reference) ? res.reference : '';
+                           if (!ref) { if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Donate'; } if (donateError) { donateError.textContent = 'No payment reference.'; donateError.style.display = 'block'; } return; }
+                           var csrfEl = form.querySelector('[name=csrfmiddlewaretoken]');
+                           var fd = new FormData();
+                           if (csrfEl) fd.append('csrfmiddlewaretoken', csrfEl.value);
+                           fd.append('reference', ref);
+                           fd.append('amount', String(amount));
+                           fd.append('is_anonymous', isAnonymous ? '1' : '0');
+                           fd.append('donor_name', name);
+                           fd.append('donor_email', isAnonymous ? '' : email);
+                           fetch('{% url "donation_verify" %}', { method: 'POST', body: fd, credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                              .then(function(r) { return r.json(); })
+                              .then(function(data) {
+                                 if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Donate'; }
+                                 if (data && data.success) { hideDonateModal(); form.reset(); toggleDetails(); alert('Thank you! Your donation was successful.'); }
+                                 else { if (donateError) { donateError.textContent = (data && data.message) ? data.message : 'Verification failed.'; donateError.style.display = 'block'; } }
+                              })
+                              .catch(function() { if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Donate'; } if (donateError) { donateError.textContent = 'Something went wrong. Please try again.'; donateError.style.display = 'block'; } });
+                        }
+                     });
+                     handler.openIframe();
+                  } catch (err) {
+                     if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Donate'; }
+                     if (donateError) { donateError.textContent = 'Could not open payment. Please try again.'; donateError.style.display = 'block'; }
+                     console.error('Donate Paystack error:', err);
+                  }
+                  return false;
+               });
+            }
+         }
+         if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initDonateModal);
+         } else {
+            initDonateModal();
+         }
+      })();
+      </script>
+      {% block extra_scripts %}{% endblock %}
+
+   <!-- Site Loader Script -->
+   <script>
+   // Hide loader when page is fully loaded
+   window.addEventListener('load', function() {
+       var loader = document.getElementById('site-loader');
+       if (loader) {
+           setTimeout(function() {
+               loader.classList.add('hidden');
+               // Remove from DOM after animation completes
+               setTimeout(function() {
+                   loader.style.display = 'none';
+               }, 400);
+           }, 300); // Small delay for smooth transition
+       }
+   });
+
+   // Fallback: hide loader after 3 seconds even if load event doesn't fire
+   setTimeout(function() {
+       var loader = document.getElementById('site-loader');
+       if (loader && !loader.classList.contains('hidden')) {
+           loader.classList.add('hidden');
+           setTimeout(function() {
+               loader.style.display = 'none';
+           }, 400);
+       }
+   }, 3000);
+   </script>
+
+   <!-- Navbar Dropdown Fix -->
+   <script>
+   $(document).ready(function() {
+       // Ensure Bootstrap dropdowns work properly
+       $('.navbar .dropdown-toggle').on('click', function(e) {
+           var $el = $(this);
+           var $parent = $el.parent('.dropdown');
+           var $menu = $parent.find('.dropdown-menu');
+
+           // Close other dropdowns
+           $('.navbar .dropdown-menu.show').not($menu).removeClass('show');
+           $('.navbar .dropdown-toggle').not($el).attr('aria-expanded', 'false');
+
+           // Toggle this dropdown
+           $menu.toggleClass('show');
+           $el.attr('aria-expanded', $menu.hasClass('show'));
+
+           e.preventDefault();
+           e.stopPropagation();
+       });
+
+       // Close dropdowns when clicking outside
+       $(document).on('click', function(e) {
+           if (!$(e.target).closest('.navbar .dropdown').length) {
+               $('.navbar .dropdown-menu.show').removeClass('show');
+               $('.navbar .dropdown-toggle').attr('aria-expanded', 'false');
+           }
+       });
+
+       // Prevent dropdown menu clicks from closing the dropdown
+       $('.navbar .dropdown-menu').on('click', function(e) {
+           e.stopPropagation();
+       });
+
+       // User Avatar Dropdown Toggle
+       function initAvatarDropdown() {
+           const avatarBtn = document.getElementById('userAvatarBtn');
+           const avatarMenu = document.getElementById('navAvatarMenu');
+           
+           if (avatarBtn && avatarMenu) {
+               console.log('Avatar dropdown initialized');
+               
+               avatarBtn.addEventListener('click', function(e) {
+                   e.preventDefault();
+                   e.stopPropagation();
+                   
+                   const isExpanded = this.getAttribute('aria-expanded') === 'true';
+                   
+                   // Close other Bootstrap dropdowns
+                   $('.navbar .dropdown-menu.show').removeClass('show');
+                   $('.navbar .dropdown-toggle').attr('aria-expanded', 'false');
+                   
+                   // Close other avatar dropdowns
+                   document.querySelectorAll('.nav-avatar-menu.show').forEach(menu => {
+                       if (menu !== avatarMenu) {
+                           menu.classList.remove('show');
+                       }
+                   });
+                   document.querySelectorAll('.nav-avatar-btn[aria-expanded="true"]').forEach(btn => {
+                       if (btn !== avatarBtn) {
+                           btn.setAttribute('aria-expanded', 'false');
+                       }
+                   });
+                   
+                   // Toggle this dropdown
+                   this.setAttribute('aria-expanded', !isExpanded);
+                   avatarMenu.classList.toggle('show', !isExpanded);
+                   
+                   console.log('Avatar dropdown toggled:', !isExpanded);
+               });
+
+               // Close avatar dropdown when clicking outside
+               document.addEventListener('click', function(e) {
+                   if (avatarBtn && avatarMenu && !e.target.closest('#userAvatarDropdown')) {
+                       avatarBtn.setAttribute('aria-expanded', 'false');
+                       avatarMenu.classList.remove('show');
+                   }
+               });
+
+               // Prevent menu clicks from closing dropdown
+               avatarMenu.addEventListener('click', function(e) {
+                   e.stopPropagation();
+               });
+           } else {
+               console.log('Avatar elements not found:', { avatarBtn, avatarMenu });
+           }
+       }
+       
+       // Initialize on DOM ready
+       initAvatarDropdown();
+
+       // Load user profile image if available (optional enhancement)
+       // This can be enhanced to fetch from an API endpoint
+       function loadUserProfileImage() {
+           // You can add an AJAX call here to fetch profile image URL
+           // For now, this is a placeholder that can be extended
+           // Example:
+           // fetch('/api/user/profile-image/')
+           //     .then(response => response.json())
+           //     .then(data => {
+           //         if (data.profile_image_url) {
+           //             const navAvatar = document.getElementById('navAvatar');
+           //             const navAvatarImg = document.getElementById('navAvatarImg');
+           //             const menuAvatar = document.getElementById('avatarMenuAvatar');
+           //             const menuAvatarImg = document.getElementById('avatarMenuImg');
+           //             
+           //             navAvatarImg.src = data.profile_image_url;
+           //             menuAvatarImg.src = data.profile_image_url;
+           //             navAvatar.classList.add('has-image');
+           //             menuAvatar.classList.add('has-image');
+           //         }
+           //     });
+       }
+       
+       // Uncomment to enable profile image loading
+       // loadUserProfileImage();
+   });
+   </script>
+   </body>
+</html>
+

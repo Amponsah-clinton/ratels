@@ -1,0 +1,727 @@
+{% extends "dashboard/base_dashboard.html" %}
+
+{% block title %}Resources Management{% endblock %}
+
+{% block content %}
+<div class="md-space-y-6">
+
+    <!-- Page Header -->
+    <div class="md-vault-header">
+        <div class="md-vault-header-content">
+            <h1 class="md-page-title">Resources</h1>
+            <p class="md-page-subtitle">Manage downloadable materials, toolkits, and guides</p>
+        </div>
+        <div class="md-vault-header-actions">
+            <button class="md-btn md-btn-primary md-btn-sm" onclick="openResourceModal()">
+                <i data-lucide="plus" style="width:16px;height:16px;"></i>
+                Add Resource
+            </button>
+        </div>
+    </div>
+
+    <!-- Category Tabs -->
+    <div class="md-vault-tabs">
+        <button class="md-vault-tab {% if not current_category or current_category == 'all' %}active{% endif %}" onclick="filterCategory('all')">
+            All Resources
+        </button>
+        {% for cat in categories %}
+        <button class="md-vault-tab {% if current_category == cat.key %}active{% endif %}" onclick="filterCategory('{{ cat.key }}')">
+            {{ cat.label }}
+        </button>
+        {% endfor %}
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="md-filter-bar">
+        <div class="md-filter-search">
+            <span class="md-filter-search-icon">
+                <i data-lucide="search"></i>
+            </span>
+            <input type="text" class="md-filter-search-input" placeholder="Search resources..." id="searchInput" onkeyup="searchResources()">
+        </div>
+        <select class="md-filter-select" id="sortSelect" onchange="sortResources()">
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="title">Title A-Z</option>
+        </select>
+    </div>
+
+    <!-- Resources Table -->
+    <div class="md-table-container">
+        <table class="md-table" id="resourcesTable">
+            <thead>
+                <tr>
+                    <th style="width: 35%;">Resource</th>
+                    <th style="width: 15%;">Category</th>
+                    <th style="width: 10%;">Type</th>
+                    <th style="width: 12%;">Status</th>
+                    <th style="width: 13%;">Created</th>
+                    <th style="width: 15%;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if resources %}
+                    {% for resource in resources %}
+                    <tr data-id="{{ resource.id }}" data-title="{{ resource.title|lower }}" data-category="{{ resource.category }}">
+                        <td>
+                            <div class="md-table-resource">
+                                <div class="md-table-resource-icon">
+                                    {% if resource.file_type == 'pdf' %}
+                                    <i data-lucide="file-text" style="color: #ef4444;"></i>
+                                    {% elif resource.file_type == 'doc' or resource.file_type == 'docx' %}
+                                    <i data-lucide="file-text" style="color: #3b82f6;"></i>
+                                    {% elif resource.file_type == 'zip' %}
+                                    <i data-lucide="file-archive" style="color: #8b5cf6;"></i>
+                                    {% else %}
+                                    <i data-lucide="file" style="color: #6b7280;"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="md-table-resource-info">
+                                    <span class="md-table-resource-title">{{ resource.title }}</span>
+                                    <span class="md-table-resource-desc">{{ resource.description|truncatewords:10|default:"No description" }}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="md-badge md-badge-{{ resource.category }}">
+                                {% if resource.category == 'activist_toolkits' %}Activist Toolkits
+                                {% elif resource.category == 'educational_materials' %}Educational
+                                {% elif resource.category == 'legal_civic_guides' %}Legal & Civic
+                                {% elif resource.category == 'research_reading' %}Research
+                                {% elif resource.category == 'download_centre' %}Download Centre
+                                {% else %}{{ resource.category }}{% endif %}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="md-type-badge">{{ resource.file_type|upper|default:"—" }}</span>
+                        </td>
+                        <td>
+                            {% if resource.status == 'active' %}
+                            <span class="md-status-badge md-status-active">Active</span>
+                            {% elif resource.status == 'draft' %}
+                            <span class="md-status-badge md-status-draft">Draft</span>
+                            {% else %}
+                            <span class="md-status-badge md-status-archived">Archived</span>
+                            {% endif %}
+                        </td>
+                        <td class="md-text-muted">
+                            {{ resource.created_at|date:"M d, Y" }}
+                        </td>
+                        <td>
+                            <div class="md-table-actions">
+                                {% if resource.file_url %}
+                                <a href="{{ resource.file_url }}" target="_blank" class="md-action-btn md-action-view" title="Download">
+                                    <i data-lucide="download"></i>
+                                </a>
+                                {% endif %}
+                                <button class="md-action-btn md-action-edit" onclick="editResource('{{ resource.id }}')" title="Edit">
+                                    <i data-lucide="edit-2"></i>
+                                </button>
+                                <button class="md-action-btn md-action-delete" onclick="deleteResource('{{ resource.id }}', '{{ resource.title|escapejs }}')" title="Delete">
+                                    <i data-lucide="trash-2"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="6" class="md-table-empty">
+                        <div class="md-empty-state">
+                            <i data-lucide="folder-open" class="md-empty-icon"></i>
+                            <h3>No resources yet</h3>
+                            <p>Upload your first resource to get started</p>
+                            <button class="md-btn md-btn-primary md-btn-sm" onclick="openResourceModal()">
+                                <i data-lucide="plus"></i>
+                                Add Resource
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<!-- Add/Edit Resource Modal -->
+<div class="md-modal-overlay" id="resourceModal">
+    <div class="md-modal md-modal-lg">
+        <div class="md-modal-header">
+            <h2 id="modalTitle">Add New Resource</h2>
+            <button class="md-modal-close" onclick="closeResourceModal()">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        <form id="resourceForm" action="{% url 'dashboard_resources_save' %}" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="resource_id" id="resourceId" value="">
+
+            <div class="md-modal-body">
+                <div class="md-form-grid">
+                    <!-- Title -->
+                    <div class="md-form-group md-form-full">
+                        <label class="md-form-label" for="title">
+                            Title <span class="md-required">*</span>
+                        </label>
+                        <input type="text" class="md-form-input" id="title" name="title" required placeholder="Enter resource title">
+                    </div>
+
+                    <!-- Category -->
+                    <div class="md-form-group">
+                        <label class="md-form-label" for="category">
+                            Category <span class="md-required">*</span>
+                        </label>
+                        <select class="md-form-select" id="category" name="category" required>
+                            <option value="">Select category</option>
+                            <option value="activist_toolkits">Activist Toolkits</option>
+                            <option value="educational_materials">Educational Materials</option>
+                            <option value="legal_civic_guides">Legal & Civic Guides</option>
+                            <option value="research_reading">Research & Reading</option>
+                            <option value="download_centre">Download Centre</option>
+                        </select>
+                    </div>
+
+                    <!-- Status -->
+                    <div class="md-form-group">
+                        <label class="md-form-label" for="status">Status</label>
+                        <select class="md-form-select" id="status" name="status">
+                            <option value="active">Active</option>
+                            <option value="draft">Draft</option>
+                        </select>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="md-form-group md-form-full">
+                        <label class="md-form-label" for="description">Description</label>
+                        <textarea class="md-form-textarea" id="description" name="description" rows="3" placeholder="Brief description of the resource"></textarea>
+                    </div>
+
+                    <!-- Intended Audience -->
+                    <div class="md-form-group md-form-full">
+                        <label class="md-form-label" for="intended_audience">Intended Audience</label>
+                        <input type="text" class="md-form-input" id="intended_audience" name="intended_audience" placeholder="e.g., Community organizers, activists, educators">
+                    </div>
+
+                    <!-- How to Use -->
+                    <div class="md-form-group md-form-full">
+                        <label class="md-form-label" for="how_to_use">How to Use</label>
+                        <textarea class="md-form-textarea" id="how_to_use" name="how_to_use" rows="3" placeholder="Instructions on how to use this resource effectively"></textarea>
+                    </div>
+
+                    <!-- Author -->
+                    <div class="md-form-group">
+                        <label class="md-form-label" for="author">Author</label>
+                        <input type="text" class="md-form-input" id="author" name="author" placeholder="Author or organization">
+                    </div>
+
+                    <!-- Version -->
+                    <div class="md-form-group">
+                        <label class="md-form-label" for="version">Version</label>
+                        <input type="text" class="md-form-input" id="version" name="version" placeholder="e.g., 1.0, 2024 Edition">
+                    </div>
+
+                    <!-- Tags -->
+                    <div class="md-form-group md-form-full">
+                        <label class="md-form-label" for="tags">Tags</label>
+                        <input type="text" class="md-form-input" id="tags" name="tags" placeholder="Comma-separated tags (e.g., organizing, legal rights, guide)">
+                    </div>
+
+                    <!-- File Upload -->
+                    <div class="md-form-group md-form-full">
+                        <label class="md-form-label" for="resource_file">
+                            Resource File
+                            <span class="md-form-hint">(PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, ZIP)</span>
+                        </label>
+                        <div class="md-file-upload" id="fileDropZone">
+                            <input type="file" class="md-file-input" id="resource_file" name="resource_file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar">
+                            <div class="md-file-upload-content">
+                                <i data-lucide="upload-cloud" class="md-file-upload-icon"></i>
+                                <p class="md-file-upload-text">Drag & drop your file here or <span>browse</span></p>
+                                <p class="md-file-upload-hint">Max file size: 50MB</p>
+                            </div>
+                            <div class="md-file-preview" id="filePreview" style="display: none;">
+                                <i data-lucide="file"></i>
+                                <span id="fileName"></span>
+                                <button type="button" class="md-file-remove" onclick="removeFile()">
+                                    <i data-lucide="x"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Featured -->
+                    <div class="md-form-group md-form-full">
+                        <label class="md-form-checkbox">
+                            <input type="checkbox" id="is_featured" name="is_featured">
+                            <span class="md-checkbox-mark"></span>
+                            <span>Mark as Featured Resource</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="md-modal-footer">
+                <button type="button" class="md-btn md-btn-secondary" onclick="closeResourceModal()">Cancel</button>
+                <button type="submit" class="md-btn md-btn-primary">
+                    <i data-lucide="save" style="width:16px;height:16px;"></i>
+                    Save Resource
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+/* Additional styles for resources page */
+.md-table-resource {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.md-table-resource-icon {
+    width: 40px;
+    height: 40px;
+    background: #f3f4f6;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.md-table-resource-icon i {
+    width: 20px;
+    height: 20px;
+}
+
+.md-table-resource-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.md-table-resource-title {
+    font-weight: 600;
+    color: #111827;
+}
+
+.md-table-resource-desc {
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.md-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.md-badge-activist_toolkits { background: #fef3c7; color: #92400e; }
+.md-badge-educational_materials { background: #dbeafe; color: #1e40af; }
+.md-badge-legal_civic_guides { background: #ede9fe; color: #5b21b6; }
+.md-badge-research_reading { background: #d1fae5; color: #065f46; }
+.md-badge-download_centre { background: #f3f4f6; color: #374151; }
+
+.md-type-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    background: #f3f4f6;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #6b7280;
+}
+
+.md-status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.md-status-active { background: #d1fae5; color: #065f46; }
+.md-status-draft { background: #fef3c7; color: #92400e; }
+.md-status-archived { background: #f3f4f6; color: #6b7280; }
+
+.md-table-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.md-action-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.md-action-btn i {
+    width: 16px;
+    height: 16px;
+}
+
+.md-action-view { background: #dbeafe; color: #1e40af; }
+.md-action-view:hover { background: #bfdbfe; }
+.md-action-edit { background: #f3f4f6; color: #374151; }
+.md-action-edit:hover { background: #e5e7eb; }
+.md-action-delete { background: #fee2e2; color: #dc2626; }
+.md-action-delete:hover { background: #fecaca; }
+
+.md-table-empty {
+    padding: 60px 20px !important;
+}
+
+.md-empty-state {
+    text-align: center;
+}
+
+.md-empty-icon {
+    width: 48px;
+    height: 48px;
+    color: #d1d5db;
+    margin-bottom: 16px;
+}
+
+.md-empty-state h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #374151;
+    margin: 0 0 4px 0;
+}
+
+.md-empty-state p {
+    font-size: 0.9rem;
+    color: #9ca3af;
+    margin: 0 0 16px 0;
+}
+
+/* Modal styles */
+.md-modal-lg {
+    max-width: 700px;
+}
+
+.md-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.md-form-full {
+    grid-column: 1 / -1;
+}
+
+.md-form-hint {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    font-weight: normal;
+    margin-left: 4px;
+}
+
+.md-required {
+    color: #dc2626;
+}
+
+.md-file-upload {
+    border: 2px dashed #e5e7eb;
+    border-radius: 12px;
+    padding: 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.md-file-upload:hover {
+    border-color: #d1d5db;
+    background: #f9fafb;
+}
+
+.md-file-upload.dragover {
+    border-color: #111827;
+    background: #f9fafb;
+}
+
+.md-file-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.md-file-upload-icon {
+    width: 40px;
+    height: 40px;
+    color: #9ca3af;
+    margin-bottom: 12px;
+}
+
+.md-file-upload-text {
+    font-size: 0.9rem;
+    color: #6b7280;
+    margin: 0 0 4px 0;
+}
+
+.md-file-upload-text span {
+    color: #111827;
+    font-weight: 600;
+}
+
+.md-file-upload-hint {
+    font-size: 0.8rem;
+    color: #9ca3af;
+    margin: 0;
+}
+
+.md-file-preview {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: #f9fafb;
+    border-radius: 8px;
+    margin-top: 12px;
+}
+
+.md-file-preview i {
+    width: 20px;
+    height: 20px;
+    color: #6b7280;
+}
+
+.md-file-preview span {
+    flex: 1;
+    font-size: 0.9rem;
+    color: #374151;
+}
+
+.md-file-remove {
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: #fee2e2;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #dc2626;
+}
+
+.md-file-remove i {
+    width: 14px;
+    height: 14px;
+}
+
+.md-form-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #374151;
+}
+
+.md-form-checkbox input {
+    display: none;
+}
+
+.md-checkbox-mark {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #e5e7eb;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.md-form-checkbox input:checked + .md-checkbox-mark {
+    background: #111827;
+    border-color: #111827;
+}
+
+.md-form-checkbox input:checked + .md-checkbox-mark::after {
+    content: '';
+    width: 6px;
+    height: 10px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+</style>
+
+<script>
+// Filter by category
+function filterCategory(category) {
+    if (category === 'all') {
+        window.location.href = '{% url "dashboard_resources" %}';
+    } else {
+        window.location.href = '{% url "dashboard_resources" %}?category=' + category;
+    }
+}
+
+// Search resources
+function searchResources() {
+    const query = document.getElementById('searchInput').value.toLowerCase();
+    const rows = document.querySelectorAll('#resourcesTable tbody tr[data-id]');
+
+    rows.forEach(row => {
+        const title = row.getAttribute('data-title') || '';
+        if (title.includes(query)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+// Open add resource modal
+function openResourceModal() {
+    document.getElementById('modalTitle').textContent = 'Add New Resource';
+    document.getElementById('resourceForm').reset();
+    document.getElementById('resourceId').value = '';
+    document.getElementById('filePreview').style.display = 'none';
+    document.getElementById('resourceModal').classList.add('open');
+}
+
+// Close modal
+function closeResourceModal() {
+    document.getElementById('resourceModal').classList.remove('open');
+}
+
+// Edit resource
+function editResource(id) {
+    document.getElementById('modalTitle').textContent = 'Edit Resource';
+
+    fetch('{% url "dashboard_resources_get" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({ id: id })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const r = data.resource;
+            document.getElementById('resourceId').value = r.id;
+            document.getElementById('title').value = r.title || '';
+            document.getElementById('category').value = r.category || '';
+            document.getElementById('description').value = r.description || '';
+            document.getElementById('intended_audience').value = r.intended_audience || '';
+            document.getElementById('how_to_use').value = r.how_to_use || '';
+            document.getElementById('author').value = r.author || '';
+            document.getElementById('version').value = r.version || '';
+            document.getElementById('tags').value = r.tags ? r.tags.join(', ') : '';
+            document.getElementById('status').value = r.status || 'active';
+            document.getElementById('is_featured').checked = r.is_featured || false;
+
+            if (r.file_name) {
+                document.getElementById('fileName').textContent = r.file_name;
+                document.getElementById('filePreview').style.display = 'flex';
+            }
+
+            document.getElementById('resourceModal').classList.add('open');
+        } else {
+            alert('Failed to load resource: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to load resource');
+    });
+}
+
+// Delete resource
+function deleteResource(id, title) {
+    if (!confirm('Are you sure you want to delete "' + title + '"?')) return;
+
+    fetch('{% url "dashboard_resources_delete" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({ id: id })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.reload();
+        } else {
+            alert('Failed to delete resource: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to delete resource');
+    });
+}
+
+// File upload handling
+const fileInput = document.getElementById('resource_file');
+const fileDropZone = document.getElementById('fileDropZone');
+const filePreview = document.getElementById('filePreview');
+const fileName = document.getElementById('fileName');
+
+fileInput.addEventListener('change', function() {
+    if (this.files.length > 0) {
+        fileName.textContent = this.files[0].name;
+        filePreview.style.display = 'flex';
+    }
+});
+
+fileDropZone.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    this.classList.add('dragover');
+});
+
+fileDropZone.addEventListener('dragleave', function() {
+    this.classList.remove('dragover');
+});
+
+fileDropZone.addEventListener('drop', function(e) {
+    e.preventDefault();
+    this.classList.remove('dragover');
+    if (e.dataTransfer.files.length > 0) {
+        fileInput.files = e.dataTransfer.files;
+        fileName.textContent = e.dataTransfer.files[0].name;
+        filePreview.style.display = 'flex';
+    }
+});
+
+function removeFile() {
+    fileInput.value = '';
+    filePreview.style.display = 'none';
+}
+
+// Close modal on overlay click
+document.getElementById('resourceModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeResourceModal();
+    }
+});
+
+// Re-initialize lucide icons
+if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+}
+</script>
+{% endblock %}

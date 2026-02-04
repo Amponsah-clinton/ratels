@@ -1,0 +1,177 @@
+{% extends "dashboard/base_dashboard.html" %}
+
+{% block title %}Billing{% endblock %}
+
+{% block content %}
+<div>
+
+    <!-- Page Header -->
+    <div class="md-page-header">
+        <h1 class="md-billing-title">Billing</h1>
+        <p class="md-billing-subtitle">Manage your subscription and billing information</p>
+    </div>
+
+    <!-- Plan & Payment -->
+    <div class="md-grid md-grid-2">
+        <div class="md-card">
+            <div class="md-card-header">
+                <h3 class="md-card-title-lg">Current Plan</h3>
+            </div>
+            <div class="md-card-content">
+                <div class="md-space-y-4">
+                    <div>
+                        <div class="md-plan-name">Professional</div>
+                        <div class="md-plan-price">$49/monthly</div>
+                    </div>
+                    <div class="md-plan-date">
+                        <i data-lucide="calendar" style="width:16px;height:16px;"></i>
+                        <span>Next billing date: 2025-11-02</span>
+                    </div>
+                    <button class="md-btn md-btn-outline md-btn-full">Change Plan</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="md-card">
+            <div class="md-card-header">
+                <h3 class="md-card-title-lg">Payment Method</h3>
+            </div>
+            <div class="md-card-content">
+                <div class="md-space-y-4">
+                    <div class="md-payment-method">
+                        <div class="md-payment-icon">
+                            <i data-lucide="credit-card" style="width:20px;height:20px;"></i>
+                        </div>
+                        <div class="md-payment-details">
+                            <div class="md-payment-card">Visa &bull;&bull;&bull;&bull; 4242</div>
+                            <div class="md-payment-expiry">Expires 12/25</div>
+                        </div>
+                    </div>
+                    <button class="md-btn md-btn-outline md-btn-full">Update Payment Method</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Billing History -->
+    <div class="md-card md-mt-6">
+        <div class="md-card-header">
+            <h3 class="md-card-title-lg">Billing History</h3>
+        </div>
+        <div class="md-card-content">
+            <div class="md-space-y-2">
+
+                <!-- Table Header -->
+                <div class="md-invoice-header">
+                    <div>Invoice</div>
+                    <div>Date</div>
+                    <div>Amount</div>
+                    <div>Status</div>
+                </div>
+
+                <!-- Row 1 -->
+                <div class="md-invoice-row">
+                    <div class="md-invoice-cell">
+                        <span class="md-invoice-cell-label">Invoice</span>
+                        <span class="md-invoice-cell-value font-medium">INV-001</span>
+                    </div>
+                    <div class="md-invoice-cell">
+                        <span class="md-invoice-cell-label">Date</span>
+                        <span class="md-invoice-cell-value">2025-10-02</span>
+                    </div>
+                    <div class="md-invoice-cell">
+                        <span class="md-invoice-cell-label">Amount</span>
+                        <span class="md-invoice-cell-value">$49</span>
+                    </div>
+                    <div class="md-invoice-cell">
+                        <span class="md-invoice-cell-label">Status</span>
+                        <div class="md-invoice-status">
+                            <span class="md-badge md-badge-green">Paid</span>
+                            <button class="md-invoice-download" title="Download invoice">
+                                <i data-lucide="download" style="width:16px;height:16px;"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 2 -->
+                <div class="md-invoice-row">
+                    <div class="md-invoice-cell">
+                        <span class="md-invoice-cell-label">Invoice</span>
+                        <span class="md-invoice-cell-value font-medium">INV-002</span>
+                    </div>
+                    <div class="md-invoice-cell">
+                        <span class="md-invoice-cell-label">Date</span>
+                        <span class="md-invoice-cell-value">2025-09-02</span>
+                    </div>
+                    <div class="md-invoice-cell">
+                        <span class="md-invoice-cell-label">Amount</span>
+                        <span class="md-invoice-cell-value">$49</span>
+                    </div>
+                    <div class="md-invoice-cell">
+                        <span class="md-invoice-cell-label">Status</span>
+                        <div class="md-invoice-status">
+                            <span class="md-badge md-badge-green">Paid</span>
+                            <button class="md-invoice-download" title="Download invoice">
+                                <i data-lucide="download" style="width:16px;height:16px;"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 3 -->
+                <div class="md-invoice-row">
+                    <div class="md-invoice-cell">
+                        <span class="md-invoice-cell-label">Invoice</span>
+                        <span class="md-invoice-cell-value font-medium">INV-003</span>
+                    </div>
+                    <div class="md-invoice-cell">
+                        <span class="md-invoice-cell-label">Date</span>
+                        <span class="md-invoice-cell-value">2025-08-02</span>
+                    </div>
+                    <div class="md-invoice-cell">
+                        <span class="md-invoice-cell-label">Amount</span>
+                        <span class="md-invoice-cell-value">$49</span>
+                    </div>
+                    <div class="md-invoice-cell">
+                        <span class="md-invoice-cell-label">Status</span>
+                        <div class="md-invoice-status">
+                            <span class="md-badge md-badge-green">Paid</span>
+                            <button class="md-invoice-download" title="Download invoice">
+                                <i data-lucide="download" style="width:16px;height:16px;"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 4 -->
+                <div class="md-invoice-row">
+                    <div class="md-invoice-cell">
+                        <span class="md-invoice-cell-label">Invoice</span>
+                        <span class="md-invoice-cell-value font-medium">INV-004</span>
+                    </div>
+                    <div class="md-invoice-cell">
+                        <span class="md-invoice-cell-label">Date</span>
+                        <span class="md-invoice-cell-value">2025-07-02</span>
+                    </div>
+                    <div class="md-invoice-cell">
+                        <span class="md-invoice-cell-label">Amount</span>
+                        <span class="md-invoice-cell-value">$49</span>
+                    </div>
+                    <div class="md-invoice-cell">
+                        <span class="md-invoice-cell-label">Status</span>
+                        <div class="md-invoice-status">
+                            <span class="md-badge md-badge-green">Paid</span>
+                            <button class="md-invoice-download" title="Download invoice">
+                                <i data-lucide="download" style="width:16px;height:16px;"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

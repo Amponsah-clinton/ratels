@@ -1,0 +1,415 @@
+{% extends 'dashboard/base_dashboard.html' %}
+{% load static %}
+
+{% block title %}YouTube / IG - Dashboard{% endblock %}
+{% block page_title %}YouTube / Instagram{% endblock %}
+{% block page_subtitle %}Manage YouTube and Instagram links separately. Each link can be either YouTube OR Instagram, not both.{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* No gradients. Clean, flat design. */
+    .yig-page { max-width: 960px; margin: 0 auto; }
+    .yig-section { margin-bottom: 2rem; }
+    .yig-section-title {
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #64748b;
+        margin-bottom: 1rem;
+    }
+    .yig-card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    .yig-form { padding: 1.5rem 1.75rem; }
+    .yig-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+    .yig-form-row.full { grid-template-columns: 1fr; }
+    .yig-label {
+        display: block;
+        font-size: 0.8125rem;
+        font-weight: 500;
+        color: #334155;
+        margin-bottom: 0.375rem;
+    }
+    .yig-input, .yig-select, .yig-textarea {
+        width: 100%;
+        padding: 0.625rem 0.875rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 0.9375rem;
+        color: #0f172a;
+        background: #fff;
+        transition: border-color 0.15s ease;
+    }
+    .yig-input:focus, .yig-select:focus, .yig-textarea:focus {
+        outline: none;
+        border-color: #0f172a;
+    }
+    .yig-textarea { min-height: 80px; resize: vertical; }
+    .yig-file-wrap {
+        border: 2px dashed #e2e8f0;
+        border-radius: 10px;
+        padding: 1.25rem;
+        text-align: center;
+        background: #f8fafc;
+        cursor: pointer;
+        transition: border-color 0.15s ease, background 0.15s ease;
+    }
+    .yig-file-wrap:hover { border-color: #cbd5e1; background: #f1f5f9; }
+    .yig-file-wrap.has-file { border-color: #0f172a; background: #f1f5f9; }
+    .yig-file-wrap input { display: none; }
+    .yig-file-label { font-size: 0.875rem; font-weight: 500; color: #475569; margin-bottom: 0.25rem; }
+    .yig-file-hint { font-size: 0.75rem; color: #94a3b8; }
+    .yig-actions { display: flex; gap: 0.75rem; margin-top: 1.25rem; flex-wrap: wrap; }
+    .yig-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.625rem 1.25rem;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        border: none;
+        transition: background 0.15s ease, color 0.15s ease;
+    }
+    .yig-btn-primary { background: #0f172a; color: #fff; }
+    .yig-btn-primary:hover { background: #1e293b; }
+    .yig-btn-secondary { background: #fff; color: #334155; border: 1px solid #e2e8f0; }
+    .yig-btn-secondary:hover { background: #f8fafc; border-color: #cbd5e1; }
+    .yig-btn-danger { background: #fff; color: #b91c1c; border: 1px solid #fecaca; }
+    .yig-btn-danger:hover { background: #fef2f2; }
+    .yig-list { display: flex; flex-direction: column; gap: 0.75rem; }
+    .yig-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem 1.25rem;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .yig-item:hover { border-color: #cbd5e1; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+    .yig-item-thumb {
+        width: 64px;
+        height: 64px;
+        border-radius: 8px;
+        background: #f1f5f9;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+    .yig-item-thumb.none {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #94a3b8;
+        font-size: 1.5rem;
+    }
+    .yig-item-body { flex: 1; min-width: 0; }
+    .yig-item-title { font-size: 1rem; font-weight: 600; color: #0f172a; margin: 0 0 0.25rem 0; }
+    .yig-item-meta { font-size: 0.8125rem; color: #64748b; display: flex; flex-wrap: wrap; gap: 0.75rem; }
+    .yig-item-meta a { color: #475569; text-decoration: none; }
+    .yig-item-meta a:hover { text-decoration: underline; }
+    .yig-item-actions { display: flex; gap: 0.5rem; flex-shrink: 0; }
+    .yig-item-actions button {
+        width: 36px;
+        height: 36px;
+        border: 1px solid #e2e8f0;
+        background: #fff;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #64748b;
+        transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    }
+    .yig-item-actions button:hover { background: #f8fafc; border-color: #cbd5e1; color: #0f172a; }
+    .yig-item-actions button.danger:hover { background: #fef2f2; border-color: #fecaca; color: #b91c1c; }
+    .yig-empty {
+        text-align: center;
+        padding: 3rem 1.5rem;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        color: #64748b;
+        font-size: 0.9375rem;
+    }
+    .yig-toggle { display: flex; align-items: center; gap: 0.5rem; }
+    .yig-toggle input { width: 18px; height: 18px; accent-color: #0f172a; }
+    .yig-toggle span { font-size: 0.875rem; color: #334155; }
+    @media (max-width: 640px) {
+        .yig-form-row { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="yig-page">
+    <div class="yig-section">
+        <p class="yig-section-title">Add or edit link</p>
+        <div class="yig-card">
+            <form id="yigForm" class="yig-form" enctype="multipart/form-data">
+                <input type="hidden" name="link_id" id="linkId" value="">
+                <input type="hidden" name="link_type" id="linkType" value="">
+                <div class="yig-form-row">
+                    <div>
+                        <label class="yig-label" for="linkTypeSelect">Link Type <span style="color:#b91c1c;">*</span></label>
+                        <select name="link_type" id="linkTypeSelect" class="yig-select" required onchange="updateFormType()">
+                            <option value="">Select type...</option>
+                            <option value="youtube">YouTube</option>
+                            <option value="instagram">Instagram</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="yig-label" for="display_order">Display order</label>
+                        <input type="number" name="display_order" id="displayOrder" class="yig-input" value="0" min="0">
+                    </div>
+                </div>
+                <div class="yig-form-row">
+                    <div>
+                        <label class="yig-label" for="title">Title <span style="color:#b91c1c;">*</span></label>
+                        <input type="text" name="title" id="title" class="yig-input" placeholder="e.g. Official Channel" required>
+                    </div>
+                    <div>
+                        <label class="yig-label" for="subtitle">Subtitle (optional)</label>
+                        <input type="text" name="subtitle" id="subtitle" class="yig-input" placeholder="Short description">
+                    </div>
+                </div>
+                <div class="yig-form-row full" id="youtubeUrlRow" style="display:none;">
+                    <div>
+                        <label class="yig-label" for="youtube_url">YouTube URL <span style="color:#b91c1c;">*</span></label>
+                        <input type="url" name="youtube_url" id="youtubeUrl" class="yig-input" placeholder="https://youtube.com/...">
+                    </div>
+                </div>
+                <div class="yig-form-row full" id="igUrlRow" style="display:none;">
+                    <div>
+                        <label class="yig-label" for="ig_url">Instagram URL <span style="color:#b91c1c;">*</span></label>
+                        <input type="url" name="ig_url" id="igUrl" class="yig-input" placeholder="https://instagram.com/...">
+                    </div>
+                </div>
+                <div class="yig-form-row full">
+                    <label class="yig-label">Thumbnail (optional)</label>
+                    <div class="yig-file-wrap" id="fileWrap" onclick="document.getElementById('thumbnail').click()">
+                        <input type="file" name="thumbnail" id="thumbnail" accept="image/*">
+                        <p class="yig-file-label" id="fileLabel">Click to upload image</p>
+                        <p class="yig-file-hint">PNG, JPG. Stored in Supabase messages bucket.</p>
+                    </div>
+                </div>
+                <div class="yig-form-row full">
+                    <div class="yig-toggle">
+                        <input type="checkbox" name="is_active" id="isActive" checked>
+                        <span>Show on landing page</span>
+                    </div>
+                </div>
+                <div class="yig-actions">
+                    <button type="submit" class="yig-btn yig-btn-primary" id="submitBtn">
+                        <i data-lucide="save" style="width:16px;height:16px;"></i>
+                        Save
+                    </button>
+                    <button type="button" class="yig-btn yig-btn-secondary" onclick="resetForm()">
+                        <i data-lucide="x" style="width:16px;height:16px;"></i>
+                        Clear
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- YouTube Links Section -->
+    <div class="yig-section">
+        <p class="yig-section-title">YouTube Links</p>
+        {% if youtube_list %}
+        <div class="yig-list" id="youtubeList">
+            {% for link in youtube_list %}
+            <div class="yig-item" data-id="{{ link.id }}">
+                {% if link.thumbnail_url %}
+                <img class="yig-item-thumb" src="{{ link.thumbnail_url }}" alt="{{ link.title }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="yig-item-thumb none" style="display:none;"><i data-lucide="image"></i></div>
+                {% else %}
+                <div class="yig-item-thumb none"><i data-lucide="image"></i></div>
+                {% endif %}
+                <div class="yig-item-body">
+                    <h3 class="yig-item-title">{{ link.title }}</h3>
+                    <div class="yig-item-meta">
+                        {% if link.subtitle %}<span>{{ link.subtitle }}</span>{% endif %}
+                        {% if link.youtube_url %}<a href="{{ link.youtube_url }}" target="_blank" rel="noopener">YouTube</a>{% endif %}
+                        <span>Order: {{ link.display_order }}</span>
+                        {% if not link.is_active %}<span style="color:#b91c1c;">Hidden from landing page</span>{% endif %}
+                    </div>
+                </div>
+                <div class="yig-item-actions">
+                    <button type="button" onclick="editLink('{{ link.id }}', 'youtube')" title="Edit"><i data-lucide="pencil" style="width:16px;height:16px;"></i></button>
+                    <button type="button" class="danger" onclick="deleteLink('{{ link.id }}', '{{ link.title|escapejs }}')" title="Delete"><i data-lucide="trash-2" style="width:16px;height:16px;"></i></button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="yig-empty" id="youtubeEmpty">No YouTube links yet. Add one above to show on the landing page.</div>
+        {% endif %}
+    </div>
+
+    <!-- Instagram Links Section -->
+    <div class="yig-section">
+        <p class="yig-section-title">Instagram Links</p>
+        {% if instagram_list %}
+        <div class="yig-list" id="instagramList">
+            {% for link in instagram_list %}
+            <div class="yig-item" data-id="{{ link.id }}">
+                {% if link.thumbnail_url %}
+                <img class="yig-item-thumb" src="{{ link.thumbnail_url }}" alt="{{ link.title }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="yig-item-thumb none" style="display:none;"><i data-lucide="image"></i></div>
+                {% else %}
+                <div class="yig-item-thumb none"><i data-lucide="image"></i></div>
+                {% endif %}
+                <div class="yig-item-body">
+                    <h3 class="yig-item-title">{{ link.title }}</h3>
+                    <div class="yig-item-meta">
+                        {% if link.subtitle %}<span>{{ link.subtitle }}</span>{% endif %}
+                        {% if link.ig_url %}<a href="{{ link.ig_url }}" target="_blank" rel="noopener">Instagram</a>{% endif %}
+                        <span>Order: {{ link.display_order }}</span>
+                        {% if not link.is_active %}<span style="color:#b91c1c;">Hidden from landing page</span>{% endif %}
+                    </div>
+                </div>
+                <div class="yig-item-actions">
+                    <button type="button" onclick="editLink('{{ link.id }}', 'instagram')" title="Edit"><i data-lucide="pencil" style="width:16px;height:16px;"></i></button>
+                    <button type="button" class="danger" onclick="deleteLink('{{ link.id }}', '{{ link.title|escapejs }}')" title="Delete"><i data-lucide="trash-2" style="width:16px;height:16px;"></i></button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="yig-empty" id="instagramEmpty">No Instagram links yet. Add one above to show on the landing page.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.getElementById('thumbnail').addEventListener('change', function() {
+        var wrap = document.getElementById('fileWrap');
+        var label = document.getElementById('fileLabel');
+        if (this.files.length) {
+            wrap.classList.add('has-file');
+            label.textContent = this.files[0].name;
+        } else {
+            wrap.classList.remove('has-file');
+            label.textContent = 'Click to upload image';
+        }
+    });
+
+    document.getElementById('yigForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        var btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i data-lucide="loader-2" class="spin" style="width:16px;height:16px;"></i> Saving...';
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+        var formData = new FormData(this);
+        try {
+            var r = await fetch('{% url "dashboard_youtube_ig_save" %}', {
+                method: 'POST',
+                headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+                body: formData
+            });
+            var data = await r.json();
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + (data.error || 'Unknown'));
+            }
+        } catch (err) {
+            alert('Error: ' + err.message);
+        }
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="save" style="width:16px;height:16px;"></i> Save';
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
+
+    function updateFormType() {
+        var type = document.getElementById('linkTypeSelect').value;
+        document.getElementById('linkType').value = type;
+        var youtubeRow = document.getElementById('youtubeUrlRow');
+        var igRow = document.getElementById('igUrlRow');
+        var youtubeInput = document.getElementById('youtubeUrl');
+        var igInput = document.getElementById('igUrl');
+        
+        if (type === 'youtube') {
+            youtubeRow.style.display = 'block';
+            igRow.style.display = 'none';
+            youtubeInput.required = true;
+            igInput.required = false;
+            igInput.value = ''; // Clear IG URL
+        } else if (type === 'instagram') {
+            youtubeRow.style.display = 'none';
+            igRow.style.display = 'block';
+            youtubeInput.required = false;
+            igInput.required = true;
+            youtubeInput.value = ''; // Clear YouTube URL
+        } else {
+            youtubeRow.style.display = 'none';
+            igRow.style.display = 'none';
+            youtubeInput.required = false;
+            igInput.required = false;
+        }
+    }
+
+    function resetForm() {
+        document.getElementById('yigForm').reset();
+        document.getElementById('linkId').value = '';
+        document.getElementById('linkType').value = '';
+        document.getElementById('linkTypeSelect').value = '';
+        document.getElementById('displayOrder').value = '0';
+        document.getElementById('isActive').checked = true;
+        document.getElementById('fileWrap').classList.remove('has-file');
+        document.getElementById('fileLabel').textContent = 'Click to upload image';
+        updateFormType();
+    }
+
+    function editLink(id, type) {
+        fetch('{% url "dashboard_youtube_ig_get" %}?id=' + id)
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    var l = data.link;
+                    document.getElementById('linkId').value = l.id;
+                    document.getElementById('title').value = l.title || '';
+                    document.getElementById('subtitle').value = l.subtitle || '';
+                    document.getElementById('displayOrder').value = l.display_order || 0;
+                    document.getElementById('isActive').checked = l.is_active !== false;
+                    
+                    // Set link type based on which URL exists
+                    if (l.youtube_url) {
+                        document.getElementById('linkTypeSelect').value = 'youtube';
+                        document.getElementById('youtubeUrl').value = l.youtube_url || '';
+                        document.getElementById('igUrl').value = '';
+                    } else if (l.ig_url) {
+                        document.getElementById('linkTypeSelect').value = 'instagram';
+                        document.getElementById('igUrl').value = l.ig_url || '';
+                        document.getElementById('youtubeUrl').value = '';
+                    }
+                    updateFormType();
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
+                }
+            });
+    }
+
+    function deleteLink(id, title) {
+        if (!confirm('Delete “‘ + title + ’”? This cannot be undone.')) return;
+        fetch('{% url "dashboard_youtube_ig_delete" %}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+            body: JSON.stringify({ id: id })
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) { if (data.success) location.reload(); else alert('Error: ' + (data.error || 'Unknown')); });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() { if (typeof lucide !== 'undefined') lucide.createIcons(); });
+</script>
+{% endblock %}

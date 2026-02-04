@@ -1,0 +1,26 @@
+<div class="resource-card">
+    <div class="resource-thumbnail">
+        {% if resource.thumbnail_url %}
+            <img src="{{ resource.thumbnail_url }}" alt="{{ resource.title }}">
+        {% else %}
+            <i class="fa fa-file-text-o"></i>
+        {% endif %}
+        <span class="resource-type-badge">{{ resource.file_type|default:"PDF" }}</span>
+    </div>
+    <div class="resource-body">
+        <h3 class="resource-title">{{ resource.title }}</h3>
+        <p class="resource-description">{{ resource.description|truncatechars:120 }}</p>
+        <div class="resource-meta">
+            <div class="resource-info">
+                <span><i class="fa fa-calendar"></i> {{ resource.created_at|slice:":10" }}</span>
+                {% if resource.file_size %}
+                    <span><i class="fa fa-file"></i> {{ resource.file_size }}</span>
+                {% endif %}
+            </div>
+            <a href="{{ resource.file_url }}" class="resource-download-btn" target="_blank">
+                <i class="fa fa-download"></i>
+                Download
+            </a>
+        </div>
+    </div>
+</div>

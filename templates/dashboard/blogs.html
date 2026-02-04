@@ -1,0 +1,417 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% load static %}
+
+{% block title %}Blog Management{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+<style>
+.blog-manager { max-width: 1400px; margin: 0 auto; }
+
+.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; padding-bottom: 24px; border-bottom: 1px solid #e5e7eb; }
+.page-title { font-size: 1.75rem; font-weight: 700; color: #111827; margin: 0 0 6px 0; }
+.page-subtitle { font-size: 0.95rem; color: #6b7280; margin: 0; }
+.btn-new { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; background: #111827; color: #fff; border: none; border-radius: 10px; font-size: 0.9rem; font-weight: 600; text-decoration: none; transition: all 0.2s; cursor: pointer; }
+.btn-new:hover { background: #1f2937; transform: translateY(-1px); }
+
+.blogs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; margin-bottom: 32px; }
+.blog-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; transition: all 0.2s; }
+.blog-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); transform: translateY(-2px); }
+.blog-card-image { width: 100%; height: 180px; background: #f3f4f6; object-fit: cover; }
+.blog-card-body { padding: 20px; }
+.blog-card-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; font-size: 0.8rem; color: #6b7280; }
+.blog-card-title { font-size: 1.1rem; font-weight: 600; color: #111827; margin: 0 0 8px 0; line-height: 1.4; }
+.blog-card-excerpt { font-size: 0.875rem; color: #6b7280; margin: 0 0 16px 0; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.blog-card-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 16px; border-top: 1px solid #f3f4f6; }
+.blog-card-status { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 500; }
+.blog-card-status.published { background: #dcfce7; color: #166534; }
+.blog-card-status.draft { background: #fef3c7; color: #92400e; }
+.blog-card-actions { display: flex; gap: 8px; }
+.btn-icon { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: 1px solid #e5e7eb; border-radius: 6px; background: #fff; cursor: pointer; transition: all 0.2s; }
+.btn-icon:hover { background: #f9fafb; border-color: #d1d5db; }
+.btn-icon.edit:hover { background: #eff6ff; border-color: #3b82f6; color: #3b82f6; }
+.btn-icon.delete:hover { background: #fef2f2; border-color: #ef4444; color: #ef4444; }
+
+/* Modal */
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; }
+.modal-overlay.active { display: flex; align-items: center; justify-content: center; padding: 20px; }
+.modal { background: #fff; border-radius: 16px; width: 100%; max-width: 900px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+.modal-header { padding: 24px 28px; border-bottom: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: space-between; }
+.modal-title { font-size: 1.5rem; font-weight: 700; color: #111827; margin: 0; }
+.modal-close { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border: none; background: #f3f4f6; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+.modal-close:hover { background: #e5e7eb; }
+.modal-body { padding: 28px; }
+.modal-footer { padding: 20px 28px; border-top: 1px solid #e5e7eb; display: flex; gap: 12px; justify-content: flex-end; }
+
+.form-group { margin-bottom: 24px; }
+.form-label { display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 8px; }
+.form-input, .form-select, .form-textarea { width: 100%; padding: 12px 16px; border: 1.5px solid #e5e7eb; border-radius: 10px; font-size: 0.95rem; font-family: inherit; transition: all 0.2s; background: #fff; box-sizing: border-box; }
+.form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: #111827; box-shadow: 0 0 0 3px rgba(17,24,39,0.08); }
+.form-textarea { min-height: 100px; resize: vertical; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.form-checkbox { display: flex; align-items: center; gap: 10px; }
+.form-checkbox input { width: 18px; height: 18px; accent-color: #111827; cursor: pointer; }
+
+.editor-wrapper { border: 1.5px solid #e5e7eb; border-radius: 10px; overflow: hidden; background: #fff; }
+.editor-wrapper:focus-within { border-color: #111827; box-shadow: 0 0 0 3px rgba(17,24,39,0.08); }
+.quill-editor { min-height: 400px; }
+.ql-toolbar.ql-snow { border: none !important; border-bottom: 1px solid #e5e7eb !important; background: #f9fafb; padding: 12px 16px !important; }
+.ql-container.ql-snow { border: none !important; font-size: 0.95rem; }
+.ql-editor { padding: 24px !important; min-height: 360px; line-height: 1.7; }
+
+.image-upload { border: 2px dashed #e5e7eb; border-radius: 12px; overflow: hidden; cursor: pointer; transition: all 0.2s; background: #fafafa; }
+.image-upload:hover { border-color: #d1d5db; background: #f5f5f5; }
+.upload-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; color: #9ca3af; }
+.upload-placeholder svg { margin-bottom: 12px; opacity: 0.6; }
+.upload-placeholder span { font-size: 0.85rem; font-weight: 500; }
+.image-preview { position: relative; }
+.image-preview img { width: 100%; height: 200px; object-fit: cover; }
+.remove-image { position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.6); color: #fff; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+.remove-image:hover { background: #dc2626; }
+
+.btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; background: #111827; color: #fff; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.btn-primary:hover { background: #1f2937; }
+.btn-secondary { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; background: #fff; color: #374151; border: 1.5px solid #e5e7eb; border-radius: 10px; font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+.btn-secondary:hover { background: #f9fafb; border-color: #d1d5db; }
+
+.toast { position: fixed; bottom: 24px; right: 24px; padding: 14px 20px; border-radius: 10px; font-weight: 500; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+.toast.success { background: #059669; color: #fff; }
+.toast.error { background: #dc2626; color: #fff; }
+
+.empty-state { text-align: center; padding: 60px 20px; }
+.empty-state-icon { width: 80px; height: 80px; margin: 0 auto 20px; color: #d1d5db; }
+.empty-state h3 { font-size: 1.25rem; font-weight: 600; color: #374151; margin: 0 0 8px 0; }
+.empty-state p { font-size: 0.95rem; color: #6b7280; margin: 0; }
+
+@media (max-width: 768px) {
+    .form-row { grid-template-columns: 1fr; }
+    .blogs-grid { grid-template-columns: 1fr; }
+    .modal { max-width: 100%; margin: 0; border-radius: 0; max-height: 100vh; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="blog-manager">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Blog Management</h1>
+            <p class="page-subtitle">Create and manage blog posts</p>
+        </div>
+        <button class="btn-new" onclick="openBlogModal()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+            New Blog Post
+        </button>
+    </div>
+
+    {% if blogs %}
+    <div class="blogs-grid">
+        {% for blog in blogs %}
+        <div class="blog-card">
+            {% if blog.featured_image_url %}
+            <img src="{{ blog.featured_image_url }}" alt="{{ blog.title }}" class="blog-card-image">
+            {% else %}
+            <div class="blog-card-image" style="display:flex;align-items:center;justify-content:center;color:#9ca3af;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+            </div>
+            {% endif %}
+            <div class="blog-card-body">
+                <div class="blog-card-meta">
+                    <span>{{ blog.category|default:"general" }}</span>
+                    <span>•</span>
+                    {% if blog.published_at %}
+                    <span>{{ blog.published_at|date:"M d, Y" }}</span>
+                    {% else %}
+                    <span>Draft</span>
+                    {% endif %}
+                </div>
+                <h3 class="blog-card-title">{{ blog.title|truncatewords:8 }}</h3>
+                {% if blog.excerpt %}
+                <p class="blog-card-excerpt">{{ blog.excerpt|truncatewords:15 }}</p>
+                {% endif %}
+                <div class="blog-card-footer">
+                    <span class="blog-card-status {% if blog.is_published %}published{% else %}draft{% endif %}">
+                        {% if blog.is_published %}Published{% else %}Draft{% endif %}
+                    </span>
+                    <div class="blog-card-actions">
+                        <button class="btn-icon edit" onclick="editBlog('{{ blog.id }}')" title="Edit">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        </button>
+                        <button class="btn-icon delete" onclick="deleteBlog('{{ blog.id }}', '{{ blog.title|escapejs }}')" title="Delete">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <svg class="empty-state-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+        <h3>No blog posts yet</h3>
+        <p>Create your first blog post to get started</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Blog Modal -->
+<div class="modal-overlay" id="blogModal" onclick="if(event.target===this) closeBlogModal()">
+    <div class="modal">
+        <div class="modal-header">
+            <h2 class="modal-title" id="modalTitle">New Blog Post</h2>
+            <button class="modal-close" onclick="closeBlogModal()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+            </button>
+        </div>
+        <form id="blogForm" method="post" action="{% url 'dashboard_blogs_save' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-body">
+                <input type="hidden" name="blog_id" id="blog_id">
+                <input type="hidden" name="existing_image_url" id="existing_image_url">
+                
+                <div class="form-group">
+                    <label class="form-label">Title <span style="color:#dc2626;">*</span></label>
+                    <input type="text" name="title" id="blog_title" class="form-input" required placeholder="Enter blog title">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Excerpt</label>
+                    <textarea name="excerpt" id="blog_excerpt" class="form-textarea" placeholder="Short description (optional)"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Content <span style="color:#dc2626;">*</span></label>
+                    <div class="editor-wrapper">
+                        <div id="blogEditor" class="quill-editor"></div>
+                        <input type="hidden" name="content" id="blog_content">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Category</label>
+                        <select name="category" id="blog_category" class="form-select">
+                            <option value="general">General</option>
+                            <option value="news">News</option>
+                            <option value="analysis">Analysis</option>
+                            <option value="opinion">Opinion</option>
+                            <option value="updates">Updates</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Author Name</label>
+                        <input type="text" name="author_name" id="blog_author" class="form-input" value="Ratel Movement" placeholder="Author name">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Tags (comma-separated)</label>
+                    <input type="text" name="tags" id="blog_tags" class="form-input" placeholder="e.g. accountability, transparency, justice">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Meta Description (SEO)</label>
+                    <textarea name="meta_description" id="blog_meta" class="form-textarea" placeholder="Brief description for search engines"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Featured Image</label>
+                    <div class="image-upload" onclick="document.getElementById('blog_image').click()">
+                        <div id="imagePreview" class="image-preview" style="display:none;">
+                            <img id="previewImg" src="" alt="Preview">
+                            <button type="button" class="remove-image" onclick="removeBlogImage()">×</button>
+                        </div>
+                        <div id="imagePlaceholder" class="upload-placeholder">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                            <span>Upload Featured Image</span>
+                        </div>
+                        <input type="file" name="featured_image" id="blog_image" accept="image/*" style="display:none" onchange="previewBlogImage(this)">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-checkbox">
+                        <input type="checkbox" name="is_published" id="blog_published">
+                        <label for="blog_published" class="form-label" style="margin:0;">Publish immediately</label>
+                    </div>
+                    <div class="form-checkbox">
+                        <input type="checkbox" name="is_featured" id="blog_featured">
+                        <label for="blog_featured" class="form-label" style="margin:0;">Feature this post</label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeBlogModal()">Cancel</button>
+                <button type="submit" class="btn-primary">Save Blog Post</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+<script>
+let blogEditor = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Quill editor
+    blogEditor = new Quill('#blogEditor', {
+        theme: 'snow',
+        modules: {
+            toolbar: [
+                [{ 'header': [2, 3, 4, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                [{ 'script': 'sub'}, { 'script': 'super' }],
+                [{ 'indent': '-1'}, { 'indent': '+1' }],
+                [{ 'color': [] }, { 'background': [] }],
+                [{ 'align': [] }],
+                ['link', 'image', 'blockquote', 'code-block'],
+                ['clean']
+            ]
+        },
+        placeholder: 'Write your blog post content here...'
+    });
+    
+    // Update hidden input on content change
+    blogEditor.on('text-change', function() {
+        document.getElementById('blog_content').value = blogEditor.root.innerHTML;
+    });
+    
+    // Form submission
+    document.getElementById('blogForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        document.getElementById('blog_content').value = blogEditor.root.innerHTML;
+        
+        const formData = new FormData(this);
+        const btn = this.querySelector('button[type="submit"]');
+        const origText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Saving...';
+        
+        fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value },
+            credentials: 'same-origin'
+        })
+        .then(r => r.json())
+        .then(data => {
+            btn.disabled = false;
+            btn.textContent = origText;
+            if (data.success) {
+                showToast(data.message || 'Blog saved!', 'success');
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                showToast(data.error || 'Failed to save blog', 'error');
+            }
+        })
+        .catch(err => {
+            btn.disabled = false;
+            btn.textContent = origText;
+            showToast('Network error. Try again.', 'error');
+        });
+    });
+});
+
+function openBlogModal(blogId = null) {
+    document.getElementById('blogModal').classList.add('active');
+    document.getElementById('blogForm').reset();
+    document.getElementById('blog_id').value = '';
+    document.getElementById('existing_image_url').value = '';
+    document.getElementById('modalTitle').textContent = blogId ? 'Edit Blog Post' : 'New Blog Post';
+    blogEditor.root.innerHTML = '';
+    document.getElementById('blog_content').value = '';
+    removeBlogImage();
+    
+    if (blogId) {
+        fetch(`{% url 'dashboard_blogs_get' %}?id=${blogId}`)
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    const blog = data.data;
+                    document.getElementById('blog_id').value = blog.id;
+                    document.getElementById('blog_title').value = blog.title || '';
+                    document.getElementById('blog_excerpt').value = blog.excerpt || '';
+                    document.getElementById('blog_category').value = blog.category || 'general';
+                    document.getElementById('blog_author').value = blog.author_name || 'Ratel Movement';
+                    document.getElementById('blog_tags').value = blog.tags ? blog.tags.join(', ') : '';
+                    document.getElementById('blog_meta').value = blog.meta_description || '';
+                    document.getElementById('blog_published').checked = blog.is_published || false;
+                    document.getElementById('blog_featured').checked = blog.is_featured || false;
+                    if (blog.content) {
+                        blogEditor.root.innerHTML = blog.content;
+                        document.getElementById('blog_content').value = blog.content;
+                    }
+                    if (blog.featured_image_url) {
+                        document.getElementById('existing_image_url').value = blog.featured_image_url;
+                        document.getElementById('previewImg').src = blog.featured_image_url;
+                        document.getElementById('imagePreview').style.display = 'block';
+                        document.getElementById('imagePlaceholder').style.display = 'none';
+                    }
+                }
+            });
+    }
+}
+
+function closeBlogModal() {
+    document.getElementById('blogModal').classList.remove('active');
+}
+
+function editBlog(blogId) {
+    openBlogModal(blogId);
+}
+
+function deleteBlog(blogId, title) {
+    if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;
+    
+    fetch('{% url "dashboard_blogs_delete" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({id: blogId}),
+        credentials: 'same-origin'
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            showToast('Blog deleted!', 'success');
+            setTimeout(() => window.location.reload(), 1000);
+        } else {
+            showToast(data.error || 'Failed to delete', 'error');
+        }
+    });
+}
+
+function previewBlogImage(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('previewImg').src = e.target.result;
+            document.getElementById('imagePreview').style.display = 'block';
+            document.getElementById('imagePlaceholder').style.display = 'none';
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function removeBlogImage() {
+    document.getElementById('blog_image').value = '';
+    document.getElementById('existing_image_url').value = '';
+    document.getElementById('imagePreview').style.display = 'none';
+    document.getElementById('imagePlaceholder').style.display = 'flex';
+}
+
+function showToast(message, type) {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3500);
+}
+</script>
+{% endblock %}

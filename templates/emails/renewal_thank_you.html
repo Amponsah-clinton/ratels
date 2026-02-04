@@ -1,0 +1,37 @@
+{% extends "emails/base_email.html" %}
+{% block title %}Thank You for Renewing - RATEL Movement{% endblock %}
+{% block content %}
+<p style="margin:0 0 20px;font-size:16px;color:#374151;line-height:1.7;">
+Dear {{ member_name }},
+</p>
+<p style="margin:0 0 20px;font-size:16px;color:#4b5563;line-height:1.7;">
+Thank you for renewing your RATEL Movement membership.
+</p>
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;margin-bottom:24px;">
+    <tr>
+        <td style="padding:20px;">
+            <p style="margin:0 0 8px;font-size:13px;color:#6b7280;">Your membership is now active until</p>
+            <p style="margin:0;font-size:18px;font-weight:600;color:#111827;">{{ end_date }}</p>
+            <p style="margin:16px 0 0;font-size:13px;color:#6b7280;">Member ID: {{ member_id }}</p>
+        </td>
+    </tr>
+</table>
+<p style="margin:0 0 20px;font-size:16px;color:#4b5563;line-height:1.7;">
+We appreciate your continued support and commitment to our mission.
+</p>
+<table role="presentation" cellspacing="0" cellpadding="0" border="0">
+    <tr>
+        <td>
+            <a href="{{ member_dashboard_url }}" style="display:inline-block;padding:14px 28px;background-color:#111827;color:#ffffff;text-decoration:none;border-radius:6px;font-size:14px;font-weight:600;">
+                Access Member Dashboard
+            </a>
+        </td>
+    </tr>
+</table>
+<p style="margin:16px 0 0;font-size:15px;color:#111827;font-weight:600;">
+    Neutrality is complicity. Thank you for standing with RATEL.
+</p>
+<p style="margin:8px 0 0;font-size:14px;color:#6b7280;">
+    RATEL Movement Team
+</p>
+{% endblock %}

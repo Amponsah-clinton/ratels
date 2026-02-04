@@ -1,0 +1,1852 @@
+{% extends "member/base_member.html" %}
+
+{% block title %}Member Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .welcome-section {
+        margin-bottom: 1.5rem;
+    }
+    .welcome-section h1 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0 0 0.25rem 0;
+    }
+    .welcome-section p {
+        color: #64748b;
+        font-size: 0.9rem;
+        margin: 0;
+    }
+
+    /* Member Badge Card */
+    .badge-section {
+        display: grid;
+        grid-template-columns: 380px 1fr;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    @media (max-width: 1024px) {
+        .badge-section {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .member-badge-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+        position: relative;
+    }
+    .badge-header {
+        background: #0f172a;
+        padding: 1.25rem 1.5rem;
+        text-align: center;
+        position: relative;
+    }
+    .badge-logo {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 0.75rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .badge-logo img {
+        width: 40px;
+        height: 40px;
+        object-fit: contain;
+    }
+    .badge-title {
+        color: #fff;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        margin: 0 0 0.25rem 0;
+    }
+    .badge-type {
+        color: #fbbf24;
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin: 0;
+    }
+    .badge-verified {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        width: 28px;
+        height: 28px;
+        background: #22c55e;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .badge-verified i {
+        width: 16px;
+        height: 16px;
+        color: #fff;
+    }
+
+    .badge-body {
+        padding: 1.5rem;
+    }
+    .badge-avatar-section {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+        padding-bottom: 1.25rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .badge-avatar {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #64748b;
+        border: 3px solid #e2e8f0;
+    }
+    .badge-name-section {
+        flex: 1;
+    }
+    .badge-member-name {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0 0 0.25rem 0;
+    }
+    .badge-member-id {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        background: #0f172a;
+        color: #fff;
+        padding: 0.35rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        font-family: 'Courier New', monospace;
+        letter-spacing: 0.05em;
+    }
+    .badge-member-id i {
+        width: 14px;
+        height: 14px;
+    }
+
+    .badge-details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+    .badge-detail-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    .badge-detail-label {
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #94a3b8;
+    }
+    .badge-detail-value {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #1e293b;
+    }
+
+    .badge-footer {
+        padding: 1rem 1.5rem;
+        background: #f8fafc;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .badge-qr {
+        width: 48px;
+        height: 48px;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .badge-qr i {
+        width: 28px;
+        height: 28px;
+        color: #64748b;
+    }
+    .badge-download-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: #0f172a;
+        color: #fff;
+        font-size: 0.8rem;
+        font-weight: 500;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .badge-download-btn:hover {
+        background: #1e293b;
+    }
+    .badge-download-btn i {
+        width: 16px;
+        height: 16px;
+    }
+
+    .badge-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+    .certificate-btn {
+        background: #7b2d26;
+    }
+    .certificate-btn:hover {
+        background: #922f27;
+    }
+
+    /* Quick Stats Card */
+    .quick-stats-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+    }
+    .quick-stats-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0 0 1rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .quick-stats-title i {
+        width: 18px;
+        height: 18px;
+        color: #64748b;
+    }
+    .quick-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        flex: 1;
+    }
+    .quick-stat-item {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+    .quick-stat-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 0.5rem;
+    }
+    .quick-stat-icon.blue { background: #dbeafe; color: #2563eb; }
+    .quick-stat-icon.green { background: #dcfce7; color: #16a34a; }
+    .quick-stat-icon.purple { background: #f3e8ff; color: #9333ea; }
+    .quick-stat-icon.orange { background: #ffedd5; color: #ea580c; }
+    .quick-stat-icon i { width: 20px; height: 20px; }
+    .quick-stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e293b;
+    }
+    .quick-stat-label {
+        font-size: 0.75rem;
+        color: #64748b;
+    }
+
+    /* Content Grid */
+    .content-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+    @media (max-width: 1024px) {
+        .content-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .content-card {
+        background: #fff;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+    }
+    .content-card-header {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .content-card-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 0;
+    }
+    .content-card-title i {
+        width: 18px;
+        height: 18px;
+        color: #64748b;
+    }
+    .view-all-link {
+        font-size: 0.8rem;
+        color: #3b82f6;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .view-all-link:hover {
+        text-decoration: underline;
+    }
+    .content-card-body {
+        padding: 1rem 1.25rem;
+    }
+
+    .announcement-item {
+        padding: 1rem 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .announcement-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+    .announcement-item:first-child {
+        padding-top: 0;
+    }
+    .announcement-meta {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    .announcement-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    .badge-high { background: #fee2e2; color: #991b1b; }
+    .badge-normal { background: #e0f2fe; color: #0369a1; }
+    .badge-pinned { background: #fef3c7; color: #92400e; }
+    .announcement-date {
+        font-size: 0.75rem;
+        color: #94a3b8;
+    }
+    .announcement-title {
+        font-weight: 600;
+        color: #1e293b;
+        font-size: 0.95rem;
+        margin: 0 0 0.25rem 0;
+    }
+    .announcement-excerpt {
+        font-size: 0.85rem;
+        color: #64748b;
+        line-height: 1.5;
+        margin: 0;
+    }
+
+    .comm-item {
+        padding: 1rem 0;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        gap: 1rem;
+    }
+    .comm-item:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+    .comm-item:first-child {
+        padding-top: 0;
+    }
+    .comm-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    .comm-icon i {
+        width: 18px;
+        height: 18px;
+        color: #64748b;
+    }
+    .comm-icon.urgent {
+        background: #fee2e2;
+    }
+    .comm-icon.urgent i {
+        color: #dc2626;
+    }
+    .comm-content {
+        flex: 1;
+        min-width: 0;
+    }
+    .comm-subject {
+        font-weight: 600;
+        color: #1e293b;
+        font-size: 0.9rem;
+        margin: 0 0 0.25rem 0;
+    }
+    .comm-preview {
+        font-size: 0.8rem;
+        color: #64748b;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin: 0;
+    }
+    .comm-time {
+        font-size: 0.7rem;
+        color: #94a3b8;
+        margin-top: 0.25rem;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 2rem 1rem;
+        color: #94a3b8;
+    }
+    .empty-state i {
+        width: 48px;
+        height: 48px;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+    .empty-state p {
+        font-size: 0.9rem;
+        margin: 0;
+    }
+
+    /* Subscription Status Card */
+    .subscription-card {
+        background: #fff;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    .subscription-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    .subscription-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .subscription-icon i {
+        width: 24px;
+        height: 24px;
+    }
+    .subscription-icon.active {
+        background: #d1fae5;
+        color: #059669;
+    }
+    .subscription-icon.expiring {
+        background: #fef3c7;
+        color: #d97706;
+    }
+    .subscription-icon.expired {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+    .subscription-icon.none {
+        background: #f1f5f9;
+        color: #64748b;
+    }
+    .subscription-details h3 {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0 0 0.25rem 0;
+    }
+    .subscription-details p {
+        font-size: 0.85rem;
+        color: #64748b;
+        margin: 0;
+    }
+    .subscription-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.35rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-left: 0.5rem;
+    }
+    .subscription-badge.active {
+        background: #d1fae5;
+        color: #059669;
+    }
+    .subscription-badge.expiring {
+        background: #fef3c7;
+        color: #d97706;
+    }
+    .subscription-badge.expired {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+    .subscription-badge.none {
+        background: #f1f5f9;
+        color: #64748b;
+    }
+    .btn-renew {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.65rem 1.25rem;
+        background: #1e293b;
+        color: #fff;
+        font-size: 0.85rem;
+        font-weight: 500;
+        border: none;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    .btn-renew:hover {
+        background: #334155;
+        color: #fff;
+    }
+    .btn-renew i {
+        width: 16px;
+        height: 16px;
+    }
+
+    /* Animated Renew Button for Expired/No Subscription */
+    .btn-renew.pulse-attention {
+        background: #dc2626;
+        animation: pulse-glow 2s ease-in-out infinite;
+        box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7);
+    }
+    .btn-renew.pulse-attention:hover {
+        background: #ef4444;
+    }
+    @keyframes pulse-glow {
+        0% {
+            box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7);
+            transform: scale(1);
+        }
+        50% {
+            box-shadow: 0 0 20px 10px rgba(220, 38, 38, 0);
+            transform: scale(1.05);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(220, 38, 38, 0);
+            transform: scale(1);
+        }
+    }
+
+    /* Warning Alert Banner */
+    .subscription-warning-banner {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        border-left: 4px solid #dc2626;
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        animation: slideInBanner 0.5s ease-out;
+    }
+    @keyframes slideInBanner {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    .subscription-warning-banner .warning-icon {
+        width: 48px;
+        height: 48px;
+        background: #dc2626;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        animation: shake 0.5s ease-in-out infinite;
+        animation-delay: 2s;
+    }
+    @keyframes shake {
+        0%, 100% { transform: rotate(0deg); }
+        25% { transform: rotate(-10deg); }
+        75% { transform: rotate(10deg); }
+    }
+    .subscription-warning-banner .warning-icon i {
+        width: 24px;
+        height: 24px;
+        color: #fff;
+    }
+    .subscription-warning-banner .warning-content {
+        flex: 1;
+    }
+    .subscription-warning-banner .warning-content h4 {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #991b1b;
+        margin: 0 0 0.25rem 0;
+    }
+    .subscription-warning-banner .warning-content p {
+        font-size: 0.875rem;
+        color: #7f1d1d;
+        margin: 0;
+        line-height: 1.5;
+    }
+    .subscription-warning-banner .warning-action {
+        flex-shrink: 0;
+    }
+    .subscription-warning-banner .btn-renew-banner {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background: #dc2626;
+        color: #fff;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border: none;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: all 0.2s;
+        animation: bounce-attention 1s ease-in-out infinite;
+    }
+    .subscription-warning-banner .btn-renew-banner:hover {
+        background: #b91c1c;
+        color: #fff;
+        transform: scale(1.05);
+    }
+    .subscription-warning-banner .btn-renew-banner i {
+        width: 18px;
+        height: 18px;
+    }
+    @keyframes bounce-attention {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-3px); }
+    }
+
+    @media (max-width: 640px) {
+        .subscription-warning-banner {
+            flex-direction: column;
+            text-align: center;
+        }
+        .subscription-warning-banner .warning-action {
+            width: 100%;
+        }
+        .subscription-warning-banner .btn-renew-banner {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    /* Countdown Timer */
+    .countdown-inline {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 0.75rem;
+    }
+    .countdown-box {
+        text-align: center;
+        min-width: 48px;
+    }
+    .countdown-num {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1e293b;
+        background: #f1f5f9;
+        border-radius: 6px;
+        padding: 0.35rem 0.5rem;
+        line-height: 1;
+    }
+    .countdown-label {
+        font-size: 0.65rem;
+        color: #94a3b8;
+        text-transform: uppercase;
+        margin-top: 0.25rem;
+        letter-spacing: 0.02em;
+    }
+    .subscription-card.expiring .countdown-num {
+        background: #fef3c7;
+        color: #d97706;
+    }
+    .subscription-card.expired .countdown-num {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    /* ============================================
+       CERTIFICATE SECTION (INLINE)
+       ============================================ */
+    .certificate-section {
+        margin-bottom: 1.5rem;
+        animation: slideDown 0.3s ease;
+    }
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    .certificate-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+    }
+    .certificate-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 1.5rem;
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    .certificate-card-header h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .certificate-card-header h3 i {
+        width: 20px;
+        height: 20px;
+        color: #7b2d26;
+    }
+    .certificate-card-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .cert-action-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: #0f172a;
+        color: #fff;
+        font-size: 0.8rem;
+        font-weight: 600;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .cert-action-btn:hover {
+        background: #1e293b;
+    }
+    .cert-action-btn i {
+        width: 16px;
+        height: 16px;
+    }
+    .cert-close-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: #f1f5f9;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        color: #64748b;
+        font-size: 0.8rem;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+    .cert-close-btn:hover {
+        background: #e2e8f0;
+        color: #1e293b;
+    }
+    .cert-close-btn i {
+        width: 16px;
+        height: 16px;
+    }
+    .certificate-card-body {
+        padding: 1.5rem;
+        background: #e9e9e7;
+        overflow-x: auto;
+    }
+    .certificate-stage {
+        display: flex;
+        justify-content: center;
+        min-width: fit-content;
+    }
+
+    /* ============================================
+       CERTIFICATE PAGE (A4 Landscape)
+       ============================================ */
+    .certificate-page {
+        width: 297mm;
+        height: 210mm;
+        background: #f6f5f2;
+        position: relative;
+        overflow: hidden;
+        border-radius: 8px;
+        box-shadow: 0 18px 60px rgba(0, 0, 0, 0.14);
+        transform-origin: top center;
+        transform: scale(0.55);
+        margin: -80mm 0;
+    }
+    @media (min-width: 1400px) {
+        .certificate-page {
+            transform: scale(0.7);
+            margin: -50mm 0;
+        }
+    }
+    @media (max-width: 1024px) {
+        .certificate-page {
+            transform: scale(0.45);
+            margin: -95mm 0;
+        }
+    }
+    @media (max-width: 768px) {
+        .certificate-page {
+            transform: scale(0.32);
+            margin: -120mm 0;
+        }
+    }
+
+    .certificate-page::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+            linear-gradient(#d6d6d4 1px, transparent 1px),
+            linear-gradient(90deg, #d6d6d4 1px, transparent 1px);
+        background-size: 36mm 36mm;
+        opacity: 0.12;
+        pointer-events: none;
+    }
+
+    .cert-watermark {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+        z-index: 0;
+    }
+    .cert-watermark img {
+        width: 120mm;
+        opacity: 0.035;
+        filter: grayscale(100%);
+    }
+
+    .cert-frame {
+        position: absolute;
+        inset: 10mm;
+        border: 1.5px solid #444;
+        z-index: 1;
+    }
+    .cert-corner {
+        position: absolute;
+        width: 18mm;
+        height: 18mm;
+        border: 3px solid #b08a3e;
+        z-index: 1;
+    }
+    .cert-tl { top: 10mm; left: 10mm; border-right: none; border-bottom: none; }
+    .cert-tr { top: 10mm; right: 10mm; border-left: none; border-bottom: none; }
+    .cert-bl { bottom: 10mm; left: 10mm; border-right: none; border-top: none; }
+    .cert-br { bottom: 10mm; right: 10mm; border-left: none; border-top: none; }
+
+    .cert-content {
+        position: absolute;
+        inset: 18mm 20mm;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        gap: 8mm;
+    }
+
+    .cert-topbar {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12mm;
+    }
+    .cert-org {
+        max-width: 120mm;
+    }
+    .cert-orgname {
+        font-family: "Playfair Display", Georgia, "Times New Roman", serif;
+        font-weight: 700;
+        font-size: 18px;
+        letter-spacing: 0.06em;
+        margin: 0;
+        text-transform: uppercase;
+        color: #1b1f24;
+    }
+    .cert-tag {
+        margin-top: 6px;
+        font-size: 12px;
+        color: #5b6470;
+        letter-spacing: 0.18em;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .cert-meta {
+        text-align: right;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        align-items: flex-end;
+    }
+    .cert-chip {
+        display: inline-block;
+        padding: 8px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 999px;
+        font-size: 11px;
+        letter-spacing: 0.18em;
+        font-weight: 800;
+        text-transform: uppercase;
+        background: #fff;
+        color: #1b1f24;
+    }
+    .cert-meta-line {
+        font-size: 12px;
+        color: #5b6470;
+        font-weight: 700;
+    }
+    .cert-meta-line b {
+        color: #1b1f24;
+        letter-spacing: 0.02em;
+    }
+
+    .cert-header {
+        text-align: center;
+        margin-top: 2mm;
+    }
+    .cert-header h1 {
+        font-family: "Playfair Display", Georgia, "Times New Roman", serif;
+        font-weight: 700;
+        font-size: 44px;
+        margin: 0;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #1b1f24;
+    }
+    .cert-sub {
+        margin-top: 6px;
+        font-size: 13px;
+        letter-spacing: 0.22em;
+        font-weight: 700;
+        color: #555;
+        text-transform: uppercase;
+    }
+
+    .cert-certify {
+        text-align: center;
+    }
+    .cert-ribbon {
+        display: inline-block;
+        padding: 7px 22px;
+        background: #7b2d26;
+        color: #fff;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+    }
+    .cert-name {
+        font-family: "Playfair Display", Georgia, "Times New Roman", serif;
+        font-size: 48px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        margin-top: 4mm;
+        text-transform: uppercase;
+        color: #1b1f24;
+    }
+    .cert-rule {
+        width: 60%;
+        height: 1px;
+        background: #444;
+        margin: 6mm auto 0;
+        opacity: 0.9;
+    }
+
+    .cert-statement {
+        text-align: center;
+        max-width: 170mm;
+        margin: 0 auto;
+        font-size: 15px;
+        line-height: 1.85;
+        color: #444;
+        font-weight: 500;
+    }
+
+    .cert-bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 12mm;
+        margin-top: 6mm;
+    }
+
+    .cert-details {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        min-width: 90mm;
+    }
+    .cert-detail-row {
+        font-size: 12px;
+        color: #5b6470;
+        font-weight: 800;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+    }
+    .cert-detail-val {
+        margin-top: 6px;
+        color: #1b1f24;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+        text-transform: none;
+        font-size: 13px;
+    }
+
+    .cert-sig-block {
+        text-align: center;
+        min-width: 95mm;
+    }
+    .cert-sig-img-wrap {
+        height: 18mm;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 4px;
+    }
+    .cert-sig-img-wrap img {
+        max-height: 18mm;
+        max-width: 75mm;
+        object-fit: contain;
+        display: block;
+        opacity: 0.95;
+    }
+    .cert-sig-line {
+        width: 72mm;
+        height: 1px;
+        background: #222;
+        margin: 0 auto 6px;
+    }
+    .cert-sig-role {
+        font-size: 12px;
+        color: #5b6470;
+        letter-spacing: 0.14em;
+        font-weight: 900;
+        text-transform: uppercase;
+    }
+
+    .cert-footer {
+        position: absolute;
+        left: 20mm;
+        right: 20mm;
+        bottom: 12mm;
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        color: #666;
+        text-transform: uppercase;
+        z-index: 2;
+    }
+
+    /* Print styles for certificate */
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+        .certificate-section,
+        .certificate-section * {
+            visibility: visible;
+        }
+        .certificate-section {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            margin: 0;
+        }
+        .certificate-card-header {
+            display: none !important;
+        }
+        .certificate-card {
+            border: none;
+            background: transparent;
+        }
+        .certificate-card-body {
+            padding: 0;
+            background: transparent;
+            overflow: visible;
+        }
+        .certificate-page {
+            transform: none !important;
+            margin: 0 !important;
+            box-shadow: none;
+            border-radius: 0;
+        }
+        @page {
+            size: A4 landscape;
+            margin: 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Warning Banner for Expired/No Subscription -->
+{% if subscription_status == 'expired' or subscription_status == 'never_subscribed' %}
+<div class="subscription-warning-banner">
+    <div class="warning-icon">
+        <i data-lucide="alert-triangle"></i>
+    </div>
+    <div class="warning-content">
+        {% if subscription_status == 'expired' %}
+        <h4>Your Membership Has Expired!</h4>
+        <p>Your access to member benefits has been suspended. Renew now to restore full access to announcements, communications, resources, and exclusive member content.</p>
+        {% else %}
+        <h4>Activate Your Membership</h4>
+        <p>Activate your membership now to unlock full access to announcements, communications, resources, and exclusive member benefits.</p>
+        {% endif %}
+    </div>
+    <div class="warning-action">
+        <a href="{% url 'member_renew' %}" class="btn-renew-banner">
+            <i data-lucide="credit-card"></i>
+            Renew Now
+        </a>
+    </div>
+</div>
+{% endif %}
+
+<!-- Welcome Section -->
+<div class="welcome-section">
+    <h1>Welcome back, {{ member_name|default:"Member" }}!</h1>
+    <p>Your member dashboard - access announcements, resources, and your digital badge.</p>
+</div>
+
+<!-- Subscription Status Card -->
+<div class="subscription-card {% if subscription_status == 'expiring_soon' %}expiring{% elif subscription_status == 'expired' %}expired{% endif %}">
+    <div class="subscription-info">
+        <div class="subscription-icon {% if subscription_status == 'active' %}active{% elif subscription_status == 'expiring_soon' %}expiring{% elif subscription_status == 'expired' %}expired{% else %}none{% endif %}">
+            {% if subscription_status == 'active' %}
+                <i data-lucide="shield-check"></i>
+            {% elif subscription_status == 'expiring_soon' %}
+                <i data-lucide="alert-triangle"></i>
+            {% elif subscription_status == 'expired' %}
+                <i data-lucide="shield-x"></i>
+            {% else %}
+                <i data-lucide="shield-question"></i>
+            {% endif %}
+        </div>
+        <div class="subscription-details">
+            <h3>
+                Membership Status
+                {% if subscription_status == 'active' %}
+                    <span class="subscription-badge active">Active</span>
+                {% elif subscription_status == 'expiring_soon' %}
+                    <span class="subscription-badge expiring">Expiring Soon</span>
+                {% elif subscription_status == 'expired' %}
+                    <span class="subscription-badge expired">Expired</span>
+                {% else %}
+                    <span class="subscription-badge none">No Subscription</span>
+                {% endif %}
+            </h3>
+            <p>
+                {% if subscription_status == 'active' %}
+                    Your membership is active until {{ subscription_end }}.
+                {% elif subscription_status == 'expiring_soon' %}
+                    Your membership expires on {{ subscription_end }}. Renew now!
+                {% elif subscription_status == 'expired' %}
+                    Your membership expired. Renew to restore access.
+                {% else %}
+                    Activate your membership. {{ currency }} {{ membership_fee|floatformat:0 }}/month.
+                {% endif %}
+            </p>
+            {% if subscription_end_iso %}
+            <div class="countdown-inline" id="dashboardCountdown" data-end="{{ subscription_end_iso }}" data-expired="{% if subscription_status == 'expired' %}true{% else %}false{% endif %}">
+                <div class="countdown-box">
+                    <div class="countdown-num" id="dashDays">--</div>
+                    <div class="countdown-label">Days</div>
+                </div>
+                <div class="countdown-box">
+                    <div class="countdown-num" id="dashHours">--</div>
+                    <div class="countdown-label">Hrs</div>
+                </div>
+                <div class="countdown-box">
+                    <div class="countdown-num" id="dashMins">--</div>
+                    <div class="countdown-label">Min</div>
+                </div>
+                <div class="countdown-box">
+                    <div class="countdown-num" id="dashSecs">--</div>
+                    <div class="countdown-label">Sec</div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <a href="{% url 'member_renew' %}" class="btn-renew {% if subscription_status == 'expired' or subscription_status == 'never_subscribed' %}pulse-attention{% endif %}">
+        <i data-lucide="credit-card"></i>
+        {% if subscription_status == 'active' %}Extend{% else %}Renew Now{% endif %}
+    </a>
+</div>
+
+<!-- Badge Section -->
+<div class="badge-section">
+    <!-- Member Badge Card -->
+    <div class="member-badge-card" id="memberBadge">
+        <div class="badge-header">
+            <div class="badge-logo">
+                <img src="https://res.cloudinary.com/dmqizfpyz/image/upload/v1769424497/mmm_lyzhlw.png" alt="RATEL">
+            </div>
+            <p class="badge-title">Ratel Movement</p>
+            <h2 class="badge-type">Full Member</h2>
+            <div class="badge-verified" title="Verified Member">
+                <i data-lucide="check"></i>
+            </div>
+        </div>
+        <div class="badge-body">
+            <div class="badge-avatar-section">
+                <div class="badge-avatar">{{ member_initials|default:"M" }}</div>
+                <div class="badge-name-section">
+                    <h3 class="badge-member-name">{{ member_name|default:"Member Name" }}</h3>
+                    <span class="badge-member-id">
+                        <i data-lucide="fingerprint"></i>
+                        {{ member_id|default:"RATEL-NG-LAG-000001" }}
+                    </span>
+                </div>
+            </div>
+            <div class="badge-details">
+                <div class="badge-detail-item">
+                    <span class="badge-detail-label">Country</span>
+                    <span class="badge-detail-value">{{ member_country|default:"Nigeria" }}</span>
+                </div>
+                <div class="badge-detail-item">
+                    <span class="badge-detail-label">State</span>
+                    <span class="badge-detail-value">{{ member_state|default:"Lagos" }}</span>
+                </div>
+                <div class="badge-detail-item">
+                    <span class="badge-detail-label">LGA</span>
+                    <span class="badge-detail-value">{{ member_lga|default:"Ikeja" }}</span>
+                </div>
+                <div class="badge-detail-item">
+                    <span class="badge-detail-label">Member Since</span>
+                    <span class="badge-detail-value">{{ member_joined|default:"Jan 2024" }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="badge-footer">
+            <div class="badge-qr" title="Scan to verify">
+                <i data-lucide="qr-code"></i>
+            </div>
+            <div class="badge-actions">
+                <button class="badge-download-btn" onclick="downloadBadge()">
+                    <i data-lucide="download"></i>
+                    Badge
+                </button>
+                <button class="badge-download-btn certificate-btn" onclick="openCertificateModal()">
+                    <i data-lucide="award"></i>
+                    Certificate
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="quick-stats-card">
+        <h3 class="quick-stats-title">
+            <i data-lucide="bar-chart-3"></i>
+            Activity Overview
+        </h3>
+        <div class="quick-stats-grid">
+            <div class="quick-stat-item">
+                <div class="quick-stat-icon blue">
+                    <i data-lucide="megaphone"></i>
+                </div>
+                <div class="quick-stat-value">{{ announcements_count|default:"0" }}</div>
+                <div class="quick-stat-label">Announcements</div>
+            </div>
+            <div class="quick-stat-item">
+                <div class="quick-stat-icon green">
+                    <i data-lucide="mail"></i>
+                </div>
+                <div class="quick-stat-value">{{ communications_count|default:"0" }}</div>
+                <div class="quick-stat-label">Communications</div>
+            </div>
+            <div class="quick-stat-item">
+                <div class="quick-stat-icon purple">
+                    <i data-lucide="book-open"></i>
+                </div>
+                <div class="quick-stat-value">{{ resources_count|default:"0" }}</div>
+                <div class="quick-stat-label">Resources</div>
+            </div>
+            <div class="quick-stat-item">
+                <div class="quick-stat-icon orange">
+                    <i data-lucide="calendar"></i>
+                </div>
+                <div class="quick-stat-value">{{ events_count|default:"0" }}</div>
+                <div class="quick-stat-label">Events</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Certificate Section (Inline - shows when button clicked) -->
+<div class="certificate-section" id="certificateSection" style="display: none;">
+    <div class="certificate-card">
+        <div class="certificate-card-header">
+            <h3>
+                <i data-lucide="award"></i>
+                Your Membership Certificate
+            </h3>
+            <div class="certificate-card-actions">
+                <button class="cert-action-btn" onclick="printCertificate()">
+                    <i data-lucide="printer"></i>
+                    Print / Save PDF
+                </button>
+                <button class="cert-close-btn" onclick="hideCertificate()">
+                    <i data-lucide="x"></i>
+                    Close
+                </button>
+            </div>
+        </div>
+        <div class="certificate-card-body">
+            <div class="certificate-stage">
+                <section class="certificate-page" id="certificatePage">
+                    <!-- Watermark logo -->
+                    <div class="cert-watermark">
+                        <img src="https://res.cloudinary.com/dmqizfpyz/image/upload/v1769424497/mmm_lyzhlw.png" alt="RATEL logo watermark">
+                    </div>
+
+                    <div class="cert-frame"></div>
+                    <div class="cert-corner cert-tl"></div>
+                    <div class="cert-corner cert-tr"></div>
+                    <div class="cert-corner cert-bl"></div>
+                    <div class="cert-corner cert-br"></div>
+
+                    <div class="cert-content">
+                        <div class="cert-topbar">
+                            <div class="cert-org">
+                                <p class="cert-orgname">THE RATEL MOVEMENT</p>
+                                <div class="cert-tag">4TH ARM OF THE GOVERNMENT</div>
+                            </div>
+
+                            <div class="cert-meta">
+                                <div class="cert-chip">Official Certificate</div>
+                                <div class="cert-meta-line">Cert No: <b id="certNo"></b></div>
+                                <div class="cert-meta-line">Issue Date: <b id="certDate"></b></div>
+                            </div>
+                        </div>
+
+                        <div class="cert-header">
+                            <h1>CERTIFICATE</h1>
+                            <div class="cert-sub">OF MEMBERSHIP</div>
+                        </div>
+
+                        <div class="cert-certify">
+                            <span class="cert-ribbon">THIS IS TO CERTIFY THAT</span>
+                            <div class="cert-name" id="certName">{{ member_name|default:"Member Name"|upper }}</div>
+                            <div class="cert-rule"></div>
+                        </div>
+
+                        <div class="cert-statement">
+                            has been duly admitted and recognized as a full member of
+                            <strong>THE RATEL MOVEMENT</strong>, in accordance with its constitutional values,
+                            principles of accountability, and commitment to civic responsibility.
+                        </div>
+
+                        <div class="cert-bottom">
+                            <div class="cert-details">
+                                <div class="cert-detail-row">
+                                    DATE
+                                    <div class="cert-detail-val" id="certDateLong"></div>
+                                </div>
+                                <div class="cert-detail-row">
+                                    MEMBERSHIP ID
+                                    <div class="cert-detail-val" id="certMemberId">{{ member_id|default:"RATEL-NG-LAG-000001" }}</div>
+                                </div>
+                            </div>
+
+                            <div class="cert-sig-block">
+                                <div class="cert-sig-img-wrap">
+                                    <img id="certSigImg" alt="President signature" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='820' height='220'%3E%3Crect width='100%25' height='100%25' fill='white'/%3E%3Cpath d='M40 140c40-60 90-80 130-25 20 28 50 62 75 20 14-24 28-82 65-72 28 8-10 114 40 120 26 3 50-58 70-85 20-28 55-42 70-10 10 20-10 60 10 78 34 30 55-95 85-95 50 0-40 140 10 140 28 0 48-40 70-72 18-26 52-44 75-22 24 24-24 70 4 92 34 26 64-44 96-84' fill='none' stroke='%23222' stroke-width='8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+                                </div>
+                                <div class="cert-sig-line"></div>
+                                <div class="cert-sig-role">PRESIDENT</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cert-footer">
+                        <div>Official Membership Certificate</div>
+                        <div id="certFooterRef"></div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Content Grid -->
+<div class="content-grid">
+    <!-- Recent Announcements -->
+    <div class="content-card">
+        <div class="content-card-header">
+            <h3 class="content-card-title">
+                <i data-lucide="megaphone"></i>
+                Recent Announcements
+            </h3>
+            <a href="{% url 'member_announcements' %}" class="view-all-link">View All</a>
+        </div>
+        <div class="content-card-body">
+            {% if recent_announcements %}
+                {% for ann in recent_announcements %}
+                <div class="announcement-item">
+                    <div class="announcement-meta">
+                        {% if ann.is_pinned %}
+                            <span class="announcement-badge badge-pinned">Pinned</span>
+                        {% endif %}
+                        {% if ann.priority == 'high' %}
+                            <span class="announcement-badge badge-high">Important</span>
+                        {% elif ann.priority == 'normal' %}
+                            <span class="announcement-badge badge-normal">Update</span>
+                        {% endif %}
+                        <span class="announcement-date">{{ ann.created_at|slice:":10" }}</span>
+                    </div>
+                    <h4 class="announcement-title">{{ ann.title|truncatechars:50 }}</h4>
+                    <p class="announcement-excerpt">{{ ann.summary|default:ann.content|truncatechars:100 }}</p>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i data-lucide="megaphone"></i>
+                    <p>No announcements yet</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Recent Communications -->
+    <div class="content-card">
+        <div class="content-card-header">
+            <h3 class="content-card-title">
+                <i data-lucide="mail"></i>
+                Secure Communications
+            </h3>
+            <a href="{% url 'member_communications' %}" class="view-all-link">View All</a>
+        </div>
+        <div class="content-card-body">
+            {% if recent_communications %}
+                {% for comm in recent_communications %}
+                <div class="comm-item">
+                    <div class="comm-icon {% if comm.is_urgent %}urgent{% endif %}">
+                        <i data-lucide="mail"></i>
+                    </div>
+                    <div class="comm-content">
+                        <h4 class="comm-subject">{{ comm.subject|truncatechars:40 }}</h4>
+                        <p class="comm-preview">{{ comm.message|truncatechars:60 }}</p>
+                        <div class="comm-time">{{ comm.created_at|slice:":10" }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i data-lucide="mail"></i>
+                    <p>No communications yet</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<!-- Google Fonts for Certificate -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
+<script>
+// ============================================
+// CERTIFICATE MODAL FUNCTIONS
+// ============================================
+function generateCertNo() {
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const digits = String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+    const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ';
+    const letters = chars[Math.floor(Math.random() * chars.length)] + chars[Math.floor(Math.random() * chars.length)];
+    return `RM/${yyyy}/${mm}/${digits}${letters}`;
+}
+
+function formatDateShort(date) {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return `${String(date.getDate()).padStart(2, '0')} ${months[date.getMonth()]} ${date.getFullYear()}`;
+}
+
+function formatDateLong(date) {
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    return `${String(date.getDate()).padStart(2, '0')} ${months[date.getMonth()]} ${date.getFullYear()}`;
+}
+
+function openCertificateModal() {
+    const section = document.getElementById('certificateSection');
+    const now = new Date();
+    const certNo = generateCertNo();
+
+    // Populate certificate details
+    document.getElementById('certNo').textContent = certNo;
+    document.getElementById('certDate').textContent = formatDateShort(now);
+    document.getElementById('certDateLong').textContent = formatDateLong(now);
+    document.getElementById('certFooterRef').textContent = certNo;
+    document.getElementById('certName').textContent = '{{ member_name|default:"Member Name"|upper }}';
+    document.getElementById('certMemberId').textContent = '{{ member_id|default:"RATEL-NG-LAG-000001" }}';
+
+    // Show the certificate section
+    section.style.display = 'block';
+
+    // Scroll to certificate
+    setTimeout(() => {
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+
+    lucide.createIcons();
+}
+
+function hideCertificate() {
+    const section = document.getElementById('certificateSection');
+    section.style.display = 'none';
+}
+
+function printCertificate() {
+    window.print();
+}
+
+// Close certificate on Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        hideCertificate();
+    }
+});
+
+// ============================================
+// BADGE DOWNLOAD FUNCTION
+// ============================================
+async function downloadBadge() {
+    const badge = document.getElementById('memberBadge');
+    const downloadBtn = badge.querySelector('.badge-download-btn');
+    const originalText = downloadBtn.innerHTML;
+
+    // Show loading state
+    downloadBtn.innerHTML = '<i data-lucide="loader-2" class="spin"></i> Generating...';
+    downloadBtn.disabled = true;
+    lucide.createIcons();
+
+    try {
+        // Create custom canvas badge
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Badge dimensions (ID card style - 3.375 x 2.125 inches at 300 DPI scaled)
+        const width = 800;
+        const height = 500;
+        canvas.width = width;
+        canvas.height = height;
+
+        // Background - Clean white
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, width, height);
+
+        // Left accent bar
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(0, 0, 12, height);
+
+        // Top header section
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(12, 0, width - 12, 120);
+
+        // Organization name
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '600 14px Inter, system-ui, sans-serif';
+        ctx.letterSpacing = '3px';
+        ctx.fillText('RATEL MOVEMENT', 40, 45);
+
+        // Badge type
+        ctx.fillStyle = '#fbbf24';
+        ctx.font = '700 28px Inter, system-ui, sans-serif';
+        ctx.fillText('FULL MEMBER', 40, 85);
+
+        // Verified badge circle
+        ctx.beginPath();
+        ctx.arc(width - 60, 60, 24, 0, Math.PI * 2);
+        ctx.fillStyle = '#22c55e';
+        ctx.fill();
+
+        // Checkmark in verified badge
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 3;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        ctx.moveTo(width - 70, 60);
+        ctx.lineTo(width - 62, 68);
+        ctx.lineTo(width - 50, 52);
+        ctx.stroke();
+
+        // Member avatar circle
+        ctx.beginPath();
+        ctx.arc(90, 200, 50, 0, Math.PI * 2);
+        ctx.fillStyle = '#f1f5f9';
+        ctx.fill();
+        ctx.strokeStyle = '#e2e8f0';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        // Avatar initials
+        ctx.fillStyle = '#64748b';
+        ctx.font = '700 32px Inter, system-ui, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('{{ member_initials|default:"M" }}', 90, 212);
+        ctx.textAlign = 'left';
+
+        // Member name
+        ctx.fillStyle = '#1e293b';
+        ctx.font = '700 24px Inter, system-ui, sans-serif';
+        ctx.fillText('{{ member_name|default:"Member Name" }}', 160, 185);
+
+        // Member ID badge
+        ctx.fillStyle = '#0f172a';
+        roundRect(ctx, 160, 200, 280, 32, 6);
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '600 14px "Courier New", monospace';
+        ctx.fillText('{{ member_id|default:"RATEL-NG-LAG-000001" }}', 175, 222);
+
+        // Divider line
+        ctx.strokeStyle = '#e2e8f0';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(40, 270);
+        ctx.lineTo(width - 40, 270);
+        ctx.stroke();
+
+        // Details section - 2 columns
+        const detailY = 310;
+        const col1X = 40;
+        const col2X = 420;
+
+        // Column 1
+        drawDetailItem(ctx, col1X, detailY, 'COUNTRY', '{{ member_country|default:"Nigeria" }}');
+        drawDetailItem(ctx, col1X, detailY + 60, 'STATE', '{{ member_state|default:"Lagos" }}');
+
+        // Column 2
+        drawDetailItem(ctx, col2X, detailY, 'LOCAL GOVERNMENT', '{{ member_lga|default:"Ikeja" }}');
+        drawDetailItem(ctx, col2X, detailY + 60, 'MEMBER SINCE', '{{ member_joined|default:"January 2024" }}');
+
+        // Bottom footer
+        ctx.fillStyle = '#f8fafc';
+        ctx.fillRect(12, height - 50, width - 12, 50);
+
+        // Footer border
+        ctx.strokeStyle = '#e2e8f0';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(12, height - 50);
+        ctx.lineTo(width, height - 50);
+        ctx.stroke();
+
+        // Footer text
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '500 11px Inter, system-ui, sans-serif';
+        ctx.fillText('This badge certifies membership in the Ratel Movement organization.', 40, height - 22);
+
+        // QR code placeholder box
+        ctx.strokeStyle = '#e2e8f0';
+        ctx.lineWidth = 1;
+        ctx.fillStyle = '#ffffff';
+        roundRect(ctx, width - 90, height - 95, 50, 50, 4);
+        ctx.fill();
+        ctx.stroke();
+
+        // QR pattern (simple representation)
+        ctx.fillStyle = '#64748b';
+        ctx.font = '400 8px Inter, system-ui, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('SCAN TO', width - 65, height - 72);
+        ctx.fillText('VERIFY', width - 65, height - 62);
+        ctx.textAlign = 'left';
+
+        // Download the canvas
+        const link = document.createElement('a');
+        link.download = 'ratel-member-badge-{{ member_id|default:"RATEL-NG-000001" }}.png';
+        link.href = canvas.toDataURL('image/png', 1.0);
+        link.click();
+
+        // Success feedback
+        downloadBtn.innerHTML = '<i data-lucide="check"></i> Downloaded!';
+        lucide.createIcons();
+
+        setTimeout(() => {
+            downloadBtn.innerHTML = originalText;
+            downloadBtn.disabled = false;
+            lucide.createIcons();
+        }, 2000);
+
+    } catch (error) {
+        console.error('Badge download error:', error);
+        downloadBtn.innerHTML = '<i data-lucide="alert-circle"></i> Error';
+        lucide.createIcons();
+
+        setTimeout(() => {
+            downloadBtn.innerHTML = originalText;
+            downloadBtn.disabled = false;
+            lucide.createIcons();
+        }, 2000);
+    }
+}
+
+// Helper function to draw rounded rectangles
+function roundRect(ctx, x, y, width, height, radius) {
+    ctx.beginPath();
+    ctx.moveTo(x + radius, y);
+    ctx.lineTo(x + width - radius, y);
+    ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+    ctx.lineTo(x + width, y + height - radius);
+    ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+    ctx.lineTo(x + radius, y + height);
+    ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+    ctx.lineTo(x, y + radius);
+    ctx.quadraticCurveTo(x, y, x + radius, y);
+    ctx.closePath();
+}
+
+// Helper function to draw detail items
+function drawDetailItem(ctx, x, y, label, value) {
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '600 10px Inter, system-ui, sans-serif';
+    ctx.fillText(label, x, y);
+
+    ctx.fillStyle = '#1e293b';
+    ctx.font = '500 16px Inter, system-ui, sans-serif';
+    ctx.fillText(value, x, y + 22);
+}
+</script>
+<style>
+.spin {
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+</style>
+
+<script>
+// Dashboard Countdown Timer
+document.addEventListener('DOMContentLoaded', function() {
+    const countdownEl = document.getElementById('dashboardCountdown');
+    if (!countdownEl) return;
+
+    const endDateStr = countdownEl.dataset.end;
+    const isExpired = countdownEl.dataset.expired === 'true';
+    if (!endDateStr) return;
+
+    const endDate = new Date(endDateStr);
+
+    function updateCountdown() {
+        const now = new Date();
+        let diff = isExpired ? (now - endDate) : (endDate - now);
+
+        if (diff < 0 && !isExpired) {
+            document.getElementById('dashDays').textContent = '0';
+            document.getElementById('dashHours').textContent = '0';
+            document.getElementById('dashMins').textContent = '0';
+            document.getElementById('dashSecs').textContent = '0';
+            return;
+        }
+
+        const days = Math.floor(Math.abs(diff) / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((Math.abs(diff) % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const mins = Math.floor((Math.abs(diff) % (1000 * 60 * 60)) / (1000 * 60));
+        const secs = Math.floor((Math.abs(diff) % (1000 * 60)) / 1000);
+
+        document.getElementById('dashDays').textContent = days;
+        document.getElementById('dashHours').textContent = hours;
+        document.getElementById('dashMins').textContent = mins;
+        document.getElementById('dashSecs').textContent = secs;
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+});
+</script>
+{% endblock %}

@@ -1,0 +1,197 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Dashboard{% endblock %} - Ratel Movement</title>
+    <link rel="icon" href="{% static 'images/fevicon.png' %}" type="image/gif" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/dashboard_material.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+<div class="md-app">
+
+    <!-- Sidebar Overlay (mobile) -->
+    <div class="md-sidebar-overlay" id="mdSidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="md-sidebar" id="mdSidebar">
+        <div class="md-sidebar-header">
+            <a href="{% url 'dashboard_home' %}" class="md-sidebar-brand">Ratel Movement</a>
+            <button class="md-sidebar-toggle" id="mdSidebarToggle" aria-label="Toggle sidebar">
+                <i data-lucide="chevron-left" style="width:20px;height:20px;"></i>
+            </button>
+        </div>
+        <nav class="md-sidebar-nav">
+            <a href="{% url 'dashboard_home' %}" class="md-nav-item {% if active_page == 'dashboard' %}active{% endif %}">
+                <i data-lucide="layout-dashboard"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="{% url 'dashboard_membership' %}" class="md-nav-item {% if active_page == 'contacts' %}active{% endif %}">
+                <i data-lucide="users"></i>
+                <span>Membership</span>
+            </a>
+            <a href="{% url 'dashboard_leadership' %}" class="md-nav-item {% if active_page == 'leadership' %}active{% endif %}">
+                <i data-lucide="crown"></i>
+                <span>Leadership</span>
+            </a>
+            <a href="{% url 'dashboard_inquiries' %}" class="md-nav-item {% if active_page == 'inquiries' %}active{% endif %}">
+                <i data-lucide="mail"></i>
+                <span>Inquiries</span>
+            </a>
+
+            <!-- Media Vault with Expandable Submenu -->
+            <div class="md-nav-group {% if active_page == 'media_vault' or active_page == 'media_videos' or active_page == 'media_audio' or active_page == 'media_images' or active_page == 'media_documents' %}expanded{% endif %}">
+                <button class="md-nav-group-toggle {% if active_page == 'media_vault' or active_page == 'media_videos' or active_page == 'media_audio' or active_page == 'media_images' or active_page == 'media_documents' %}active{% endif %}" onclick="toggleNavGroup(this)">
+                    <i data-lucide="archive"></i>
+                    <span>Media Vault</span>
+                    <i data-lucide="chevron-down" class="md-nav-chevron"></i>
+                </button>
+                <div class="md-nav-submenu">
+                    <a href="{% url 'dashboard_media_vault' %}" class="md-nav-subitem {% if active_page == 'media_vault' %}active{% endif %}">
+                        <i data-lucide="layout-grid"></i>
+                        <span>Overview</span>
+                    </a>
+                    <a href="{% url 'dashboard_media_videos' %}" class="md-nav-subitem {% if active_page == 'media_videos' %}active{% endif %}">
+                        <i data-lucide="video"></i>
+                        <span>Videos</span>
+                    </a>
+                    <a href="{% url 'dashboard_media_audio' %}" class="md-nav-subitem {% if active_page == 'media_audio' %}active{% endif %}">
+                        <i data-lucide="mic"></i>
+                        <span>Audio</span>
+                    </a>
+                    <a href="{% url 'dashboard_media_images' %}" class="md-nav-subitem {% if active_page == 'media_images' %}active{% endif %}">
+                        <i data-lucide="image"></i>
+                        <span>Images</span>
+                    </a>
+                    <a href="{% url 'dashboard_media_documents' %}" class="md-nav-subitem {% if active_page == 'media_documents' %}active{% endif %}">
+                        <i data-lucide="file-text"></i>
+                        <span>Documents</span>
+                    </a>
+                </div>
+            </div>
+
+            <a href="{% url 'dashboard_about' %}" class="md-nav-item {% if active_page == 'about' %}active{% endif %}">
+                <i data-lucide="info"></i>
+                <span>About / Manifesto</span>
+            </a>
+            <a href="{% url 'dashboard_billing' %}" class="md-nav-item {% if active_page == 'billing' %}active{% endif %}">
+                <i data-lucide="credit-card"></i>
+                <span>Billing</span>
+            </a>
+            <a href="{% url 'dashboard_settings' %}" class="md-nav-item {% if active_page == 'settings' %}active{% endif %}">
+                <i data-lucide="settings"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="md-main">
+
+        <!-- Navbar -->
+        <nav class="md-navbar">
+            <div class="md-navbar-inner">
+                <div class="md-navbar-left">
+                    <button class="md-hamburger" id="mdHamburger" aria-label="Toggle menu">
+                        <i data-lucide="menu" style="width:20px;height:20px;"></i>
+                    </button>
+                    <form class="md-search-form" onsubmit="return false;">
+                        <span class="md-search-icon">
+                            <i data-lucide="search" style="width:18px;height:18px;"></i>
+                        </span>
+                        <input type="search" class="md-search-input" placeholder="Search...">
+                    </form>
+                </div>
+                <div class="md-navbar-right">
+                    <button class="md-navbar-sidebar-toggle" id="mdNavbarSidebarToggle" aria-label="Toggle sidebar">
+                        <i data-lucide="menu" style="width:20px;height:20px;"></i>
+                    </button>
+                    <div class="md-account">
+                        <button class="md-account-btn" id="mdAccountBtn">
+                            <div class="md-account-avatar">
+                                <i data-lucide="user" style="width:18px;height:18px;"></i>
+                            </div>
+                            <span class="md-account-name">Account</span>
+                            <i data-lucide="chevron-down" style="width:16px;height:16px;" class="md-account-chevron"></i>
+                        </button>
+                        <div class="md-account-dropdown" id="mdAccountDropdown">
+                            <div class="md-account-info">
+                                <div class="md-account-info-name">John Doe</div>
+                                <div class="md-account-info-email">john@example.com</div>
+                            </div>
+                            <a href="{% url 'dashboard_billing' %}" class="md-account-dropdown-item">
+                                <i data-lucide="credit-card" style="width:16px;height:16px;"></i>
+                                <span>Billing</span>
+                            </a>
+                            <button class="md-account-dropdown-item danger">
+                                <i data-lucide="log-out" style="width:16px;height:16px;"></i>
+                                <span>Logout</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="md-mobile-search">
+                <form class="md-search-form" onsubmit="return false;">
+                    <span class="md-search-icon">
+                        <i data-lucide="search" style="width:18px;height:18px;"></i>
+                    </span>
+                    <input type="search" class="md-search-input" placeholder="Search...">
+                </form>
+            </div>
+        </nav>
+
+        <!-- Page Content -->
+        <div class="md-content">
+            {% if messages %}
+                <div class="md-alerts" style="margin-bottom: 1rem;">
+                    {% for message in messages %}
+                        <div class="md-alert md-alert-{{ message.tags|default:'info' }}" style="padding:10px 14px;border-radius:8px;margin-bottom:6px;font-size:0.85rem;
+                            {% if 'error' in message.tags %}
+                                background:#fee2e2;color:#7f1d1d;border:1px solid #fecaca;
+                            {% elif 'success' in message.tags %}
+                                background:#dcfce7;color:#14532d;border:1px solid #bbf7d0;
+                            {% else %}
+                                background:#e0f2fe;color:#0f172a;border:1px solid #bae6fd;
+                            {% endif %}
+                        ">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            {% block content %}{% endblock %}
+        </div>
+
+        <!-- Footer -->
+        <footer class="md-footer">
+            <div class="md-footer-inner">
+                <div class="md-footer-left">
+                    <span>&copy; 2026, made with</span>
+                    <span class="md-footer-heart">&hearts;</span>
+                    <span>by</span>
+                    <a href="{% url 'index' %}" class="md-footer-link">Ratel Movement</a>
+                </div>
+                <div class="md-footer-right">
+                    <a href="{% url 'index' %}">Home</a>
+                    <a href="{% url 'about' %}">About Us</a>
+                    <a href="{% url 'contact' %}">Contact</a>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script src="{% static 'js/dashboard_material.js' %}"></script>
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

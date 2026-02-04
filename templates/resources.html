@@ -1,0 +1,367 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Resources - Ratel Movement{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Resources Page Styles */
+    .resources-banner {
+        background: #fff;
+        padding: 80px 0 40px;
+        margin-bottom: 0;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .resources-banner h1 {
+        color: #1e293b;
+        font-size: 2.25rem;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+    }
+    .resources-banner p {
+        color: #64748b;
+        font-size: 1rem;
+        max-width: 600px;
+        margin: 0;
+    }
+
+    .resources-section {
+        padding: 40px 0 60px;
+        background: #f8fafc;
+    }
+
+    /* Category Tabs */
+    .category-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background: #fff;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+    }
+    .category-tab {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.25rem;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #475569;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+    }
+    .category-tab:hover {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+        color: #1e293b;
+    }
+    .category-tab.active {
+        background: #0f172a;
+        border-color: #0f172a;
+        color: #fff;
+    }
+    .category-tab i {
+        font-size: 1rem;
+    }
+
+    /* Category Section */
+    .category-section {
+        display: none;
+    }
+    .category-section.active {
+        display: block;
+    }
+    .category-header {
+        margin-bottom: 1.5rem;
+    }
+    .category-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 0.25rem;
+    }
+    .category-desc {
+        color: #64748b;
+        font-size: 0.95rem;
+    }
+
+    /* Resources Grid */
+    .resources-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .resource-card {
+        background: #fff;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+        transition: all 0.2s;
+    }
+    .resource-card:hover {
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        transform: translateY(-3px);
+    }
+
+    .resource-thumbnail {
+        height: 160px;
+        background: #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+    .resource-thumbnail img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .resource-thumbnail i {
+        font-size: 3rem;
+        color: #cbd5e1;
+    }
+    .resource-type-badge {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        padding: 0.35rem 0.75rem;
+        background: rgba(15, 23, 42, 0.9);
+        border-radius: 6px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: #fff;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+
+    .resource-body {
+        padding: 1.5rem;
+    }
+    .resource-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 0.75rem;
+        line-height: 1.4;
+    }
+    .resource-description {
+        font-size: 0.9rem;
+        color: #64748b;
+        line-height: 1.6;
+        margin-bottom: 1.25rem;
+    }
+    .resource-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 1rem;
+        border-top: 1px solid #f1f5f9;
+    }
+    .resource-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        font-size: 0.8rem;
+        color: #94a3b8;
+    }
+    .resource-info span {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+    .resource-download-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.6rem 1.25rem;
+        background: #0f172a;
+        color: #fff;
+        font-size: 0.85rem;
+        font-weight: 500;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    .resource-download-btn:hover {
+        background: #1e293b;
+        color: #fff;
+    }
+
+    /* Empty State */
+    .empty-state {
+        background: #fff;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        padding: 4rem 2rem;
+        text-align: center;
+        grid-column: 1 / -1;
+    }
+    .empty-state i {
+        font-size: 4rem;
+        color: #e2e8f0;
+        margin-bottom: 1.5rem;
+    }
+    .empty-state h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #475569;
+        margin-bottom: 0.5rem;
+    }
+    .empty-state p {
+        color: #94a3b8;
+        font-size: 0.95rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .resources-banner h1 {
+            font-size: 1.75rem;
+        }
+        .category-tabs {
+            padding: 1rem;
+        }
+        .category-tab {
+            padding: 0.6rem 1rem;
+            font-size: 0.85rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Resources Banner -->
+<div class="resources-banner">
+    <div class="container">
+        <h1>Resources</h1>
+        <p>Access educational materials, activist toolkits, legal guides, and more to support your journey with the movement.</p>
+    </div>
+</div>
+
+<!-- Resources Section -->
+<section class="resources-section">
+    <div class="container">
+        <!-- Category Tabs -->
+        <div class="category-tabs">
+            <a href="?category=activist_toolkits" class="category-tab {% if current_category == 'activist_toolkits' %}active{% endif %}">
+                <i class="fa fa-bullhorn"></i>
+                Activist Toolkits
+            </a>
+            <a href="?category=educational_materials" class="category-tab {% if current_category == 'educational_materials' %}active{% endif %}">
+                <i class="fa fa-graduation-cap"></i>
+                Educational Materials
+            </a>
+            <a href="?category=legal_civic_guides" class="category-tab {% if current_category == 'legal_civic_guides' %}active{% endif %}">
+                <i class="fa fa-balance-scale"></i>
+                Legal & Civic Guides
+            </a>
+            <a href="?category=research_reading" class="category-tab {% if current_category == 'research_reading' %}active{% endif %}">
+                <i class="fa fa-book"></i>
+                Research & Reading
+            </a>
+            <a href="?category=download_centre" class="category-tab {% if current_category == 'download_centre' %}active{% endif %}">
+                <i class="fa fa-download"></i>
+                Download Centre
+            </a>
+        </div>
+
+        <!-- Current Category Resources -->
+        <div class="category-header">
+            {% if current_category == 'activist_toolkits' %}
+                <h2 class="category-title">Activist Toolkits</h2>
+                <p class="category-desc">Practical tools and guides for effective activism and community organizing.</p>
+            {% elif current_category == 'educational_materials' %}
+                <h2 class="category-title">Educational Materials</h2>
+                <p class="category-desc">Learn about civic engagement, democracy, and social change.</p>
+            {% elif current_category == 'legal_civic_guides' %}
+                <h2 class="category-title">Legal & Civic Guides</h2>
+                <p class="category-desc">Understand your rights and civic responsibilities.</p>
+            {% elif current_category == 'research_reading' %}
+                <h2 class="category-title">Research & Reading</h2>
+                <p class="category-desc">In-depth research and analysis on relevant topics.</p>
+            {% elif current_category == 'download_centre' %}
+                <h2 class="category-title">Download Centre</h2>
+                <p class="category-desc">Downloadable materials including posters, flyers, and templates.</p>
+            {% endif %}
+        </div>
+
+        <div class="resources-grid">
+            {% if current_category == 'activist_toolkits' %}
+                {% for resource in resources.activist_toolkits %}
+                    {% include "partials/resource_card.html" %}
+                {% empty %}
+                    <div class="empty-state">
+                        <i class="fa fa-folder-open-o"></i>
+                        <h3>No resources available</h3>
+                        <p>Resources in this category will be added soon. Please check back later.</p>
+                    </div>
+                {% endfor %}
+            {% elif current_category == 'educational_materials' %}
+                {% for resource in resources.educational_materials %}
+                    {% include "partials/resource_card.html" %}
+                {% empty %}
+                    <div class="empty-state">
+                        <i class="fa fa-folder-open-o"></i>
+                        <h3>No resources available</h3>
+                        <p>Resources in this category will be added soon. Please check back later.</p>
+                    </div>
+                {% endfor %}
+            {% elif current_category == 'legal_civic_guides' %}
+                {% for resource in resources.legal_civic_guides %}
+                    {% include "partials/resource_card.html" %}
+                {% empty %}
+                    <div class="empty-state">
+                        <i class="fa fa-folder-open-o"></i>
+                        <h3>No resources available</h3>
+                        <p>Resources in this category will be added soon. Please check back later.</p>
+                    </div>
+                {% endfor %}
+            {% elif current_category == 'research_reading' %}
+                {% for resource in resources.research_reading %}
+                    {% include "partials/resource_card.html" %}
+                {% empty %}
+                    <div class="empty-state">
+                        <i class="fa fa-folder-open-o"></i>
+                        <h3>No resources available</h3>
+                        <p>Resources in this category will be added soon. Please check back later.</p>
+                    </div>
+                {% endfor %}
+            {% elif current_category == 'download_centre' %}
+                {% for resource in resources.download_centre %}
+                    {% include "partials/resource_card.html" %}
+                {% empty %}
+                    <div class="empty-state">
+                        <i class="fa fa-folder-open-o"></i>
+                        <h3>No resources available</h3>
+                        <p>Resources in this category will be added soon. Please check back later.</p>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Handle tab navigation without page reload (optional enhancement)
+document.addEventListener('DOMContentLoaded', function() {
+    // Smooth scroll to resources section if coming from tab click
+    if (window.location.search.includes('category=')) {
+        const resourcesSection = document.querySelector('.resources-section');
+        if (resourcesSection) {
+            window.scrollTo({
+                top: resourcesSection.offsetTop - 100,
+                behavior: 'smooth'
+            });
+        }
+    }
+});
+</script>
+{% endblock %}

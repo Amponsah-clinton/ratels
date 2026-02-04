@@ -1,0 +1,138 @@
+{% extends "dashboard/base_dashboard.html" %}
+
+{% block title %}Tasks{% endblock %}
+
+{% block content %}
+<div class="md-space-y-6">
+
+    <!-- Page Header -->
+    <div class="md-page-header-row">
+        <div>
+            <h1 class="md-page-title">Tasks</h1>
+            <p class="md-page-subtitle">Manage your todo list and assignments</p>
+        </div>
+        <button class="md-btn md-btn-primary md-btn-sm">
+            <i data-lucide="plus" style="width:16px;height:16px;"></i>
+            Add Task
+        </button>
+    </div>
+
+    <!-- Task Columns -->
+    <div class="md-grid md-grid-3">
+
+        <!-- To Do -->
+        <div class="md-kanban-column">
+            <div class="md-kanban-header">TO DO</div>
+            <div class="md-card">
+                <div class="md-card-content" style="padding-top:16px;">
+                    <div class="md-flex md-items-start md-gap-3">
+                        <input type="checkbox" class="md-task-checkbox" style="margin-top:4px;">
+                        <div class="md-flex-1">
+                            <div class="md-task-card-title">Call with prospect</div>
+                            <div class="md-task-card-desc">Discuss project requirements and timeline</div>
+                            <div class="md-task-card-meta">
+                                <div class="md-task-card-meta-item">
+                                    <i data-lucide="calendar" style="width:14px;height:14px;"></i>
+                                    <span>Today at 2:00 PM</span>
+                                </div>
+                                <div class="md-task-card-meta-item">
+                                    <i data-lucide="user" style="width:14px;height:14px;"></i>
+                                    <span>Assigned to you</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="md-card">
+                <div class="md-card-content" style="padding-top:16px;">
+                    <div class="md-flex md-items-start md-gap-3">
+                        <input type="checkbox" class="md-task-checkbox" style="margin-top:4px;">
+                        <div class="md-flex-1">
+                            <div class="md-task-card-title">Prepare presentation</div>
+                            <div class="md-task-card-desc">Create slides for client meeting</div>
+                            <div class="md-task-card-meta">
+                                <div class="md-task-card-meta-item">
+                                    <i data-lucide="calendar" style="width:14px;height:14px;"></i>
+                                    <span>Tomorrow at 10:00 AM</span>
+                                </div>
+                                <div class="md-task-card-meta-item">
+                                    <i data-lucide="user" style="width:14px;height:14px;"></i>
+                                    <span>Assigned to you</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- In Progress -->
+        <div class="md-kanban-column">
+            <div class="md-kanban-header">IN PROGRESS</div>
+            <div class="md-card">
+                <div class="md-card-content" style="padding-top:16px;">
+                    <div class="md-flex md-items-start md-gap-3">
+                        <input type="checkbox" class="md-task-checkbox" style="margin-top:4px;">
+                        <div class="md-flex-1">
+                            <div class="md-task-card-title">Draft proposal</div>
+                            <div class="md-task-card-desc">Write detailed proposal for Enterprise Solution</div>
+                            <div class="md-task-card-meta">
+                                <div class="md-task-card-meta-item">
+                                    <i data-lucide="calendar" style="width:14px;height:14px;"></i>
+                                    <span>Due in 2 days</span>
+                                </div>
+                                <div class="md-task-card-meta-item">
+                                    <i data-lucide="user" style="width:14px;height:14px;"></i>
+                                    <span>Assigned to you</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Completed -->
+        <div class="md-kanban-column">
+            <div class="md-kanban-header">COMPLETED</div>
+            <div class="md-card md-task-completed">
+                <div class="md-card-content" style="padding-top:16px;">
+                    <div class="md-flex md-items-start md-gap-3">
+                        <input type="checkbox" class="md-task-checkbox" checked style="margin-top:4px;">
+                        <div class="md-flex-1">
+                            <div class="md-task-card-title">Follow-up email</div>
+                            <div class="md-task-card-desc">Send follow-up to Jane Smith</div>
+                            <div class="md-task-card-meta">
+                                <div class="md-task-card-meta-item">
+                                    <i data-lucide="calendar" style="width:14px;height:14px;"></i>
+                                    <span>Completed yesterday</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="md-card md-task-completed">
+                <div class="md-card-content" style="padding-top:16px;">
+                    <div class="md-flex md-items-start md-gap-3">
+                        <input type="checkbox" class="md-task-checkbox" checked style="margin-top:4px;">
+                        <div class="md-flex-1">
+                            <div class="md-task-card-title">Update CRM records</div>
+                            <div class="md-task-card-desc">Add new contacts from conference</div>
+                            <div class="md-task-card-meta">
+                                <div class="md-task-card-meta-item">
+                                    <i data-lucide="calendar" style="width:14px;height:14px;"></i>
+                                    <span>Completed 2 days ago</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

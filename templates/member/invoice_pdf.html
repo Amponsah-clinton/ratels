@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Invoice – {{ invoice_number }}</title>
+    <style type="text/css">
+        @page {
+            size: A4 portrait;
+            margin: 18mm 15mm;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+            font-size: 10pt;
+            color: #1f2937;
+            line-height: 1.5;
+            background: #ffffff;
+        }
+        .invoice-wrapper {
+            width: 100%;
+            max-width: 180mm;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        /* Header Section - Compact & Clean */
+        .invoice-header {
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 3px solid #111827;
+            overflow: hidden;
+        }
+        .header-left {
+            float: left;
+            width: 48%;
+        }
+        .header-right {
+            float: right;
+            width: 48%;
+            text-align: right;
+        }
+        .company-logo {
+            width: 36px;
+            height: 36px;
+            margin-bottom: 6px;
+            display: block;
+        }
+        .company-name {
+            font-size: 18pt;
+            font-weight: 700;
+            color: #111827;
+            margin: 0 0 2px 0;
+            line-height: 1.2;
+        }
+        .company-subtitle {
+            font-size: 9pt;
+            color: #6b7280;
+            margin: 0;
+        }
+        .invoice-badge {
+            font-size: 24pt;
+            font-weight: 700;
+            color: #111827;
+            margin: 0 0 6px 0;
+            line-height: 1;
+            letter-spacing: -0.5px;
+        }
+        .invoice-details {
+            font-size: 9pt;
+            color: #4b5563;
+            line-height: 1.6;
+        }
+        .invoice-details strong {
+            color: #111827;
+            font-weight: 600;
+        }
+        .clearfix::after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+        
+        /* Bill To Section - Compact */
+        .bill-to-section {
+            margin-bottom: 18px;
+        }
+        .section-title {
+            font-size: 8.5pt;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #6b7280;
+            margin-bottom: 6px;
+        }
+        .bill-info-box {
+            background: transparent;
+            border: none;
+            padding: 8px 0;
+        }
+        .bill-info-line {
+            font-size: 10pt;
+            color: #374151;
+            margin-bottom: 3px;
+            line-height: 1.4;
+        }
+        .bill-info-line:last-child {
+            margin-bottom: 0;
+        }
+        .bill-info-line strong {
+            color: #111827;
+            font-weight: 600;
+        }
+        
+        /* Invoice Items Table - Clean & Structured */
+        .invoice-items {
+            margin-bottom: 18px;
+        }
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1.5px solid #d1d5db;
+            background: #ffffff;
+        }
+        .items-table thead {
+            background: #f3f4f6;
+        }
+        .items-table thead th {
+            padding: 9px 10px;
+            text-align: left;
+            font-size: 8.5pt;
+            font-weight: 700;
+            color: #111827;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-right: none;
+        }
+        .items-table thead th:last-child {
+            border-right: none;
+        }
+        .items-table thead th.align-center {
+            text-align: center;
+        }
+        .items-table thead th.align-right {
+            text-align: right;
+        }
+        .items-table tbody td {
+            padding: 11px 10px;
+            font-size: 10pt;
+            color: #374151;
+            border-bottom: 1px solid #e5e7eb;
+            border-right: none;
+            vertical-align: top;
+        }
+        .items-table tbody td.align-center {
+            text-align: center;
+        }
+        .items-table tbody td.align-right {
+            text-align: right;
+            font-weight: 600;
+        }
+        .item-description {
+            font-size: 10pt;
+            color: #111827;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+        .item-meta {
+            font-size: 8.5pt;
+            color: #6b7280;
+        }
+        .period-text {
+            font-size: 9pt;
+            line-height: 1.5;
+        }
+        .items-table tfoot {
+            background: transparent;
+            border-top: 2px solid #e5e7eb;
+        }
+        .items-table tfoot td {
+            padding: 11px 10px;
+            font-size: 11pt;
+            font-weight: 700;
+            color: #111827;
+            border: none;
+        }
+        .items-table tfoot td.align-right {
+            text-align: right;
+        }
+        
+        /* Payment Information - Compact Grid */
+        .payment-info {
+            margin-bottom: 20px;
+            padding: 12px 0;
+            background: transparent;
+            border: none;
+            border-top: 1px solid #e5e7eb;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .payment-info-row {
+            margin-bottom: 5px;
+            overflow: hidden;
+        }
+        .payment-info-row:last-child {
+            margin-bottom: 0;
+        }
+        .payment-label {
+            float: left;
+            font-size: 9.5pt;
+            color: #6b7280;
+            font-weight: 500;
+            width: 45%;
+        }
+        .payment-value {
+            float: right;
+            font-size: 9.5pt;
+            color: #111827;
+            font-weight: 600;
+            text-align: right;
+            width: 52%;
+        }
+        .payment-status {
+            text-transform: uppercase;
+            font-size: 9pt;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Footer - Minimal & Professional */
+        .invoice-footer {
+            margin-top: 24px;
+            padding-top: 14px;
+            border-top: 1.5px solid #e5e7eb;
+            text-align: center;
+        }
+        .footer-line {
+            font-size: 8.5pt;
+            color: #6b7280;
+            line-height: 1.7;
+            margin-bottom: 3px;
+        }
+        .footer-line:last-child {
+            margin-bottom: 0;
+        }
+        .footer-copyright {
+            margin-top: 10px;
+            font-size: 8pt;
+            color: #9ca3af;
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-wrapper">
+        <!-- Header -->
+        <div class="invoice-header clearfix">
+            <div class="header-left">
+                <div class="company-name">RATEL Movement</div>
+                <div class="company-subtitle">Membership Invoice</div>
+            </div>
+            <div class="header-right">
+                <div class="invoice-badge">INVOICE</div>
+                <div class="invoice-details">
+                    <strong>Invoice #:</strong> {{ invoice_number }}<br/>
+                    <strong>Date:</strong> {{ invoice_date }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Bill To -->
+        <div class="bill-to-section">
+            <div class="section-title">Bill To</div>
+            <div class="bill-info-box">
+                <div class="bill-info-line"><strong>{{ member_name }}</strong></div>
+                <div class="bill-info-line">{{ member_email }}</div>
+                <div class="bill-info-line">Member ID: {{ member_id }}</div>
+            </div>
+        </div>
+
+        <!-- Invoice Items -->
+        <div class="invoice-items">
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th style="width: 38%;">Description</th>
+                        <th style="width: 28%;">Period</th>
+                        <th class="align-center" style="width: 12%;">Duration</th>
+                        <th class="align-right" style="width: 22%;">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="item-description">Membership Subscription</div>
+                            <div class="item-meta">Payment via {{ subscription.payment_method }}</div>
+                        </td>
+                        <td>
+                            <div class="period-text">
+                                {{ subscription.start_date }}<br/>
+                                to {{ subscription.end_date }}
+                            </div>
+                        </td>
+                        <td class="align-center">
+                            <strong>{{ subscription.months_subscribed }}</strong><br/>
+                            <span style="font-size: 8pt; color: #6b7280;">month{{ subscription.months_subscribed|pluralize }}</span>
+                        </td>
+                        <td class="align-right">GHS {{ subscription.amount_paid }}</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3">TOTAL PAID</td>
+                        <td class="align-right">GHS {{ subscription.amount_paid }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <!-- Payment Information -->
+        <div class="payment-info">
+            <div class="payment-info-row clearfix">
+                <div class="payment-label">Payment Reference:</div>
+                <div class="payment-value">{{ subscription.payment_reference }}</div>
+            </div>
+            <div class="payment-info-row clearfix">
+                <div class="payment-label">Payment Status:</div>
+                <div class="payment-value payment-status">{{ subscription.status }}</div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="invoice-footer">
+            <div class="footer-line">This is an official invoice for membership subscription paid to RATEL Movement.</div>
+            <div class="footer-line">Thank you for your continued support and membership.</div>
+            <div class="footer-copyright">&copy; {{ invoice_date|slice:"-4:" }} RATEL Movement. All rights reserved.</div>
+        </div>
+    </div>
+</body>
+</html>

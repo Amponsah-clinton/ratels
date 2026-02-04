@@ -1,0 +1,1420 @@
+{% extends "base.html" %}
+
+{% block title %}Images - Media Vault - Ratel Movement{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ============================================
+     PREMIUM MEDIA IMAGES - TOP-NOTCH UI/UX
+     Clean, Modern, No Gradients
+     ============================================ */
+
+  :root {
+    --img-bg: #f8fafc;
+    --img-surface: #ffffff;
+    --img-border: #e2e8f0;
+    --img-text-primary: #0f172a;
+    --img-text-secondary: #475569;
+    --img-text-muted: #94a3b8;
+    --img-accent: #0f172a;
+    --img-accent-hover: #1e293b;
+    --img-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
+    --img-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+    --img-shadow-lg: 0 20px 40px rgba(15, 23, 42, 0.12);
+    --img-shadow-xl: 0 25px 50px rgba(15, 23, 42, 0.18);
+    --img-radius: 16px;
+    --img-radius-sm: 10px;
+    --img-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Page Layout */
+  .img-vault-page {
+    background: var(--img-bg);
+    min-height: 100vh;
+    padding: 48px 0 100px;
+  }
+
+  .img-vault-container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* Hero Header */
+  .img-vault-hero {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .img-vault-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: var(--img-surface);
+    border: 1px solid var(--img-border);
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--img-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 20px;
+    box-shadow: var(--img-shadow-sm);
+  }
+
+  .img-vault-badge svg {
+    width: 16px;
+    height: 16px;
+    color: var(--img-accent);
+  }
+
+  .img-vault-title {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 800;
+    color: var(--img-text-primary);
+    margin: 0 0 16px 0;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+  }
+
+  .img-vault-subtitle {
+    font-size: 1.1rem;
+    color: var(--img-text-secondary);
+    margin: 0 auto;
+    max-width: 600px;
+    line-height: 1.6;
+  }
+
+  /* Search & Filter Bar */
+  .img-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+
+  .img-search-wrapper {
+    flex: 1;
+    max-width: 400px;
+    position: relative;
+  }
+
+  .img-search-input {
+    width: 100%;
+    padding: 14px 20px 14px 52px;
+    border: 1px solid var(--img-border);
+    border-radius: var(--img-radius);
+    background: var(--img-surface);
+    font-size: 0.95rem;
+    color: var(--img-text-primary);
+    transition: var(--img-transition);
+    box-shadow: var(--img-shadow-sm);
+  }
+
+  .img-search-input:focus {
+    outline: none;
+    border-color: var(--img-accent);
+    box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.08);
+  }
+
+  .img-search-input::placeholder {
+    color: var(--img-text-muted);
+  }
+
+  .img-search-icon {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    color: var(--img-text-muted);
+    pointer-events: none;
+  }
+
+  .img-filter-btn {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 20px;
+    border: 1px solid var(--img-border);
+    border-radius: var(--img-radius);
+    background: var(--img-surface);
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--img-text-secondary);
+    cursor: pointer;
+    transition: var(--img-transition);
+    box-shadow: var(--img-shadow-sm);
+  }
+
+  .img-filter-btn:hover {
+    background: var(--img-bg);
+    border-color: var(--img-accent);
+    color: var(--img-text-primary);
+  }
+
+  .img-filter-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Sort options - same styling as filter options */
+  .img-sort-option,
+  .img-sort-option-mobile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: var(--img-radius-sm);
+    cursor: pointer;
+    transition: var(--img-transition);
+    margin-bottom: 4px;
+  }
+
+  .img-sort-option:hover,
+  .img-sort-option-mobile:hover {
+    background: var(--img-bg);
+  }
+
+  .img-sort-option.active,
+  .img-sort-option-mobile.active {
+    background: var(--img-accent);
+  }
+
+  .img-sort-option.active .img-filter-text,
+  .img-sort-option-mobile.active .img-filter-text {
+    color: #fff;
+  }
+
+  .img-sort-option input,
+  .img-sort-option-mobile input {
+    display: none;
+  }
+
+  .img-sort-option:hover .img-filter-radio,
+  .img-sort-option-mobile:hover .img-filter-radio {
+    border-color: var(--img-accent);
+  }
+
+  .img-sort-option.active .img-filter-radio,
+  .img-sort-option-mobile.active .img-filter-radio {
+    border-color: #fff;
+    background: #fff;
+  }
+
+  .img-sort-option.active .img-filter-radio::after,
+  .img-sort-option-mobile.active .img-filter-radio::after {
+    transform: scale(1);
+  }
+
+  /* Main Layout */
+  .img-vault-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 32px;
+    align-items: start;
+  }
+
+  /* Sidebar */
+  .img-sidebar {
+    background: var(--img-surface);
+    border-radius: var(--img-radius);
+    padding: 24px;
+    box-shadow: var(--img-shadow);
+    position: sticky;
+    top: 100px;
+    border: 1px solid var(--img-border);
+  }
+
+  .img-sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--img-border);
+  }
+
+  .img-sidebar-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--img-text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0;
+  }
+
+  .img-clear-btn {
+    font-size: 0.8rem;
+    color: var(--img-text-muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: var(--img-transition);
+  }
+
+  .img-clear-btn:hover {
+    color: var(--img-accent);
+  }
+
+  .img-filter-group {
+    margin-bottom: 24px;
+  }
+
+  .img-filter-group:last-child {
+    margin-bottom: 0;
+  }
+
+  .img-filter-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--img-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .img-filter-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: var(--img-radius-sm);
+    cursor: pointer;
+    transition: var(--img-transition);
+    margin-bottom: 4px;
+  }
+
+  .img-filter-option:hover {
+    background: var(--img-bg);
+  }
+
+  .img-filter-option.active {
+    background: var(--img-accent);
+  }
+
+  .img-filter-option.active .img-filter-text {
+    color: #fff;
+  }
+
+  .img-filter-option input {
+    display: none;
+  }
+
+  .img-filter-radio {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--img-border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--img-transition);
+    flex-shrink: 0;
+  }
+
+  .img-filter-option:hover .img-filter-radio {
+    border-color: var(--img-accent);
+  }
+
+  .img-filter-option.active .img-filter-radio {
+    border-color: #fff;
+    background: #fff;
+  }
+
+  .img-filter-radio::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--img-accent);
+    transform: scale(0);
+    transition: var(--img-transition);
+  }
+
+  .img-filter-option.active .img-filter-radio::after {
+    transform: scale(1);
+  }
+
+  .img-filter-text {
+    font-size: 0.9rem;
+    color: var(--img-text-secondary);
+    font-weight: 500;
+  }
+
+  .img-filter-count {
+    margin-left: auto;
+    font-size: 0.75rem;
+    color: var(--img-text-muted);
+    background: var(--img-bg);
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+
+  .img-filter-option.active .img-filter-count {
+    background: rgba(255,255,255,0.2);
+    color: #fff;
+  }
+
+  /* Results Info */
+  .img-results-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    padding: 0 4px;
+  }
+
+  .img-results-text {
+    font-size: 0.9rem;
+    color: var(--img-text-muted);
+  }
+
+  .img-results-count {
+    font-weight: 700;
+    color: var(--img-text-primary);
+  }
+
+  .img-view-toggle {
+    display: flex;
+    gap: 4px;
+    background: var(--img-bg);
+    padding: 4px;
+    border-radius: var(--img-radius-sm);
+  }
+
+  .img-view-btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--img-text-muted);
+    transition: var(--img-transition);
+  }
+
+  .img-view-btn:hover {
+    color: var(--img-text-secondary);
+  }
+
+  .img-view-btn.active {
+    background: var(--img-surface);
+    color: var(--img-text-primary);
+    box-shadow: var(--img-shadow-sm);
+  }
+
+  .img-view-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Gallery Grid */
+  .img-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+  }
+
+  .img-gallery.compact {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+  }
+
+  /* Image Card - Premium Design */
+  .img-card {
+    background: var(--img-surface);
+    border-radius: var(--img-radius);
+    overflow: hidden;
+    box-shadow: var(--img-shadow);
+    border: 1px solid var(--img-border);
+    transition: var(--img-transition);
+    position: relative;
+  }
+
+  .img-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--img-shadow-xl);
+    border-color: transparent;
+  }
+
+  .img-card-media {
+    position: relative;
+    aspect-ratio: 4/3;
+    overflow: hidden;
+    background: #1e293b;
+    cursor: pointer;
+  }
+
+  .img-card-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .img-card:hover .img-card-media img {
+    transform: scale(1.08);
+  }
+
+  .img-card-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--img-transition);
+  }
+
+  .img-card:hover .img-card-overlay {
+    background: rgba(15, 23, 42, 0.4);
+  }
+
+  .img-card-actions {
+    display: flex;
+    gap: 12px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: var(--img-transition);
+  }
+
+  .img-card:hover .img-card-actions {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .img-action-btn {
+    width: 48px;
+    height: 48px;
+    border: none;
+    background: var(--img-surface);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--img-text-primary);
+    transition: var(--img-transition);
+    box-shadow: var(--img-shadow);
+  }
+
+  .img-action-btn:hover {
+    background: var(--img-accent);
+    color: #fff;
+    transform: scale(1.1);
+  }
+
+  .img-action-btn svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .img-card-badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: var(--img-surface);
+    color: var(--img-text-primary);
+    box-shadow: var(--img-shadow);
+  }
+
+  .img-card-badge.evidence {
+    background: #fee2e2;
+    color: #dc2626;
+  }
+
+  .img-card-badge.campaign_visuals {
+    background: #dcfce7;
+    color: #16a34a;
+  }
+
+  .img-card-body {
+    padding: 20px;
+  }
+
+  .img-card-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--img-text-primary);
+    margin: 0 0 8px 0;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .img-card-desc {
+    font-size: 0.875rem;
+    color: var(--img-text-secondary);
+    margin: 0 0 16px 0;
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .img-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .img-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: var(--img-text-muted);
+  }
+
+  .img-meta-item svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* Empty State */
+  .img-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 80px 40px;
+    background: var(--img-surface);
+    border-radius: var(--img-radius);
+    border: 2px dashed var(--img-border);
+  }
+
+  .img-empty-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 24px;
+    background: var(--img-bg);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .img-empty-icon svg {
+    width: 40px;
+    height: 40px;
+    color: var(--img-text-muted);
+  }
+
+  .img-empty-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--img-text-primary);
+    margin: 0 0 8px 0;
+  }
+
+  .img-empty-text {
+    font-size: 1rem;
+    color: var(--img-text-secondary);
+    margin: 0;
+  }
+
+  /* No Results */
+  .img-no-results {
+    display: none;
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 40px;
+  }
+
+  .img-no-results svg {
+    width: 48px;
+    height: 48px;
+    color: var(--img-text-muted);
+    margin-bottom: 16px;
+  }
+
+  .img-no-results p {
+    font-size: 1rem;
+    color: var(--img-text-secondary);
+    margin: 0;
+  }
+
+  /* Mobile Filter Modal */
+  .img-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 11000;
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--img-transition);
+  }
+
+  .img-modal-backdrop.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .img-modal {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 340px;
+    max-width: 90vw;
+    height: 100%;
+    background: var(--img-surface);
+    z-index: 11001;
+    transform: translateX(100%);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--img-shadow-xl);
+  }
+
+  .img-modal.active {
+    transform: translateX(0);
+  }
+
+  .img-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--img-border);
+  }
+
+  .img-modal-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--img-text-primary);
+    margin: 0;
+  }
+
+  .img-modal-close {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: var(--img-bg);
+    border-radius: var(--img-radius-sm);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--img-text-secondary);
+    transition: var(--img-transition);
+  }
+
+  .img-modal-close:hover {
+    background: var(--img-accent);
+    color: #fff;
+  }
+
+  .img-modal-close svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .img-modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+  }
+
+  .img-modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--img-border);
+    display: flex;
+    gap: 12px;
+  }
+
+  .img-modal-btn {
+    flex: 1;
+    padding: 14px 20px;
+    border-radius: var(--img-radius-sm);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--img-transition);
+  }
+
+  .img-modal-btn-reset {
+    border: 1px solid var(--img-border);
+    background: var(--img-surface);
+    color: var(--img-text-secondary);
+  }
+
+  .img-modal-btn-reset:hover {
+    background: var(--img-bg);
+  }
+
+  .img-modal-btn-apply {
+    border: none;
+    background: var(--img-accent);
+    color: #fff;
+  }
+
+  .img-modal-btn-apply:hover {
+    background: var(--img-accent-hover);
+  }
+
+  /* Lightbox - Premium Experience */
+  .img-lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 12000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--img-transition);
+  }
+
+  .img-lightbox.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .img-lightbox-content {
+    position: relative;
+    max-width: 90vw;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .img-lightbox-close {
+    position: absolute;
+    top: -60px;
+    right: 0;
+    width: 48px;
+    height: 48px;
+    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    transition: var(--img-transition);
+  }
+
+  .img-lightbox-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(90deg);
+  }
+
+  .img-lightbox-close svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .img-lightbox-img {
+    max-width: 100%;
+    max-height: 80vh;
+    border-radius: var(--img-radius);
+    box-shadow: var(--img-shadow-xl);
+  }
+
+  .img-lightbox-info {
+    text-align: center;
+    margin-top: 24px;
+    color: #fff;
+  }
+
+  .img-lightbox-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+  }
+
+  .img-lightbox-date {
+    font-size: 0.9rem;
+    color: var(--img-text-muted);
+  }
+
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .img-vault-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .img-sidebar {
+      display: none;
+    }
+
+    .img-filter-btn {
+      display: flex;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .img-vault-page {
+      padding: 56px 0 60px;
+    }
+
+    .img-vault-container {
+      padding: 0 16px;
+    }
+
+    .img-vault-hero {
+      margin-bottom: 32px;
+    }
+
+    .img-vault-title {
+      font-size: 1.75rem;
+    }
+
+    .img-vault-subtitle {
+      font-size: 1rem;
+    }
+
+    .img-toolbar {
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .img-search-wrapper {
+      max-width: 100%;
+      width: 100%;
+    }
+
+    .img-gallery {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .img-card-body {
+      padding: 16px;
+    }
+
+    .img-card-title {
+      font-size: 0.9rem;
+    }
+
+    .img-card-desc {
+      display: none;
+    }
+
+    .img-lightbox {
+      padding: 20px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .img-gallery {
+      grid-template-columns: 1fr;
+    }
+
+    .img-results-bar {
+      flex-direction: column;
+      gap: 12px;
+      align-items: flex-start;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="img-vault-page">
+  <div class="img-vault-container">
+    <!-- Hero Header -->
+    <header class="img-vault-hero">
+      <span class="img-vault-badge">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+          <circle cx="9" cy="9" r="2"></circle>
+          <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path>
+        </svg>
+        Media Vault
+      </span>
+      <h1 class="img-vault-title">Image Gallery</h1>
+      <p class="img-vault-subtitle">Browse visual documentation and campaign imagery from the Ratel Movement's mission for accountability and transparency.</p>
+    </header>
+
+    <!-- Search & Filter Toolbar -->
+    <div class="img-toolbar">
+      <div class="img-search-wrapper">
+        <svg class="img-search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.3-4.3"></path>
+        </svg>
+        <input type="text" class="img-search-input" id="imgSearch" placeholder="Search images by title or description...">
+      </div>
+      <button type="button" class="img-filter-btn" id="imgFilterBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+        </svg>
+        Filters
+      </button>
+    </div>
+
+    <!-- Main Layout -->
+    <div class="img-vault-layout">
+      <!-- Sidebar -->
+      <aside class="img-sidebar">
+        <div class="img-sidebar-header">
+          <h3 class="img-sidebar-title">Filters</h3>
+          <button type="button" class="img-clear-btn" id="imgClearFilters">Reset All</button>
+        </div>
+
+        <div class="img-filter-group">
+          <span class="img-filter-label">Category</span>
+          <label class="img-filter-option {% if not current_category or current_category == 'all' %}active{% endif %}" data-value="all">
+            <input type="radio" name="category" value="all" {% if not current_category or current_category == 'all' %}checked{% endif %}>
+            <span class="img-filter-radio"></span>
+            <span class="img-filter-text">All Images</span>
+          </label>
+          <label class="img-filter-option {% if current_category == 'evidence' %}active{% endif %}" data-value="evidence">
+            <input type="radio" name="category" value="evidence" {% if current_category == 'evidence' %}checked{% endif %}>
+            <span class="img-filter-radio"></span>
+            <span class="img-filter-text">Evidence</span>
+          </label>
+          <label class="img-filter-option {% if current_category == 'campaign_visuals' %}active{% endif %}" data-value="campaign_visuals">
+            <input type="radio" name="category" value="campaign_visuals" {% if current_category == 'campaign_visuals' %}checked{% endif %}>
+            <span class="img-filter-radio"></span>
+            <span class="img-filter-text">Campaign Visuals</span>
+          </label>
+        </div>
+
+        <div class="img-filter-group">
+          <span class="img-filter-label">Sort By</span>
+          <label class="img-sort-option active" data-sort="newest">
+            <input type="radio" name="sort" value="newest" checked>
+            <span class="img-filter-radio"></span>
+            <span class="img-filter-text">Newest First</span>
+          </label>
+          <label class="img-sort-option" data-sort="oldest">
+            <input type="radio" name="sort" value="oldest">
+            <span class="img-filter-radio"></span>
+            <span class="img-filter-text">Oldest First</span>
+          </label>
+          <label class="img-sort-option" data-sort="title">
+            <input type="radio" name="sort" value="title">
+            <span class="img-filter-radio"></span>
+            <span class="img-filter-text">Title A-Z</span>
+          </label>
+        </div>
+      </aside>
+
+      <!-- Gallery Content -->
+      <main class="img-content">
+        <div class="img-results-bar">
+          <span class="img-results-text">Showing <span class="img-results-count" id="imgCount">{{ images|length }}</span> image{% if images|length != 1 %}s{% endif %}</span>
+          <div class="img-view-toggle">
+            <button type="button" class="img-view-btn active" data-view="grid" title="Grid View">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+              </svg>
+            </button>
+            <button type="button" class="img-view-btn" data-view="compact" title="Compact View">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="5" height="5"></rect>
+                <rect x="10" y="3" width="5" height="5"></rect>
+                <rect x="17" y="3" width="5" height="5"></rect>
+                <rect x="3" y="10" width="5" height="5"></rect>
+                <rect x="10" y="10" width="5" height="5"></rect>
+                <rect x="17" y="10" width="5" height="5"></rect>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {% if images %}
+        <div class="img-gallery" id="imgGallery">
+          {% for image in images %}
+          <article class="img-card"
+                   data-title="{{ image.title|lower }}"
+                   data-category="{{ image.category }}"
+                   data-date="{{ image.created_at|slice:10 }}"
+                   data-desc="{{ image.description|lower|default:'' }}">
+            <div class="img-card-media" onclick="openImgLightbox('{{ image.file_url }}', '{{ image.title|escapejs }}', '{{ image.created_at|slice:10 }}')">
+              <img src="{{ image.file_url }}" alt="{{ image.title }}" loading="lazy">
+              <div class="img-card-overlay">
+                <div class="img-card-actions">
+                  <button type="button" class="img-action-btn" title="View Full Size">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="11" cy="11" r="8"></circle>
+                      <path d="m21 21-4.3-4.3"></path>
+                      <path d="M11 8v6"></path>
+                      <path d="M8 11h6"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <span class="img-card-badge {{ image.category }}">{{ image.category|default:"image" }}</span>
+            </div>
+            <div class="img-card-body">
+              <h3 class="img-card-title">{{ image.title }}</h3>
+              <p class="img-card-desc">{{ image.description|default:"No description available" }}</p>
+              <div class="img-card-meta">
+                <span class="img-meta-item">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                  {{ image.created_at|slice:10 }}
+                </span>
+                {% if image.location %}
+                <span class="img-meta-item">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                  </svg>
+                  {{ image.location }}
+                </span>
+                {% endif %}
+              </div>
+            </div>
+          </article>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="img-empty">
+          <div class="img-empty-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <circle cx="9" cy="9" r="2"></circle>
+              <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path>
+            </svg>
+          </div>
+          <h3 class="img-empty-title">No images available</h3>
+          <p class="img-empty-text">Check back soon for visual documentation from the Ratel Movement.</p>
+        </div>
+        {% endif %}
+
+        <div class="img-no-results" id="imgNoResults">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.3-4.3"></path>
+          </svg>
+          <p>No images match your search criteria.</p>
+        </div>
+      </main>
+    </div>
+  </div>
+</div>
+
+<!-- Mobile Filter Modal -->
+<div class="img-modal-backdrop" id="imgModalBackdrop"></div>
+<div class="img-modal" id="imgModal">
+  <div class="img-modal-header">
+    <h3 class="img-modal-title">Filter Images</h3>
+    <button type="button" class="img-modal-close" id="imgModalClose">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 6 6 18"></path>
+        <path d="m6 6 12 12"></path>
+      </svg>
+    </button>
+  </div>
+  <div class="img-modal-body">
+    <div class="img-filter-group">
+      <span class="img-filter-label">Category</span>
+      <label class="img-filter-option active" data-value="all">
+        <input type="radio" name="category_mobile" value="all" checked>
+        <span class="img-filter-radio"></span>
+        <span class="img-filter-text">All Images</span>
+      </label>
+      <label class="img-filter-option" data-value="evidence">
+        <input type="radio" name="category_mobile" value="evidence">
+        <span class="img-filter-radio"></span>
+        <span class="img-filter-text">Evidence</span>
+      </label>
+      <label class="img-filter-option" data-value="campaign_visuals">
+        <input type="radio" name="category_mobile" value="campaign_visuals">
+        <span class="img-filter-radio"></span>
+        <span class="img-filter-text">Campaign Visuals</span>
+      </label>
+    </div>
+
+    <div class="img-filter-group">
+      <span class="img-filter-label">Sort By</span>
+      <label class="img-sort-option-mobile active" data-sort="newest">
+        <input type="radio" name="sort_mobile" value="newest" checked>
+        <span class="img-filter-radio"></span>
+        <span class="img-filter-text">Newest First</span>
+      </label>
+      <label class="img-sort-option-mobile" data-sort="oldest">
+        <input type="radio" name="sort_mobile" value="oldest">
+        <span class="img-filter-radio"></span>
+        <span class="img-filter-text">Oldest First</span>
+      </label>
+      <label class="img-sort-option-mobile" data-sort="title">
+        <input type="radio" name="sort_mobile" value="title">
+        <span class="img-filter-radio"></span>
+        <span class="img-filter-text">Title A-Z</span>
+      </label>
+    </div>
+  </div>
+  <div class="img-modal-footer">
+    <button type="button" class="img-modal-btn img-modal-btn-reset" id="imgModalReset">Reset</button>
+    <button type="button" class="img-modal-btn img-modal-btn-apply" id="imgModalApply">Apply Filters</button>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="img-lightbox" id="imgLightbox">
+  <div class="img-lightbox-content">
+    <button type="button" class="img-lightbox-close" id="imgLightboxClose">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 6 6 18"></path>
+        <path d="m6 6 12 12"></path>
+      </svg>
+    </button>
+    <img class="img-lightbox-img" id="imgLightboxImg" src="" alt="">
+    <div class="img-lightbox-info">
+      <h3 class="img-lightbox-title" id="imgLightboxTitle"></h3>
+      <p class="img-lightbox-date" id="imgLightboxDate"></p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function() {
+  // Elements
+  const gallery = document.getElementById('imgGallery');
+  const searchInput = document.getElementById('imgSearch');
+  const countEl = document.getElementById('imgCount');
+  const noResults = document.getElementById('imgNoResults');
+  const clearBtn = document.getElementById('imgClearFilters');
+  const filterBtn = document.getElementById('imgFilterBtn');
+  const modalBackdrop = document.getElementById('imgModalBackdrop');
+  const modal = document.getElementById('imgModal');
+  const modalClose = document.getElementById('imgModalClose');
+  const modalReset = document.getElementById('imgModalReset');
+  const modalApply = document.getElementById('imgModalApply');
+  const lightbox = document.getElementById('imgLightbox');
+  const lightboxClose = document.getElementById('imgLightboxClose');
+  const lightboxImg = document.getElementById('imgLightboxImg');
+  const lightboxTitle = document.getElementById('imgLightboxTitle');
+  const lightboxDate = document.getElementById('imgLightboxDate');
+  const viewBtns = document.querySelectorAll('.img-view-btn');
+
+  const cards = gallery ? Array.from(gallery.querySelectorAll('.img-card')) : [];
+  const desktopFilters = document.querySelectorAll('.img-sidebar .img-filter-option');
+  const mobileFilters = document.querySelectorAll('.img-modal .img-filter-option');
+  const desktopSortOptions = document.querySelectorAll('.img-sidebar .img-sort-option');
+  const mobileSortOptions = document.querySelectorAll('.img-modal .img-sort-option-mobile');
+
+  let activeCategory = 'all';
+  let activeSort = 'newest';
+
+  // Filter & Search
+  function applyFilters() {
+    const search = searchInput ? searchInput.value.toLowerCase().trim() : '';
+    let count = 0;
+
+    cards.forEach(card => {
+      const title = card.dataset.title || '';
+      const desc = card.dataset.desc || '';
+      const cat = card.dataset.category || '';
+
+      const matchSearch = !search || title.includes(search) || desc.includes(search);
+      const matchCat = activeCategory === 'all' || cat === activeCategory;
+
+      if (matchSearch && matchCat) {
+        card.style.display = '';
+        count++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    if (countEl) countEl.textContent = count;
+
+    if (noResults && gallery) {
+      if (count === 0 && cards.length > 0) {
+        noResults.style.display = 'block';
+        gallery.style.display = 'none';
+      } else {
+        noResults.style.display = 'none';
+        gallery.style.display = 'grid';
+      }
+    }
+  }
+
+  // Sort
+  function sortCards() {
+    if (!gallery) return;
+    const sorted = [...cards].sort((a, b) => {
+      if (activeSort === 'newest') return new Date(b.dataset.date) - new Date(a.dataset.date);
+      if (activeSort === 'oldest') return new Date(a.dataset.date) - new Date(b.dataset.date);
+      return a.dataset.title.localeCompare(b.dataset.title);
+    });
+    sorted.forEach(c => gallery.appendChild(c));
+  }
+
+  // Update filter UI
+  function updateFilterUI(filters, value, attr = 'value') {
+    filters.forEach(opt => {
+      const optValue = attr === 'sort' ? opt.dataset.sort : opt.dataset.value;
+      opt.classList.toggle('active', optValue === value);
+      const input = opt.querySelector('input');
+      if (input) input.checked = optValue === value;
+    });
+  }
+
+  // Desktop filter click
+  desktopFilters.forEach(opt => {
+    opt.addEventListener('click', () => {
+      activeCategory = opt.dataset.value;
+      updateFilterUI(desktopFilters, activeCategory);
+      updateFilterUI(mobileFilters, activeCategory);
+      applyFilters();
+    });
+  });
+
+  // Desktop sort click
+  desktopSortOptions.forEach(opt => {
+    opt.addEventListener('click', () => {
+      activeSort = opt.dataset.sort;
+      updateFilterUI(desktopSortOptions, activeSort, 'sort');
+      updateFilterUI(mobileSortOptions, activeSort, 'sort');
+      sortCards();
+    });
+  });
+
+  // Mobile filter click
+  mobileFilters.forEach(opt => {
+    opt.addEventListener('click', () => {
+      updateFilterUI(mobileFilters, opt.dataset.value);
+    });
+  });
+
+  // Mobile sort click
+  mobileSortOptions.forEach(opt => {
+    opt.addEventListener('click', () => {
+      updateFilterUI(mobileSortOptions, opt.dataset.sort, 'sort');
+    });
+  });
+
+  // Clear filters
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      activeCategory = 'all';
+      activeSort = 'newest';
+      updateFilterUI(desktopFilters, 'all');
+      updateFilterUI(mobileFilters, 'all');
+      updateFilterUI(desktopSortOptions, 'newest', 'sort');
+      updateFilterUI(mobileSortOptions, 'newest', 'sort');
+      if (searchInput) searchInput.value = '';
+      applyFilters();
+      sortCards();
+    });
+  }
+
+  // Search
+  if (searchInput) searchInput.addEventListener('input', applyFilters);
+
+  // View toggle
+  viewBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      viewBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      if (gallery) {
+        gallery.classList.toggle('compact', btn.dataset.view === 'compact');
+      }
+    });
+  });
+
+  // Mobile modal
+  function openModal() {
+    modalBackdrop.classList.add('active');
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    modalBackdrop.classList.remove('active');
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  if (filterBtn) filterBtn.addEventListener('click', openModal);
+  if (modalClose) modalClose.addEventListener('click', closeModal);
+  if (modalBackdrop) modalBackdrop.addEventListener('click', closeModal);
+
+  if (modalReset) {
+    modalReset.addEventListener('click', () => {
+      updateFilterUI(mobileFilters, 'all');
+      updateFilterUI(mobileSortOptions, 'newest', 'sort');
+    });
+  }
+
+  if (modalApply) {
+    modalApply.addEventListener('click', () => {
+      // Apply category filter
+      const checkedCat = document.querySelector('.img-modal .img-filter-option.active');
+      activeCategory = checkedCat ? checkedCat.dataset.value : 'all';
+      updateFilterUI(desktopFilters, activeCategory);
+
+      // Apply sort
+      const checkedSort = document.querySelector('.img-modal .img-sort-option-mobile.active');
+      activeSort = checkedSort ? checkedSort.dataset.sort : 'newest';
+      updateFilterUI(desktopSortOptions, activeSort, 'sort');
+
+      applyFilters();
+      sortCards();
+      closeModal();
+    });
+  }
+
+  // Lightbox
+  window.openImgLightbox = function(url, title, date) {
+    if (!url) return;
+    lightboxImg.src = url;
+    lightboxTitle.textContent = title || '';
+    lightboxDate.textContent = date || '';
+    lightbox.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  };
+
+  function closeLightbox() {
+    lightboxImg.src = '';
+    lightbox.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  if (lightboxClose) lightboxClose.addEventListener('click', closeLightbox);
+  if (lightbox) {
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox) closeLightbox();
+    });
+  }
+
+  // Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeModal();
+      closeLightbox();
+    }
+  });
+})();
+</script>
+{% endblock %}

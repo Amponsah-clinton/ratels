@@ -1,0 +1,653 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% load static %}
+
+{% block title %}Settings - Hero Carousel{% endblock %}
+{% block page_title %}Settings{% endblock %}
+{% block page_subtitle %}Choose hero: 3 images (carousel) or 1 video (autoplay). Set carousel images, hero video, Manifesto image, and Hero Quote. Each setting saves independently.{% endblock %}
+
+{% block extra_css %}
+<style>
+.settings-page { max-width: 900px; margin: 0 auto; }
+.settings-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+.settings-card-header {
+    padding: 1rem 1.5rem;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #0f172a;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.settings-card-body {
+    padding: 1.5rem;
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 1.5rem;
+    align-items: start;
+}
+@media (max-width: 640px) {
+    .settings-card-body { grid-template-columns: 1fr; }
+}
+.settings-preview {
+    width: 100%;
+    aspect-ratio: 16/9;
+    max-height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
+    background: #f1f5f9;
+}
+.settings-preview-placeholder {
+    width: 100%;
+    aspect-ratio: 16/9;
+    max-height: 120px;
+    border-radius: 8px;
+    background: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    font-size: 0.85rem;
+}
+.settings-fields { display: flex; flex-direction: column; gap: 1rem; }
+.settings-label {
+    display: block;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #334155;
+    margin-bottom: 0.375rem;
+}
+.settings-input, .settings-file {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: #0f172a;
+    background: #fff;
+}
+.settings-input:focus {
+    outline: none;
+    border-color: #0f172a;
+}
+textarea.settings-input {
+    resize: vertical;
+    min-height: 80px;
+    font-family: inherit;
+    line-height: 1.5;
+}
+.settings-hint { font-size: 0.75rem; color: #64748b; margin-top: 0.25rem; }
+.settings-card-footer {
+    padding: 1rem 1.5rem;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1rem;
+}
+.settings-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    background: #0f172a;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.settings-btn:hover { background: #1e293b; }
+.settings-btn:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+}
+.settings-btn.saving {
+    background: #64748b;
+}
+.settings-status {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    padding: 0.375rem 0.75rem;
+    border-radius: 6px;
+    display: none;
+}
+.settings-status.success {
+    display: inline-block;
+    background: #dcfce7;
+    color: #166534;
+}
+.settings-status.error {
+    display: inline-block;
+    background: #fee2e2;
+    color: #991b1b;
+}
+/* Toast notification */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.toast {
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    animation: slideIn 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.toast.success {
+    background: #166534;
+    color: #fff;
+}
+.toast.error {
+    background: #991b1b;
+    color: #fff;
+}
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+@keyframes slideOut {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+}
+.spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #fff;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Toast container for notifications -->
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="settings-page">
+    <!-- Hero section type: 3 images or 1 video -->
+    <div class="settings-card" data-setting-type="hero-type">
+        <div class="settings-card-header">
+            <span>Hero section</span>
+        </div>
+        <div class="settings-card-body" style="grid-template-columns: 1fr;">
+            <div class="settings-fields">
+                <label class="settings-label">Landing hero</label>
+                <div class="hero-type-options" style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+                    <label class="hero-type-option" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.5rem 0;">
+                        <input type="radio" name="hero_type" value="images" {% if not hero_use_video %}checked{% endif %}>
+                        <span>3 images (carousel)</span>
+                    </label>
+                    <label class="hero-type-option" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.5rem 0;">
+                        <input type="radio" name="hero_type" value="video" {% if hero_use_video %}checked{% endif %}>
+                        <span>1 video (autoplay)</span>
+                    </label>
+                </div>
+                <span class="settings-hint">When "1 video" is active, the landing page shows your uploaded video instead of the carousel. Use "3 images" to switch back to the carousel.</span>
+                <div style="margin-top: 1rem; display: flex; gap: 0.75rem;">
+                    <button type="button" class="settings-btn" id="heroTypeUseImagesBtn" {% if not hero_use_video %}style="display:none;"{% endif %}>Use 3 images</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero video (visible when type = video) -->
+    <div class="settings-card hero-video-card" data-setting-type="hero_video" id="heroVideoCard" style="{% if not hero_use_video %}display: none;{% endif %}">
+        <div class="settings-card-header">
+            <span>Hero video</span>
+        </div>
+        <form class="settings-form" data-setting-type="hero_video" id="heroVideoForm">
+            {% csrf_token %}
+            <input type="hidden" name="setting_type" value="hero_video">
+            <input type="hidden" name="content_id" value="{{ hero_video.id|default:'' }}" class="content-id-input">
+            <div class="settings-card-body">
+                <div>
+                    {% if hero_video.image_url %}
+                    <div class="settings-preview-placeholder" style="max-height: 120px; display: flex; align-items: center; justify-content: center; color: #64748b; font-size: 0.85rem;">
+                        Video set (autoplay on landing)
+                    </div>
+                    <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 0.5rem;">Current: {{ hero_video.image_url|truncatechars:50 }}</p>
+                    {% else %}
+                    <div class="settings-preview-placeholder" id="preview_hero_video" style="max-height: 120px;">No video</div>
+                    {% endif %}
+                </div>
+                <div class="settings-fields">
+                    <label class="settings-label">Video URL (optional – leave blank to use upload)</label>
+                    <input type="url" name="image_url" id="heroVideoUrl" class="settings-input" value="{{ hero_video.image_url|default:'' }}" placeholder="https://... (mp4, webm)">
+                    <label class="settings-label">Or upload video</label>
+                    <input type="file" name="image_file" class="settings-file" accept="video/mp4,video/webm,video/ogg" id="heroVideoFile">
+                    <span class="settings-hint">One video only. Autoplay, muted, loop on the landing page. Recommended: MP4 format, under 20MB.</span>
+                </div>
+            </div>
+            <div class="settings-card-footer">
+                <span class="settings-status"></span>
+                <button type="submit" class="settings-btn">
+                    <i data-lucide="upload" style="width:16px;height:16px;"></i>
+                    <span class="btn-text">Save video</span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- 3 hero slides (visible when type = images) -->
+    <div class="hero-slides-wrap" id="heroSlidesWrap" style="{% if hero_use_video %}display: none;{% endif %}">
+    {% for key, slide in hero_slides.items %}
+    <div class="settings-card" data-setting-type="{{ key }}">
+        <div class="settings-card-header">
+            <span>Slide {{ forloop.counter }}</span>
+        </div>
+        <form class="settings-form" data-setting-type="{{ key }}">
+            {% csrf_token %}
+            <input type="hidden" name="setting_type" value="{{ key }}">
+            <input type="hidden" name="content_id" value="{{ slide.id|default:'' }}" class="content-id-input">
+            <div class="settings-card-body">
+                <div>
+                    {% if slide.image_url %}
+                    <img src="{{ slide.image_url }}" alt="Slide {{ forloop.counter }}" class="settings-preview" id="preview_{{ key }}">
+                    <div class="settings-preview-placeholder" id="preview_ph_{{ key }}" style="display:none;">No image</div>
+                    {% else %}
+                    <div class="settings-preview-placeholder" id="preview_ph_{{ key }}">No image</div>
+                    <img src="" alt="" class="settings-preview" id="preview_{{ key }}" style="display:none;">
+                    {% endif %}
+                </div>
+                <div class="settings-fields">
+                    <label class="settings-label">Image URL (optional – leave blank to use upload)</label>
+                    <input type="url" name="image_url" class="settings-input" value="{{ slide.image_url|default:'' }}" placeholder="https://...">
+                    <label class="settings-label">Or upload new image</label>
+                    <input type="file" name="image_file" class="settings-file" accept="image/*" data-preview="preview_{{ key }}" data-placeholder="preview_ph_{{ key }}">
+                    <span class="settings-hint">Upload replaces URL. Recommended: landscape, 1200×600px or similar.</span>
+                </div>
+            </div>
+            <div class="settings-card-footer">
+                <span class="settings-status"></span>
+                <button type="submit" class="settings-btn">
+                    <i data-lucide="save" style="width:16px;height:16px;"></i>
+                    <span class="btn-text">Save</span>
+                </button>
+            </div>
+        </form>
+    </div>
+    {% endfor %}
+    </div>
+
+    <div class="settings-card" data-setting-type="manifesto">
+        <div class="settings-card-header">
+            <span>Manifesto image</span>
+        </div>
+        <form class="settings-form" data-setting-type="manifesto">
+            {% csrf_token %}
+            <input type="hidden" name="setting_type" value="manifesto">
+            <input type="hidden" name="content_id" value="{{ manifesto_section.id|default:'' }}" class="content-id-input">
+            <div class="settings-card-body">
+                <div>
+                    {% if manifesto_section.image_url %}
+                    <img src="{{ manifesto_section.image_url }}" alt="Manifesto" class="settings-preview" id="preview_manifesto">
+                    <div class="settings-preview-placeholder" id="preview_ph_manifesto" style="display:none;">No image</div>
+                    {% else %}
+                    <div class="settings-preview-placeholder" id="preview_ph_manifesto">No image</div>
+                    <img src="" alt="" class="settings-preview" id="preview_manifesto" style="display:none;">
+                    {% endif %}
+                </div>
+                <div class="settings-fields">
+                    <label class="settings-label">Image URL (optional – leave blank to use upload)</label>
+                    <input type="url" name="image_url" class="settings-input" value="{{ manifesto_section.image_url|default:'' }}" placeholder="https://...">
+                    <label class="settings-label">Or upload new image</label>
+                    <input type="file" name="image_file" class="settings-file" accept="image/*" data-preview="preview_manifesto" data-placeholder="preview_ph_manifesto">
+                    <span class="settings-hint">Upload replaces URL. This image appears beside the "Our Manifesto" section on the landing page.</span>
+                </div>
+            </div>
+            <div class="settings-card-footer">
+                <span class="settings-status"></span>
+                <button type="submit" class="settings-btn">
+                    <i data-lucide="save" style="width:16px;height:16px;"></i>
+                    <span class="btn-text">Save</span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="settings-card" data-setting-type="hero_quote">
+        <div class="settings-card-header">
+            <span>Hero Quote</span>
+        </div>
+        <form class="settings-form" data-setting-type="hero_quote">
+            {% csrf_token %}
+            <input type="hidden" name="setting_type" value="hero_quote">
+            <input type="hidden" name="content_id" value="{{ hero_quote.id|default:'' }}" class="content-id-input">
+            <div class="settings-card-body" style="grid-template-columns: 1fr;">
+                <div class="settings-fields">
+                    <label class="settings-label">Quote Text</label>
+                    <textarea name="quote_text" class="settings-input" rows="3" placeholder="Enter the quote text...">{{ hero_quote.content|default:"When the people fear the government, there is tyranny. When the government fears the people, there is liberty." }}</textarea>
+                    <label class="settings-label">Attribution (Author)</label>
+                    <input type="text" name="quote_author" class="settings-input" value="{{ hero_quote.subtitle|default:"Thomas Jefferson" }}" placeholder="e.g. Thomas Jefferson">
+                    <span class="settings-hint">This quote appears above the hero carousel on the landing page.</span>
+                </div>
+            </div>
+            <div class="settings-card-footer">
+                <span class="settings-status"></span>
+                <button type="submit" class="settings-btn">
+                    <i data-lucide="save" style="width:16px;height:16px;"></i>
+                    <span class="btn-text">Save</span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Paystack settings (overrides env when saved) -->
+    <div class="settings-card" data-setting-type="paystack">
+        <div class="settings-card-header">
+            <span>Paystack</span>
+        </div>
+        <form method="post" action="{% url 'dashboard_paystack_settings_save' %}" class="settings-form" id="paystackForm">
+            {% csrf_token %}
+            <div class="settings-card-body" style="grid-template-columns: 1fr;">
+                <div class="settings-fields">
+                    <label class="settings-label">Public key (pk_live_... or pk_test_...)</label>
+                    <input type="text" name="paystack_public_key" class="settings-input" value="{{ paystack_public_key_display|default:'' }}" placeholder="pk_test_... or pk_live_..." autocomplete="off">
+                    <span class="settings-hint">Current key in use on auth and renewal pages. When set here, overrides PAYSTACK_PUBLIC_KEY from env.</span>
+                    <label class="settings-label" style="margin-top: 1rem;">Secret key (sk_live_... or sk_test_...)</label>
+                    <p class="settings-hint" style="margin-bottom: 0.5rem; padding: 0.5rem 0.75rem; background: #f1f5f9; border-radius: 6px; border: 1px solid #e2e8f0;">
+                        {% if paystack_secret_key_set %}
+                        <strong>Current:</strong> Configured (hidden for security). Leave field blank below to keep it.
+                        {% else %}
+                        <strong>Current:</strong> Not configured (set in form or in env PAYSTACK_SECRET_KEY).
+                        {% endif %}
+                    </p>
+                    <input type="password" name="paystack_secret_key" class="settings-input" value="" placeholder="Leave blank to keep current secret key" autocomplete="new-password">
+                    <span class="settings-hint">Used server-side to verify payments. When set here, overrides PAYSTACK_SECRET_KEY from env.</span>
+                </div>
+            </div>
+            <div class="settings-card-footer">
+                <span class="settings-status"></span>
+                <button type="submit" class="settings-btn">
+                    <i data-lucide="save" style="width:16px;height:16px;"></i>
+                    <span class="btn-text">Save Paystack</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Toast notification function
+function showToast(message, type) {
+    var container = document.getElementById('toastContainer');
+    var toast = document.createElement('div');
+    toast.className = 'toast ' + type;
+    toast.innerHTML = (type === 'success' ? '&#10003; ' : '&#10007; ') + message;
+    container.appendChild(toast);
+
+    // Auto remove after 4 seconds
+    setTimeout(function() {
+        toast.style.animation = 'slideOut 0.3s ease forwards';
+        setTimeout(function() {
+            if (toast.parentNode) toast.parentNode.removeChild(toast);
+        }, 300);
+    }, 4000);
+}
+
+// Hero type: toggle visibility and save when changed
+var heroTypeImages = document.querySelector('input[name="hero_type"][value="images"]');
+var heroTypeVideo = document.querySelector('input[name="hero_type"][value="video"]');
+var heroSlidesWrap = document.getElementById('heroSlidesWrap');
+var heroVideoCard = document.getElementById('heroVideoCard');
+var heroTypeUseImagesBtn = document.getElementById('heroTypeUseImagesBtn');
+
+// Track the currently saved hero type (based on server-side value)
+var currentlySavedType = {% if hero_use_video %}'video'{% else %}'images'{% endif %};
+
+function updateHeroTypeUI() {
+    var useVideo = heroTypeVideo && heroTypeVideo.checked;
+    if (heroSlidesWrap) heroSlidesWrap.style.display = useVideo ? 'none' : 'block';
+    if (heroVideoCard) heroVideoCard.style.display = useVideo ? 'block' : 'none';
+    // Show the "Use X" button if the selected type differs from saved type
+    if (heroTypeUseImagesBtn) {
+        heroTypeUseImagesBtn.style.display = (currentlySavedType === 'video' && !useVideo) ? 'inline-flex' : 'none';
+    }
+}
+
+// When "3 images" radio is clicked and video is currently saved, automatically switch
+if (heroTypeImages) {
+    heroTypeImages.addEventListener('change', function() {
+        updateHeroTypeUI();
+        // If video is currently saved, clicking images radio should trigger the switch
+        if (currentlySavedType === 'video') {
+            switchToImages();
+        }
+    });
+}
+if (heroTypeVideo) heroTypeVideo.addEventListener('change', updateHeroTypeUI);
+
+// Function to switch to images (clear hero video)
+function switchToImages() {
+    var fd = new FormData();
+    fd.append('setting_type', 'hero_use_images');
+    fd.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+
+    // Show loading state
+    if (heroTypeImages) heroTypeImages.disabled = true;
+    if (heroTypeVideo) heroTypeVideo.disabled = true;
+    showToast('Switching to images...', 'success');
+
+    fetch('{% url "dashboard_site_settings_save_single" %}', { method: 'POST', body: fd, credentials: 'same-origin' })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (data.success) {
+                showToast('Hero set to 3 images. Landing page will show the carousel.', 'success');
+                currentlySavedType = 'images';
+                if (heroTypeUseImagesBtn) heroTypeUseImagesBtn.style.display = 'none';
+                // Re-enable radios
+                if (heroTypeImages) heroTypeImages.disabled = false;
+                if (heroTypeVideo) heroTypeVideo.disabled = false;
+            } else {
+                showToast('Error: ' + (data.error || 'Failed'), 'error');
+                // Revert radio selection
+                if (heroTypeVideo) heroTypeVideo.checked = true;
+                updateHeroTypeUI();
+                if (heroTypeImages) heroTypeImages.disabled = false;
+                if (heroTypeVideo) heroTypeVideo.disabled = false;
+            }
+        })
+        .catch(function() {
+            showToast('Network error. Please try again.', 'error');
+            // Revert radio selection
+            if (heroTypeVideo) heroTypeVideo.checked = true;
+            updateHeroTypeUI();
+            if (heroTypeImages) heroTypeImages.disabled = false;
+            if (heroTypeVideo) heroTypeVideo.disabled = false;
+        });
+}
+
+// "Use 3 images" button: clear hero video (alternative way to switch)
+if (heroTypeUseImagesBtn) {
+    heroTypeUseImagesBtn.addEventListener('click', function() {
+        var btn = heroTypeUseImagesBtn;
+        btn.disabled = true;
+        btn.textContent = 'Saving...';
+        switchToImages();
+        // Button will be hidden after successful switch
+        setTimeout(function() {
+            btn.disabled = false;
+            btn.textContent = 'Use 3 images';
+        }, 2000);
+    });
+}
+
+// File preview functionality
+document.querySelectorAll('input[type="file"][data-preview]').forEach(function(input) {
+    input.addEventListener('change', function() {
+        var previewId = this.getAttribute('data-preview');
+        var phId = this.getAttribute('data-placeholder');
+        var file = this.files && this.files[0];
+        if (file && file.type.indexOf('image') !== -1) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var img = document.getElementById(previewId);
+                var ph = document.getElementById(phId);
+                if (img) { img.src = e.target.result; img.style.display = 'block'; }
+                if (ph) { ph.style.display = 'none'; }
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+});
+
+// AJAX form submission for each settings card
+document.querySelectorAll('.settings-form').forEach(function(form) {
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        var btn = form.querySelector('.settings-btn');
+        var btnText = btn.querySelector('.btn-text');
+        var btnIcon = btn.querySelector('i');
+        var statusEl = form.querySelector('.settings-status');
+        var settingType = form.getAttribute('data-setting-type');
+
+        // Get a friendly name for the setting
+        var settingName = settingType.replace('hero_slide_', 'Slide ').replace('manifesto', 'Manifesto');
+
+        // Disable button and show loading state
+        btn.disabled = true;
+        btn.classList.add('saving');
+        btnText.textContent = 'Saving...';
+        if (btnIcon) btnIcon.outerHTML = '<span class="spinner"></span>';
+        statusEl.className = 'settings-status';
+        statusEl.style.display = 'none';
+
+        // Create FormData
+        var formData = new FormData(form);
+
+        console.log('Saving setting:', settingType);
+        console.log('Content ID:', formData.get('content_id'));
+        console.log('Image URL:', formData.get('image_url'));
+        console.log('Has file:', formData.get('image_file') && formData.get('image_file').size > 0);
+
+        // Send AJAX request
+        fetch('{% url "dashboard_site_settings_save_single" %}', {
+            method: 'POST',
+            body: formData,
+            credentials: 'same-origin'
+        })
+        .then(function(response) {
+            console.log('Response status:', response.status);
+            return response.text().then(function(text) {
+                console.log('Response text:', text);
+                try {
+                    var data = JSON.parse(text);
+                    return { ok: response.ok, data: data, status: response.status };
+                } catch (e) {
+                    return { ok: false, data: { error: 'Invalid response: ' + text.substring(0, 100) }, status: response.status };
+                }
+            });
+        })
+        .then(function(result) {
+            // Restore button
+            btn.disabled = false;
+            btn.classList.remove('saving');
+            var spinnerEl = btn.querySelector('.spinner');
+            if (spinnerEl) spinnerEl.outerHTML = '<i data-lucide="save" style="width:16px;height:16px;"></i>';
+            btnText.textContent = 'Save';
+
+            // Reinitialize lucide icons
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+
+            console.log('Result:', result);
+
+            if (result.ok && result.data.success) {
+                if (settingType === 'hero_video') {
+                    showToast('Hero video saved. Landing page will show the video.', 'success');
+                    window.location.reload();
+                    return;
+                }
+                // Show success toast
+                showToast(settingName + ' saved successfully! Changes will appear on the landing page.', 'success');
+
+                // Show inline success
+                statusEl.textContent = 'Saved!';
+                statusEl.className = 'settings-status success';
+
+                // Update content_id if returned (for newly created records)
+                if (result.data.content_id) {
+                    form.querySelector('.content-id-input').value = result.data.content_id;
+                }
+
+                // Update the URL input with the new image URL
+                if (result.data.image_url) {
+                    form.querySelector('input[name="image_url"]').value = result.data.image_url;
+                    // Update the preview image
+                    var previewImg = form.querySelector('.settings-preview');
+                    var previewPh = form.querySelector('.settings-preview-placeholder');
+                    if (previewImg) {
+                        previewImg.src = result.data.image_url;
+                        previewImg.style.display = 'block';
+                    }
+                    if (previewPh) {
+                        previewPh.style.display = 'none';
+                    }
+                    // Clear the file input
+                    form.querySelector('input[name="image_file"]').value = '';
+                }
+
+                // Hide inline success message after 3 seconds
+                setTimeout(function() {
+                    statusEl.style.display = 'none';
+                }, 3000);
+            } else {
+                // Show error toast and inline
+                var errorMsg = result.data.error || 'Failed to save (status: ' + result.status + ')';
+                showToast('Error saving ' + settingName + ': ' + errorMsg, 'error');
+                statusEl.textContent = errorMsg;
+                statusEl.className = 'settings-status error';
+            }
+        })
+        .catch(function(error) {
+            console.error('Fetch error:', error);
+            // Restore button
+            btn.disabled = false;
+            btn.classList.remove('saving');
+            var spinnerEl = btn.querySelector('.spinner');
+            if (spinnerEl) spinnerEl.outerHTML = '<i data-lucide="save" style="width:16px;height:16px;"></i>';
+            btnText.textContent = 'Save';
+
+            // Reinitialize lucide icons
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+
+            // Show error toast and inline
+            showToast('Network error saving ' + settingName + '. Please try again.', 'error');
+            statusEl.textContent = 'Network error: ' + error.message;
+            statusEl.className = 'settings-status error';
+        });
+    });
+});
+</script>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+if (typeof lucide !== 'undefined') lucide.createIcons();
+</script>
+{% endblock %}

@@ -1,0 +1,644 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Our Ideology - Ratel Movement{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Reset any inherited spacing and fix float issue from header */
+    .ideology-page {
+        clear: both;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100%;
+        float: none;
+    }
+    .ideology-page * {
+        box-sizing: border-box;
+    }
+
+    /* Hero Section - Clean white background */
+    .ideology-hero {
+        background: #fff;
+        padding: 30px 0 25px;
+        position: relative;
+        overflow: hidden;
+        margin: 0 !important;
+        width: 100%;
+        float: none;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .ideology-hero-content {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+    }
+    .ideology-hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        border-radius: 50px;
+        color: #475569;
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-bottom: 1rem;
+    }
+    .ideology-hero h1 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 0 0 0.75rem 0;
+        line-height: 1.1;
+    }
+    .ideology-hero p {
+        font-size: 1rem;
+        color: #64748b;
+        line-height: 1.7;
+        margin: 0;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* Main Section Container */
+    .ideology-main-section {
+        background: #f8fafc;
+        min-height: calc(100vh - 200px);
+    }
+
+    /* Main Layout - Sidebar + Content */
+    .ideology-wrapper {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+    .ideology-layout {
+        display: flex;
+        gap: 2rem;
+        min-height: 60vh;
+    }
+
+    /* Sidebar - Card Style like Messages Page */
+    .ideology-sidebar {
+        width: 260px;
+        flex-shrink: 0;
+        background: #fff;
+        border-radius: 12px;
+        padding: 1.25rem;
+        height: fit-content;
+        position: sticky;
+        top: 1rem;
+        border: 1px solid #e5e7eb;
+    }
+    .ideology-sidebar-header {
+        padding: 0 0.5rem;
+        margin-bottom: 0.75rem;
+    }
+    .ideology-sidebar-title {
+        font-size: 0.6875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #9ca3af;
+        margin: 0;
+    }
+    .ideology-sidebar-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+    .ideology-sidebar-link {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.625rem 0.75rem;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 0.875rem;
+        color: #4b5563;
+        text-decoration: none;
+        transition: all 0.15s ease;
+    }
+    .ideology-sidebar-link:hover {
+        background: #f3f4f6;
+        color: #111827;
+        text-decoration: none;
+    }
+    .ideology-sidebar-link.active {
+        background: #f3f4f6;
+        color: #111827;
+    }
+    .ideology-sidebar-link svg {
+        width: 18px;
+        height: 18px;
+        min-width: 18px;
+        opacity: 0.6;
+    }
+    .ideology-sidebar-link.active svg {
+        opacity: 1;
+    }
+    .ideology-sidebar-link-left {
+        display: flex;
+        align-items: center;
+        gap: 0.625rem;
+    }
+    .ideology-sidebar-link-text {
+        flex: 1;
+    }
+    .ideology-sidebar-link-number {
+        background: #f3f4f6;
+        color: #6b7280;
+        padding: 0.125rem 0.5rem;
+        border-radius: 100px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        min-width: 24px;
+        text-align: center;
+    }
+    .ideology-sidebar-link.active .ideology-sidebar-link-number {
+        background: #e5e7eb;
+        color: #374151;
+    }
+
+    /* Main Content Area */
+    .ideology-main {
+        flex: 1;
+        min-width: 0;
+    }
+
+    /* Section Styling */
+    .ideology-section {
+        padding: 40px 40px;
+        background: #fff;
+        border-bottom: 1px solid #e5e7eb;
+        scroll-margin-top: 20px;
+        margin: 0 !important;
+    }
+    .ideology-section:first-child {
+        padding-top: 30px;
+    }
+    .ideology-section:nth-child(even) {
+        background: #f8fafc;
+    }
+    .ideology-section:last-child {
+        border-bottom: none;
+    }
+
+    .section-header {
+        margin-bottom: 1.5rem;
+    }
+    .section-icon-wrapper {
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
+        background: #e2e8f0;
+        border: 1px solid #cbd5e1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.25rem;
+    }
+    .section-icon-wrapper svg {
+        width: 26px;
+        height: 26px;
+        color: #475569;
+    }
+    .section-number {
+        display: inline-block;
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 0.5rem;
+    }
+    .section-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0 0 0.5rem 0;
+    }
+    .section-subtitle {
+        font-size: 1rem;
+        color: #64748b;
+        margin: 0;
+    }
+    .section-content {
+        font-size: 1rem;
+        color: #475569;
+        line-height: 1.8;
+        max-width: 700px;
+        margin-bottom: 2rem;
+    }
+
+    /* Items Grid */
+    .items-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.25rem;
+    }
+    .item-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 1.5rem;
+        transition: all 0.2s ease;
+    }
+    .ideology-section:nth-child(even) .item-card {
+        background: #fff;
+    }
+    .item-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+        border-color: #cbd5e1;
+    }
+    .item-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        background: #e2e8f0;
+        color: #475569;
+        font-size: 0.8rem;
+        font-weight: 700;
+        border-radius: 6px;
+        margin-bottom: 0.875rem;
+        border: 1px solid #cbd5e1;
+    }
+    .item-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #0f172a;
+        margin: 0 0 0.5rem 0;
+    }
+    .item-description {
+        font-size: 0.9rem;
+        color: #64748b;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    /* Special styling for What RATEL Is Not */
+    .section-not .item-card {
+        border-left: 3px solid #dc2626;
+    }
+    .section-not .item-number {
+        background: #dc2626;
+    }
+    .section-not .section-icon-wrapper {
+        background: #dc2626;
+    }
+
+    /* CTA Section - light, no black */
+    .ideology-cta {
+        background: #f1f5f9;
+        border-top: 1px solid #e2e8f0;
+        padding: 60px 40px;
+        text-align: center;
+    }
+    .ideology-cta h2 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0 0 0.75rem 0;
+    }
+    .ideology-cta p {
+        font-size: 1rem;
+        color: #64748b;
+        margin: 0 0 1.5rem 0;
+        line-height: 1.7;
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .ideology-cta-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.875rem 1.75rem;
+        background: #334155;
+        color: #fff;
+        font-size: 0.95rem;
+        font-weight: 600;
+        text-decoration: none;
+        border-radius: 8px;
+        border: 1px solid #334155;
+        transition: all 0.2s ease;
+    }
+    .ideology-cta-btn:hover {
+        background: #475569;
+        border-color: #475569;
+        color: #fff;
+        transform: translateY(-2px);
+    }
+
+    /* Empty State */
+    .ideology-empty {
+        text-align: center;
+        padding: 100px 1.5rem;
+        background: #fff;
+    }
+    .ideology-empty-icon {
+        width: 80px;
+        height: 80px;
+        color: #cbd5e1;
+        margin-bottom: 1.5rem;
+    }
+    .ideology-empty h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0 0 0.75rem 0;
+    }
+    .ideology-empty p {
+        font-size: 1rem;
+        color: #64748b;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    /* Mobile Filter Toggle Bar */
+    .ideology-mobile-toggle {
+        display: none;
+        width: 100%;
+        padding: 0.875rem 1rem;
+        background: #fff;
+        border: none;
+        border-bottom: 1px solid #e5e7eb;
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: #374151;
+        cursor: pointer;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .ideology-mobile-toggle svg {
+        width: 18px;
+        height: 18px;
+        color: #9ca3af;
+        transition: transform 0.2s ease;
+    }
+    .ideology-mobile-toggle.open svg {
+        transform: rotate(180deg);
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .ideology-wrapper {
+            padding: 1.5rem;
+        }
+        .ideology-layout {
+            gap: 1.5rem;
+        }
+        .ideology-sidebar {
+            width: 220px;
+        }
+        .ideology-section {
+            padding: 30px 25px;
+        }
+        .ideology-section:first-child {
+            padding-top: 25px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .ideology-hero {
+            padding: 30px 0 20px;
+        }
+        .ideology-hero h1 {
+            font-size: 2rem;
+        }
+        .ideology-hero p {
+            font-size: 1rem;
+        }
+
+        .ideology-wrapper {
+            padding: 0;
+        }
+        .ideology-layout {
+            flex-direction: column;
+            gap: 0;
+        }
+        .ideology-sidebar {
+            width: 100%;
+            border-radius: 0;
+            border-left: none;
+            border-right: none;
+            border-top: none;
+            position: static;
+            display: none;
+        }
+        .ideology-sidebar.show {
+            display: block;
+        }
+        .ideology-mobile-toggle {
+            display: flex;
+        }
+        .ideology-main {
+            padding: 0;
+        }
+        .ideology-section {
+            padding: 25px 20px;
+        }
+        .ideology-section:first-child {
+            padding-top: 20px;
+        }
+        .section-title {
+            font-size: 1.5rem;
+        }
+        .items-grid {
+            grid-template-columns: 1fr;
+        }
+        .ideology-cta {
+            padding: 50px 20px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ideology-page">
+    <!-- Hero Section -->
+    <section class="ideology-hero">
+        <div class="ideology-hero-content">
+            <div class="ideology-hero-badge">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                Intellectual Backbone
+            </div>
+            <h1>Our Ideology</h1>
+            <p>The principles, beliefs, and values that define who we are, what we stand for, and the boundaries we will never cross.</p>
+        </div>
+    </section>
+
+    {% if sections %}
+    <!-- Main Section -->
+    <section class="ideology-main-section">
+        <!-- Mobile Filter Toggle -->
+        <button class="ideology-mobile-toggle" id="mobileToggle" onclick="toggleSidebar()">
+            <span>Jump to Section</span>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+
+        <div class="ideology-wrapper">
+            <!-- Main Layout -->
+            <div class="ideology-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="ideology-sidebar" id="ideologySidebar">
+            <div class="ideology-sidebar-header">
+                <h2 class="ideology-sidebar-title">Sections</h2>
+            </div>
+            <nav class="ideology-sidebar-nav">
+                {% for section in sections %}
+                <a href="#section-{{ section.section_key }}" class="ideology-sidebar-link {% if forloop.first %}active{% endif %}" data-section="{{ section.section_key }}">
+                    <span class="ideology-sidebar-link-left">
+                        {% if section.section_icon == 'heart' %}
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                        {% elif section.section_icon == 'scale' %}
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>
+                        {% elif section.section_icon == 'users' %}
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        {% elif section.section_icon == 'shield' %}
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>
+                        {% elif section.section_icon == 'x-circle' %}
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+                        {% else %}
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                        {% endif %}
+                        <span class="ideology-sidebar-link-text">{{ section.section_title }}</span>
+                    </span>
+                    <span class="ideology-sidebar-link-number">{{ forloop.counter }}</span>
+                </a>
+                {% endfor %}
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="ideology-main">
+            {% for section in sections %}
+            <section id="section-{{ section.section_key }}" class="ideology-section {% if section.section_key == 'what_ratel_is_not' %}section-not{% endif %}">
+                <div class="section-header">
+                    <div class="section-icon-wrapper">
+                        {% if section.section_icon == 'heart' %}
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                        {% elif section.section_icon == 'scale' %}
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>
+                        {% elif section.section_icon == 'users' %}
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        {% elif section.section_icon == 'shield' %}
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>
+                        {% elif section.section_icon == 'x-circle' %}
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+                        {% else %}
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                        {% endif %}
+                    </div>
+                    <span class="section-number">Section {{ forloop.counter }}</span>
+                    <h2 class="section-title">{{ section.section_title }}</h2>
+                    {% if section.section_subtitle %}
+                    <p class="section-subtitle">{{ section.section_subtitle }}</p>
+                    {% endif %}
+                </div>
+
+                {% if section.content %}
+                <p class="section-content">{{ section.content }}</p>
+                {% endif %}
+
+                {% if section.items %}
+                <div class="items-grid">
+                    {% for item in section.items %}
+                    <div class="item-card">
+                        <div class="item-number">{{ forloop.counter }}</div>
+                        <h3 class="item-title">{{ item.title }}</h3>
+                        <p class="item-description">{{ item.description }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </section>
+            {% endfor %}
+
+            <!-- CTA Section -->
+            <section class="ideology-cta">
+                <h2>Ready to Stand With Us?</h2>
+                <p>If these principles resonate with you, then you belong with us.</p>
+                <a href="{% url 'membership' %}" class="ideology-cta-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
+                    Join the Movement
+                </a>
+            </section>
+        </main>
+            </div>
+        </div>
+    </section>
+
+    {% else %}
+    <!-- Empty State -->
+    <div class="ideology-empty">
+        <svg class="ideology-empty-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        <h2>Ideology Content Coming Soon</h2>
+        <p>Our ideology sections are being prepared. Check back soon to learn about the principles that guide the Ratel Movement.</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+// Toggle sidebar (mobile)
+function toggleSidebar() {
+    var sidebar = document.getElementById('ideologySidebar');
+    var toggle = document.getElementById('mobileToggle');
+    sidebar.classList.toggle('show');
+    toggle.classList.toggle('open');
+}
+
+function closeSidebar() {
+    document.getElementById('ideologySidebar').classList.remove('show');
+    document.getElementById('mobileToggle').classList.remove('open');
+}
+
+// Smooth scroll for sidebar links
+document.querySelectorAll('.ideology-sidebar-link').forEach(link => {
+    link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href');
+        const target = document.querySelector(targetId);
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Close sidebar on mobile
+            if (window.innerWidth <= 768) {
+                closeSidebar();
+            }
+        }
+        // Update active state
+        document.querySelectorAll('.ideology-sidebar-link').forEach(l => l.classList.remove('active'));
+        this.classList.add('active');
+    });
+});
+
+// Update active sidebar link on scroll
+window.addEventListener('scroll', function() {
+    const sections = document.querySelectorAll('.ideology-section');
+    let current = '';
+
+    sections.forEach(section => {
+        const sectionTop = section.offsetTop - 150;
+        if (window.pageYOffset >= sectionTop) {
+            current = section.getAttribute('id');
+        }
+    });
+
+    document.querySelectorAll('.ideology-sidebar-link').forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === '#' + current) {
+            link.classList.add('active');
+        }
+    });
+});
+</script>
+{% endblock %}

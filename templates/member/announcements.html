@@ -1,0 +1,411 @@
+{% extends "member/base_member.html" %}
+
+{% block title %}Announcements{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    .page-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+    }
+    .page-subtitle {
+        color: #64748b;
+        font-size: 0.9rem;
+        margin: 0.25rem 0 0 0;
+    }
+
+    .filter-tabs {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    .filter-tab {
+        padding: 0.5rem 1rem;
+        border: 1px solid #e2e8f0;
+        background: #fff;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #64748b;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .filter-tab:hover {
+        border-color: #cbd5e1;
+        color: #1e293b;
+    }
+    .filter-tab.active {
+        background: #1e293b;
+        border-color: #1e293b;
+        color: #fff;
+    }
+
+    .announcements-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .announcement-card {
+        background: #fff;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+        transition: all 0.2s;
+    }
+    .announcement-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .announcement-card.pinned {
+        border-left: 4px solid #f59e0b;
+    }
+    .announcement-card.high-priority {
+        border-left: 4px solid #ef4444;
+    }
+
+    .announcement-card-header {
+        padding: 1.25rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .announcement-meta {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+        flex-wrap: wrap;
+    }
+    .meta-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.6rem;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    .meta-badge.pinned { background: #fef3c7; color: #92400e; }
+    .meta-badge.high { background: #fee2e2; color: #991b1b; }
+    .meta-badge.normal { background: #e0f2fe; color: #0369a1; }
+    .meta-badge.category { background: #f1f5f9; color: #475569; }
+    .announcement-date {
+        font-size: 0.75rem;
+        color: #94a3b8;
+        margin-left: auto;
+    }
+    .announcement-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+        line-height: 1.4;
+    }
+    .announcement-author {
+        font-size: 0.8rem;
+        color: #64748b;
+        margin-top: 0.5rem;
+    }
+    .announcement-author strong {
+        color: #475569;
+    }
+
+    .announcement-card-body {
+        padding: 1.25rem;
+    }
+    .announcement-content {
+        color: #475569;
+        font-size: 0.95rem;
+        line-height: 1.7;
+        white-space: pre-line;
+    }
+    .announcement-content.collapsed {
+        max-height: 120px;
+        overflow: hidden;
+        position: relative;
+    }
+    .announcement-content.collapsed::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 40px;
+        background: linear-gradient(transparent, #fff);
+    }
+
+    .announcement-card-footer {
+        padding: 1rem 1.25rem;
+        background: #f8fafc;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+    .read-more-btn {
+        padding: 0.5rem 1rem;
+        background: #1e293b;
+        border: none;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: #fff;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .read-more-btn:hover {
+        background: #334155;
+    }
+    .view-count {
+        font-size: 0.75rem;
+        color: #94a3b8;
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+    .view-count i {
+        width: 14px;
+        height: 14px;
+    }
+
+    .empty-state {
+        background: #fff;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        padding: 4rem 2rem;
+        text-align: center;
+    }
+    .empty-state i {
+        width: 64px;
+        height: 64px;
+        color: #cbd5e1;
+        margin-bottom: 1rem;
+    }
+    .empty-state h3 {
+        font-size: 1.1rem;
+        color: #475569;
+        margin-bottom: 0.5rem;
+    }
+    .empty-state p {
+        color: #94a3b8;
+        font-size: 0.9rem;
+    }
+
+    /* Modal */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+    }
+    .modal-overlay.active {
+        display: flex;
+    }
+    .modal-content {
+        background: #fff;
+        border-radius: 16px;
+        width: 100%;
+        max-width: 700px;
+        max-height: 90vh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+    .modal-header {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+    .modal-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+    }
+    .modal-close {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #64748b;
+        padding: 0.25rem;
+    }
+    .modal-close:hover {
+        color: #1e293b;
+    }
+    .modal-body {
+        padding: 1.5rem;
+        overflow-y: auto;
+        flex: 1;
+    }
+    .modal-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .modal-meta-item {
+        font-size: 0.8rem;
+        color: #64748b;
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+    .modal-meta-item i {
+        width: 14px;
+        height: 14px;
+    }
+    .modal-text {
+        color: #475569;
+        font-size: 1rem;
+        line-height: 1.8;
+        white-space: pre-line;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Internal Announcements</h1>
+        <p class="page-subtitle">Stay informed with the latest updates from the movement</p>
+    </div>
+</div>
+
+<div class="filter-tabs" style="margin-bottom:1.5rem;">
+    <button class="filter-tab active" onclick="filterAnnouncements('all', this)">All</button>
+    <button class="filter-tab" onclick="filterAnnouncements('pinned', this)">Pinned</button>
+    <button class="filter-tab" onclick="filterAnnouncements('high', this)">Important</button>
+</div>
+
+<div class="announcements-list" id="announcementsList">
+    {% if announcements %}
+        {% for ann in announcements %}
+        <div class="announcement-card {% if ann.is_pinned %}pinned{% elif ann.priority == 'high' %}high-priority{% endif %}"
+             data-pinned="{{ ann.is_pinned|yesno:'true,false' }}"
+             data-priority="{{ ann.priority }}">
+            <div class="announcement-card-header">
+                <div class="announcement-meta">
+                    {% if ann.is_pinned %}
+                        <span class="meta-badge pinned">Pinned</span>
+                    {% endif %}
+                    {% if ann.priority == 'high' %}
+                        <span class="meta-badge high">Important</span>
+                    {% elif ann.priority == 'normal' %}
+                        <span class="meta-badge normal">Update</span>
+                    {% endif %}
+                    {% if ann.category %}
+                        <span class="meta-badge category">{{ ann.category }}</span>
+                    {% endif %}
+                    <span class="announcement-date">{{ ann.created_at|slice:":10" }}</span>
+                </div>
+                <h3 class="announcement-title">{{ ann.title }}</h3>
+                {% if ann.author_name %}
+                    <p class="announcement-author">By <strong>{{ ann.author_name }}</strong>{% if ann.author_role %} - {{ ann.author_role }}{% endif %}</p>
+                {% endif %}
+            </div>
+            <div class="announcement-card-body">
+                <div class="announcement-content collapsed">{{ ann.content }}</div>
+            </div>
+            <div class="announcement-card-footer">
+                <button class="read-more-btn" onclick="openModal('{{ ann.title|escapejs }}', '{{ ann.content|escapejs }}', '{{ ann.author_name|default:""|escapejs }}', '{{ ann.author_role|default:""|escapejs }}', '{{ ann.created_at|slice:":10" }}', '{{ ann.category|default:"" }}')">
+                    Read Full Announcement
+                </button>
+                <span class="view-count">
+                    <i data-lucide="eye"></i>
+                    {{ ann.view_count|default:"0" }} views
+                </span>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <i data-lucide="megaphone"></i>
+            <h3>No announcements yet</h3>
+            <p>Check back later for updates from the movement.</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="announcementModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="modalTitle"></h2>
+            <button class="modal-close" onclick="closeModal()">
+                <i data-lucide="x" style="width:24px;height:24px;"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-meta" id="modalMeta"></div>
+            <div class="modal-text" id="modalContent"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function filterAnnouncements(filter, btn) {
+    document.querySelectorAll('.filter-tab').forEach(tab => tab.classList.remove('active'));
+    btn.classList.add('active');
+
+    document.querySelectorAll('.announcement-card').forEach(card => {
+        if (filter === 'all') {
+            card.style.display = 'block';
+        } else if (filter === 'pinned') {
+            card.style.display = card.dataset.pinned === 'true' ? 'block' : 'none';
+        } else if (filter === 'high') {
+            card.style.display = card.dataset.priority === 'high' ? 'block' : 'none';
+        }
+    });
+}
+
+function openModal(title, content, author, role, date, category) {
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalContent').textContent = content;
+
+    let metaHtml = `<span class="modal-meta-item"><i data-lucide="calendar"></i><span>${date}</span></span>`;
+    if (author) {
+        metaHtml += `<span class="modal-meta-item"><i data-lucide="user"></i><span>${author}${role ? ' - ' + role : ''}</span></span>`;
+    }
+    if (category) {
+        metaHtml += `<span class="modal-meta-item"><i data-lucide="tag"></i><span>${category}</span></span>`;
+    }
+    document.getElementById('modalMeta').innerHTML = metaHtml;
+    document.getElementById('announcementModal').classList.add('active');
+    lucide.createIcons();
+}
+
+function closeModal() {
+    document.getElementById('announcementModal').classList.remove('active');
+}
+
+document.getElementById('announcementModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+});
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeModal();
+});
+</script>
+{% endblock %}

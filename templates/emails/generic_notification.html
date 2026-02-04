@@ -1,0 +1,16 @@
+{% extends "emails/base_email.html" %}
+{% block title %}{{ email_subject|default:"Message" }} - RATEL Movement{% endblock %}
+{% block content %}
+<p style="margin:0 0 20px;font-size:16px;color:#374151;line-height:1.7;">
+Dear {{ recipient_name|default:"Member" }},
+</p>
+<div style="font-size:15px;color:#4b5563;line-height:1.7;">
+{{ message_body|safe }}
+</div>
+<p style="margin:24px 0 0;font-size:15px;color:#111827;font-weight:600;">
+    Neutrality is complicity.
+</p>
+<p style="margin:8px 0 0;font-size:14px;color:#6b7280;">
+    RATEL Movement Team
+</p>
+{% endblock %}

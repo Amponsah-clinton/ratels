@@ -1,0 +1,821 @@
+{% extends "dashboard/base_dashboard.html" %}
+
+{% block title %}Membership Status{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    .page-header-left h1 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0 0 0.25rem 0;
+    }
+    .page-header-left p {
+        color: #64748b;
+        font-size: 0.9rem;
+        margin: 0;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    .stat-card {
+        background: #fff;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        padding: 1.25rem;
+    }
+    .stat-label {
+        font-size: 0.8rem;
+        color: #64748b;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+    .stat-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #1e293b;
+    }
+    .stat-card.active .stat-value { color: #10b981; }
+    .stat-card.warning .stat-value { color: #f59e0b; }
+    .stat-card.danger .stat-value { color: #ef4444; }
+    .stat-card.secondary .stat-value { color: #6b7280; }
+
+    /* Settings Card */
+    .settings-card {
+        background: #fff;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .settings-card h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0 0 1rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .settings-card h3 i {
+        width: 20px;
+        height: 20px;
+        color: #64748b;
+    }
+    .settings-form {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-end;
+        flex-wrap: wrap;
+    }
+    .form-group {
+        flex: 1;
+        min-width: 150px;
+    }
+    .form-group label {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #475569;
+        margin-bottom: 0.5rem;
+    }
+    .form-group input, .form-group select {
+        width: 100%;
+        padding: 0.65rem 0.85rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        color: #1e293b;
+        background: #fff;
+    }
+    .form-group input:focus, .form-group select:focus {
+        outline: none;
+        border-color: #1e293b;
+    }
+    .btn-save {
+        padding: 0.65rem 1.5rem;
+        background: #1e293b;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: background 0.2s;
+    }
+    .btn-save:hover {
+        background: #334155;
+    }
+    .btn-save i {
+        width: 18px;
+        height: 18px;
+    }
+
+    /* Filter Tabs */
+    .filter-tabs {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1.25rem;
+        flex-wrap: wrap;
+    }
+    .filter-tab {
+        padding: 0.5rem 1rem;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #64748b;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .filter-tab:hover {
+        border-color: #cbd5e1;
+        color: #1e293b;
+    }
+    .filter-tab.active {
+        background: #1e293b;
+        border-color: #1e293b;
+        color: #fff;
+    }
+
+    /* Members Table */
+    .table-card {
+        background: #fff;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+    }
+    .table-header {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .table-header h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+    }
+    .search-box {
+        position: relative;
+    }
+    .search-box input {
+        padding: 0.5rem 0.75rem 0.5rem 2.25rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        width: 250px;
+        color: #1e293b;
+    }
+    .search-box input:focus {
+        outline: none;
+        border-color: #1e293b;
+    }
+    .search-box i {
+        position: absolute;
+        left: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        color: #94a3b8;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    thead th {
+        background: #f8fafc;
+        padding: 0.85rem 1rem;
+        text-align: left;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        white-space: nowrap;
+    }
+    tbody td {
+        padding: 1rem;
+        border-top: 1px solid #f1f5f9;
+        font-size: 0.9rem;
+        color: #1e293b;
+        vertical-align: middle;
+    }
+    tbody tr:hover {
+        background: #f8fafc;
+    }
+
+    .member-cell {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    .member-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+    .member-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .member-avatar i {
+        width: 20px;
+        height: 20px;
+        color: #94a3b8;
+    }
+    .member-info {
+        min-width: 0;
+    }
+    .member-name {
+        font-weight: 500;
+        color: #1e293b;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .member-id {
+        font-size: 0.75rem;
+        color: #94a3b8;
+    }
+
+    /* Status Badges */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.35rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    .status-badge i {
+        width: 14px;
+        height: 14px;
+    }
+    .status-badge.success {
+        background: #d1fae5;
+        color: #059669;
+    }
+    .status-badge.warning {
+        background: #fef3c7;
+        color: #d97706;
+    }
+    .status-badge.danger {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+    .status-badge.secondary {
+        background: #f1f5f9;
+        color: #64748b;
+    }
+
+    /* Action Buttons */
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        border: 1px solid #e2e8f0;
+        background: #fff;
+        color: #64748b;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .action-btn:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+        color: #1e293b;
+    }
+    .action-btn i {
+        width: 16px;
+        height: 16px;
+    }
+
+    /* Modal */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+    .modal-overlay.active {
+        display: flex;
+    }
+    .modal-content {
+        background: #fff;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 500px;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    .modal-header {
+        padding: 1.25rem;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .modal-header h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+    }
+    .modal-close {
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        border: none;
+        background: none;
+        color: #64748b;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .modal-close:hover {
+        background: #f1f5f9;
+        color: #1e293b;
+    }
+    .modal-close i {
+        width: 20px;
+        height: 20px;
+    }
+    .modal-body {
+        padding: 1.25rem;
+    }
+    .modal-body .form-group {
+        margin-bottom: 1rem;
+    }
+    .modal-body textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        color: #1e293b;
+        resize: vertical;
+        min-height: 150px;
+        font-family: inherit;
+    }
+    .modal-body textarea:focus {
+        outline: none;
+        border-color: #1e293b;
+    }
+    .modal-footer {
+        padding: 1rem 1.25rem;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+    }
+    .btn-cancel {
+        padding: 0.6rem 1.25rem;
+        background: #fff;
+        color: #64748b;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+    }
+    .btn-cancel:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+    }
+    .btn-send {
+        padding: 0.6rem 1.25rem;
+        background: #1e293b;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .btn-send:hover {
+        background: #334155;
+    }
+    .btn-send i {
+        width: 16px;
+        height: 16px;
+    }
+
+    .member-preview {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem;
+        background: #f8fafc;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+    .member-preview-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+    .member-preview-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .member-preview-info .name {
+        font-weight: 500;
+        color: #1e293b;
+    }
+    .member-preview-info .email {
+        font-size: 0.85rem;
+        color: #64748b;
+    }
+
+    /* Toast */
+    .toast {
+        position: fixed;
+        bottom: 1.5rem;
+        right: 1.5rem;
+        padding: 1rem 1.5rem;
+        background: #1e293b;
+        color: #fff;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        z-index: 2000;
+        display: none;
+    }
+    .toast.success {
+        background: #059669;
+    }
+    .toast.error {
+        background: #dc2626;
+    }
+    .toast.show {
+        display: block;
+        animation: slideIn 0.3s ease;
+    }
+    @keyframes slideIn {
+        from { transform: translateY(20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #64748b;
+    }
+    .empty-state i {
+        width: 48px;
+        height: 48px;
+        color: #cbd5e1;
+        margin-bottom: 1rem;
+    }
+    .empty-state h3 {
+        font-size: 1rem;
+        color: #475569;
+        margin: 0 0 0.5rem 0;
+    }
+    .empty-state p {
+        font-size: 0.9rem;
+        margin: 0;
+    }
+
+    @media (max-width: 768px) {
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        .settings-form {
+            flex-direction: column;
+        }
+        .form-group {
+            width: 100%;
+        }
+        .search-box input {
+            width: 100%;
+        }
+        .table-header {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-header-left">
+        <h1>Membership Status</h1>
+        <p>Manage subscription fees and track member renewal status</p>
+    </div>
+</div>
+
+<!-- Stats Grid -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-label">Total Members</div>
+        <div class="stat-value">{{ total_members }}</div>
+    </div>
+    <div class="stat-card active">
+        <div class="stat-label">Active</div>
+        <div class="stat-value">{{ active_count }}</div>
+    </div>
+    <div class="stat-card warning">
+        <div class="stat-label">Expiring Soon</div>
+        <div class="stat-value">{{ expiring_count }}</div>
+    </div>
+    <div class="stat-card danger">
+        <div class="stat-label">Expired</div>
+        <div class="stat-value">{{ expired_count }}</div>
+    </div>
+    <div class="stat-card secondary">
+        <div class="stat-label">Never Subscribed</div>
+        <div class="stat-value">{{ never_count }}</div>
+    </div>
+</div>
+
+<!-- Fee Settings -->
+<div class="settings-card">
+    <h3><i data-lucide="settings"></i> Membership Fee Settings</h3>
+    <form action="{% url 'dashboard_membership_settings_save' %}" method="POST" class="settings-form">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="currency">Currency</label>
+            <select name="currency" id="currency">
+                <option value="GHS" {% if currency == "GHS" %}selected{% endif %}>GHS (Cedis)</option>
+                <option value="NGN" {% if currency == "NGN" %}selected{% endif %}>NGN (Naira)</option>
+                <option value="USD" {% if currency == "USD" %}selected{% endif %}>USD (Dollar)</option>
+                <option value="GBP" {% if currency == "GBP" %}selected{% endif %}>GBP (Pound)</option>
+                <option value="EUR" {% if currency == "EUR" %}selected{% endif %}>EUR (Euro)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="fee_amount">Monthly Fee Amount</label>
+            <input type="number" name="fee_amount" id="fee_amount" value="{{ membership_fee }}" step="0.01" min="0" required>
+        </div>
+        <button type="submit" class="btn-save">
+            <i data-lucide="save"></i>
+            Save Settings
+        </button>
+    </form>
+</div>
+
+<!-- Filter Tabs -->
+<div class="filter-tabs">
+    <button class="filter-tab active" onclick="filterMembers('all', this)">All Members</button>
+    <button class="filter-tab" onclick="filterMembers('active', this)">Active</button>
+    <button class="filter-tab" onclick="filterMembers('expiring_soon', this)">Expiring Soon</button>
+    <button class="filter-tab" onclick="filterMembers('expired', this)">Expired</button>
+    <button class="filter-tab" onclick="filterMembers('never_subscribed', this)">Never Subscribed</button>
+</div>
+
+<!-- Members Table -->
+<div class="table-card">
+    <div class="table-header">
+        <h3>Members ({{ total_members }})</h3>
+        <div class="search-box">
+            <i data-lucide="search"></i>
+            <input type="text" id="searchInput" placeholder="Search members..." onkeyup="searchMembers()">
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table id="membersTable">
+            <thead>
+                <tr>
+                    <th>Member</th>
+                    <th>Email</th>
+                    <th>Location</th>
+                    <th>Subscription End</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for member in members %}
+                <tr class="member-row" data-status="{{ member.renewal_status }}">
+                    <td>
+                        <div class="member-cell">
+                            <div class="member-avatar">
+                                {% if member.profile_image_url %}
+                                    <img src="{{ member.profile_image_url }}" alt="{{ member.full_name }}">
+                                {% else %}
+                                    <i data-lucide="user"></i>
+                                {% endif %}
+                            </div>
+                            <div class="member-info">
+                                <div class="member-name">{{ member.full_name }}</div>
+                                <div class="member-id">{{ member.member_id }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>{{ member.email }}</td>
+                    <td>
+                        {% if member.based_in_nigeria %}
+                            {{ member.state|default:"-" }}, Nigeria
+                        {% else %}
+                            {{ member.country|default:"International" }}
+                        {% endif %}
+                    </td>
+                    <td>{{ member.subscription_end|default:"-" }}</td>
+                    <td>
+                        {% if member.renewal_status == "active" %}
+                            <span class="status-badge success">
+                                <i data-lucide="check-circle"></i>
+                                Active
+                            </span>
+                        {% elif member.renewal_status == "expiring_soon" %}
+                            <span class="status-badge warning">
+                                <i data-lucide="alert-triangle"></i>
+                                Expiring Soon
+                            </span>
+                        {% elif member.renewal_status == "expired" %}
+                            <span class="status-badge danger">
+                                <i data-lucide="x-circle"></i>
+                                Expired
+                            </span>
+                        {% else %}
+                            <span class="status-badge secondary">
+                                <i data-lucide="minus-circle"></i>
+                                No Subscription
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <button class="action-btn" title="Send Reminder Email" onclick="openEmailModal('{{ member.member_id }}', '{{ member.full_name|escapejs }}', '{{ member.email }}', '{{ member.profile_image_url|default:"" }}')">
+                            <i data-lucide="mail"></i>
+                        </button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6">
+                        <div class="empty-state">
+                            <i data-lucide="users"></i>
+                            <h3>No members found</h3>
+                            <p>Members will appear here once they register.</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Email Modal -->
+<div class="modal-overlay" id="emailModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Send Renewal Reminder</h3>
+            <button class="modal-close" onclick="closeEmailModal()">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        <form action="{% url 'dashboard_membership_send_reminder' %}" method="POST">
+            {% csrf_token %}
+            <div class="modal-body">
+                <div class="member-preview" id="memberPreview">
+                    <div class="member-preview-avatar" id="previewAvatar">
+                        <i data-lucide="user"></i>
+                    </div>
+                    <div class="member-preview-info">
+                        <div class="name" id="previewName">Member Name</div>
+                        <div class="email" id="previewEmail">email@example.com</div>
+                    </div>
+                </div>
+
+                <input type="hidden" name="member_id" id="modalMemberId">
+                <input type="hidden" name="email" id="modalEmail">
+                <input type="hidden" name="name" id="modalName">
+
+                <div class="form-group">
+                    <label for="customMessage">Message (optional - leave empty for default)</label>
+                    <textarea name="message" id="customMessage" placeholder="Enter a custom message or leave empty to use the default renewal reminder..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" onclick="closeEmailModal()">Cancel</button>
+                <button type="submit" class="btn-send">
+                    <i data-lucide="send"></i>
+                    Send Email
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function filterMembers(status, btn) {
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+
+    document.querySelectorAll('.member-row').forEach(row => {
+        if (status === 'all' || row.dataset.status === status) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+function searchMembers() {
+    const query = document.getElementById('searchInput').value.toLowerCase();
+    document.querySelectorAll('.member-row').forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(query) ? '' : 'none';
+    });
+}
+
+function openEmailModal(memberId, name, email, avatar) {
+    document.getElementById('modalMemberId').value = memberId;
+    document.getElementById('modalEmail').value = email;
+    document.getElementById('modalName').value = name;
+    document.getElementById('previewName').textContent = name;
+    document.getElementById('previewEmail').textContent = email;
+
+    const avatarEl = document.getElementById('previewAvatar');
+    if (avatar) {
+        avatarEl.innerHTML = `<img src="${avatar}" alt="${name}">`;
+    } else {
+        avatarEl.innerHTML = '<i data-lucide="user"></i>';
+        lucide.createIcons();
+    }
+
+    document.getElementById('emailModal').classList.add('active');
+    document.getElementById('customMessage').value = '';
+}
+
+function closeEmailModal() {
+    document.getElementById('emailModal').classList.remove('active');
+}
+
+function showToast(message, type) {
+    if (window.showMdToast) window.showMdToast(message, type);
+}
+
+// Close modal when clicking overlay
+document.getElementById('emailModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeEmailModal();
+    }
+});
+</script>
+{% endblock %}

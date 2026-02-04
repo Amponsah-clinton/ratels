@@ -1,0 +1,595 @@
+{% extends "dashboard/base_dashboard.html" %}
+
+{% block title %}Landing Page Content{% endblock %}
+
+{% block content %}
+<div class="content-manager">
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="header-content">
+            <h1 class="page-title">Landing Page Content</h1>
+            <p class="page-subtitle">Manage all sections that appear on your homepage</p>
+        </div>
+        <a href="{% url 'index' %}" target="_blank" class="view-live-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+            View Live Site
+        </a>
+    </div>
+
+    <!-- Tabs Navigation -->
+    <div class="tabs-container">
+        <div class="tabs-nav">
+            <button class="tab-btn active" data-tab="manifesto">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                Manifesto
+            </button>
+            <button class="tab-btn" data-tab="why_ratel_exists">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+                Why RATEL Exists
+            </button>
+            <button class="tab-btn" data-tab="what_we_stand_against">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+                What We Stand Against
+            </button>
+            <button class="tab-btn" data-tab="calls_to_action">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                Calls to Action
+            </button>
+            <button class="tab-btn" data-tab="about_ratel">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                About Ratel
+            </button>
+            <button class="tab-btn" data-tab="mission_vision">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                Mission & Vision
+            </button>
+        </div>
+    </div>
+
+    <!-- Tab Content Panels -->
+    <div class="tabs-content">
+
+        <!-- Manifesto Tab -->
+        <div class="tab-panel active" id="panel-manifesto">
+            <form method="POST" action="{% url 'dashboard_landing_save' %}" enctype="multipart/form-data" class="editor-form">
+                {% csrf_token %}
+                <input type="hidden" name="section_key" value="manifesto">
+                <input type="hidden" name="content_id" value="{{ sections.manifesto.id|default:'' }}">
+                <input type="hidden" name="existing_image_url" value="{{ sections.manifesto.image_url|default:'' }}">
+
+                <div class="form-grid">
+                    <div class="form-main">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Section Title</label>
+                                <input type="text" name="title" class="form-input" value="{{ sections.manifesto.title|default:'Our Manifesto' }}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Subtitle / Label</label>
+                                <input type="text" name="subtitle" class="form-input" value="{{ sections.manifesto.subtitle|default:'The Ratel Movement' }}">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Content <span class="required">*</span></label>
+                            <div class="editor-wrapper">
+                                <div id="editor-manifesto" class="quill-editor"></div>
+                                <input type="hidden" name="content" id="content-manifesto">
+                            </div>
+                            <p class="form-hint">Use the toolbar to format text. Styles will appear on the landing page.</p>
+                        </div>
+                    </div>
+
+                    <div class="form-sidebar">
+                        <div class="form-group">
+                            <label class="form-label">Section Image</label>
+                            <div class="image-upload" onclick="document.getElementById('image-manifesto').click()">
+                                {% if sections.manifesto.image_url %}
+                                <div class="image-preview" id="preview-manifesto">
+                                    <img src="{{ sections.manifesto.image_url }}" alt="Section image">
+                                    <button type="button" class="remove-image" onclick="event.stopPropagation(); removeImage('manifesto')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg></button>
+                                </div>
+                                {% else %}
+                                <div class="upload-placeholder" id="placeholder-manifesto">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                                    <span>Upload Image</span>
+                                </div>
+                                {% endif %}
+                                <input type="file" name="image" id="image-manifesto" accept="image/*" style="display:none" onchange="previewImage(this, 'manifesto')">
+                            </div>
+                        </div>
+                        <div class="status-card">
+                            <div class="status-row"><span class="status-label">Status</span><span class="status-value {% if sections.manifesto %}active{% else %}draft{% endif %}">{% if sections.manifesto %}Active{% else %}Not Set{% endif %}</span></div>
+                            {% if sections.manifesto.updated_at %}<div class="status-row"><span class="status-label">Updated</span><span class="status-value">{{ sections.manifesto.updated_at|date:"M d, Y" }}</span></div>{% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="form-actions"><button type="submit" class="btn-save"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Save Manifesto</button></div>
+            </form>
+        </div>
+
+        <!-- Why RATEL Exists Tab -->
+        <div class="tab-panel" id="panel-why_ratel_exists">
+            <form method="POST" action="{% url 'dashboard_landing_save' %}" enctype="multipart/form-data" class="editor-form">
+                {% csrf_token %}
+                <input type="hidden" name="section_key" value="why_ratel_exists">
+                <input type="hidden" name="content_id" value="{{ sections.why_ratel_exists.id|default:'' }}">
+                <input type="hidden" name="existing_image_url" value="{{ sections.why_ratel_exists.image_url|default:'' }}">
+
+                <div class="form-grid">
+                    <div class="form-main">
+                        <div class="form-row">
+                            <div class="form-group"><label class="form-label">Section Title</label><input type="text" name="title" class="form-input" value="{{ sections.why_ratel_exists.title|default:'Why RATEL Exists' }}"></div>
+                            <div class="form-group"><label class="form-label">Subtitle</label><input type="text" name="subtitle" class="form-input" value="{{ sections.why_ratel_exists.subtitle|default:'Our Purpose' }}"></div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Content <span class="required">*</span></label>
+                            <div class="editor-wrapper"><div id="editor-why_ratel_exists" class="quill-editor"></div><input type="hidden" name="content" id="content-why_ratel_exists"></div>
+                        </div>
+                    </div>
+                    <div class="form-sidebar">
+                        <div class="form-group">
+                            <label class="form-label">Section Image</label>
+                            <div class="image-upload" onclick="document.getElementById('image-why_ratel_exists').click()">
+                                {% if sections.why_ratel_exists.image_url %}<div class="image-preview" id="preview-why_ratel_exists"><img src="{{ sections.why_ratel_exists.image_url }}" alt=""><button type="button" class="remove-image" onclick="event.stopPropagation(); removeImage('why_ratel_exists')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg></button></div>{% else %}<div class="upload-placeholder" id="placeholder-why_ratel_exists"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg><span>Upload Image</span></div>{% endif %}
+                                <input type="file" name="image" id="image-why_ratel_exists" accept="image/*" style="display:none" onchange="previewImage(this, 'why_ratel_exists')">
+                            </div>
+                        </div>
+                        <div class="status-card"><div class="status-row"><span class="status-label">Status</span><span class="status-value {% if sections.why_ratel_exists %}active{% else %}draft{% endif %}">{% if sections.why_ratel_exists %}Active{% else %}Not Set{% endif %}</span></div></div>
+                    </div>
+                </div>
+                <div class="form-actions"><button type="submit" class="btn-save"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Save Section</button></div>
+            </form>
+        </div>
+
+        <!-- What We Stand Against Tab -->
+        <div class="tab-panel" id="panel-what_we_stand_against">
+            <form method="POST" action="{% url 'dashboard_landing_save' %}" enctype="multipart/form-data" class="editor-form">
+                {% csrf_token %}
+                <input type="hidden" name="section_key" value="what_we_stand_against">
+                <input type="hidden" name="content_id" value="{{ sections.what_we_stand_against.id|default:'' }}">
+                <input type="hidden" name="existing_image_url" value="{{ sections.what_we_stand_against.image_url|default:'' }}">
+
+                <div class="form-grid">
+                    <div class="form-main">
+                        <div class="form-row">
+                            <div class="form-group"><label class="form-label">Section Title</label><input type="text" name="title" class="form-input" value="{{ sections.what_we_stand_against.title|default:'What We Stand Against' }}"></div>
+                            <div class="form-group"><label class="form-label">Subtitle</label><input type="text" name="subtitle" class="form-input" value="{{ sections.what_we_stand_against.subtitle|default:'Our Opposition' }}"></div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Content <span class="required">*</span></label>
+                            <div class="editor-wrapper"><div id="editor-what_we_stand_against" class="quill-editor"></div><input type="hidden" name="content" id="content-what_we_stand_against"></div>
+                        </div>
+                    </div>
+                    <div class="form-sidebar">
+                        <div class="form-group">
+                            <label class="form-label">Section Image</label>
+                            <div class="image-upload" onclick="document.getElementById('image-what_we_stand_against').click()">
+                                {% if sections.what_we_stand_against.image_url %}<div class="image-preview" id="preview-what_we_stand_against"><img src="{{ sections.what_we_stand_against.image_url }}" alt=""><button type="button" class="remove-image" onclick="event.stopPropagation(); removeImage('what_we_stand_against')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg></button></div>{% else %}<div class="upload-placeholder" id="placeholder-what_we_stand_against"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg><span>Upload Image</span></div>{% endif %}
+                                <input type="file" name="image" id="image-what_we_stand_against" accept="image/*" style="display:none" onchange="previewImage(this, 'what_we_stand_against')">
+                            </div>
+                        </div>
+                        <div class="status-card"><div class="status-row"><span class="status-label">Status</span><span class="status-value {% if sections.what_we_stand_against %}active{% else %}draft{% endif %}">{% if sections.what_we_stand_against %}Active{% else %}Not Set{% endif %}</span></div></div>
+                    </div>
+                </div>
+                <div class="form-actions"><button type="submit" class="btn-save"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Save Section</button></div>
+            </form>
+        </div>
+
+        <!-- Calls to Action Tab -->
+        <div class="tab-panel" id="panel-calls_to_action">
+            <form method="POST" action="{% url 'dashboard_landing_save' %}" enctype="multipart/form-data" class="editor-form">
+                {% csrf_token %}
+                <input type="hidden" name="section_key" value="calls_to_action">
+                <input type="hidden" name="content_id" value="{{ sections.calls_to_action.id|default:'' }}">
+
+                <div class="form-grid single-col">
+                    <div class="form-main full-width">
+                        <div class="form-row">
+                            <div class="form-group"><label class="form-label">Section Title</label><input type="text" name="title" class="form-input" value="{{ sections.calls_to_action.title|default:'Take Action' }}"></div>
+                            <div class="form-group"><label class="form-label">Subtitle</label><input type="text" name="subtitle" class="form-input" value="{{ sections.calls_to_action.subtitle|default:'Join The Movement' }}"></div>
+                        </div>
+                        <div class="cta-info-box">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                            <div><strong>Tip:</strong> Create 3 CTA cards. Use H4 for titles, then add a description paragraph and a link for each action item.</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Content <span class="required">*</span></label>
+                            <div class="editor-wrapper tall"><div id="editor-calls_to_action" class="quill-editor"></div><input type="hidden" name="content" id="content-calls_to_action"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-actions"><button type="submit" class="btn-save"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Save Section</button></div>
+            </form>
+        </div>
+
+        <!-- About Ratel Tab -->
+        <div class="tab-panel" id="panel-about_ratel">
+            <div class="ap-panel-header">
+                <a href="{% url 'about_ratel' %}" target="_blank" class="view-live-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+                    View live: About Ratel
+                </a>
+            </div>
+            <p class="ap-panel-hint">Edit sections below. Changes appear on <a href="{% url 'about_ratel' %}" target="_blank">/about/ratel/</a>.</p>
+            {% for section_key, section in about_ratel.items %}
+            <div class="ap-section-card">
+                <h3 class="ap-section-heading">{{ section.title|default:section_key }}</h3>
+                <form class="ap-section-form" method="post" action="{% url 'dashboard_about_pages_save' %}" enctype="multipart/form-data" data-page="about_ratel">
+                    {% csrf_token %}
+                    <input type="hidden" name="page_key" value="about_ratel">
+                    <input type="hidden" name="section_key" value="{{ section_key }}">
+                    <input type="hidden" name="content_id" value="{{ section.id|default:'' }}">
+                    <input type="hidden" name="existing_image_url" value="{{ section.image_url|default:'' }}">
+                    <textarea class="ap-initial-content" style="display:none">{{ section.content|default:"" }}</textarea>
+                    <div class="form-row">
+                        <div class="form-group"><label class="form-label">Title</label><input type="text" name="title" class="form-input" value="{{ section.title|default:'' }}"></div>
+                        <div class="form-group"><label class="form-label">Subtitle</label><input type="text" name="subtitle" class="form-input" value="{{ section.subtitle|default:'' }}"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label class="form-label">Icon</label><input type="text" name="icon" class="form-input" value="{{ section.icon|default:'' }}" placeholder="e.g. shield, book-open"></div>
+                        <div class="form-group"><label class="form-label">Highlight text</label><input type="text" name="highlight_text" class="form-input" value="{{ section.highlight_text|default:'' }}"></div>
+                    </div>
+                    <div class="form-group"><label class="form-label">Section order</label><input type="number" name="section_order" class="form-input" value="{{ section.section_order|default:0 }}" min="0"></div>
+                    <div class="form-group">
+                        <label class="form-label">Content</label>
+                        <div class="editor-wrapper"><div class="quill-editor ap-editor"></div><input type="hidden" name="content" class="ap-content-input"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Image</label>
+                        <div class="image-upload ap-image-upload" onclick="this.querySelector('input[type=file]').click()">
+                            {% if section.image_url %}<div class="image-preview"><img src="{{ section.image_url }}" alt=""><button type="button" class="remove-image ap-remove-img">×</button></div>{% else %}<div class="upload-placeholder"><span>Upload Image</span></div>{% endif %}
+                            <input type="file" name="image" accept="image/*" style="display:none">
+                        </div>
+                    </div>
+                    <div class="form-actions"><button type="submit" class="btn-save ap-save-btn">Save this section</button></div>
+                </form>
+            </div>
+            {% empty %}
+            <p class="ap-empty">No About Ratel sections yet. Add content in Supabase <code>about_pages</code> with <code>page_key = 'about_ratel'</code> or they will appear here once saved.</p>
+            {% endfor %}
+        </div>
+
+        <!-- Mission & Vision Tab -->
+        <div class="tab-panel" id="panel-mission_vision">
+            <div class="ap-panel-header">
+                <a href="{% url 'mission_vision' %}" target="_blank" class="view-live-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+                    View live: Mission & Vision
+                </a>
+            </div>
+            <p class="ap-panel-hint">Edit sections below. Changes appear on <a href="{% url 'mission_vision' %}" target="_blank">/about/mission-vision/</a>.</p>
+            {% for section_key, section in mission_vision.items %}
+            <div class="ap-section-card">
+                <h3 class="ap-section-heading">{{ section.title|default:section_key }}</h3>
+                <form class="ap-section-form" method="post" action="{% url 'dashboard_about_pages_save' %}" enctype="multipart/form-data" data-page="mission_vision">
+                    {% csrf_token %}
+                    <input type="hidden" name="page_key" value="mission_vision">
+                    <input type="hidden" name="section_key" value="{{ section_key }}">
+                    <input type="hidden" name="content_id" value="{{ section.id|default:'' }}">
+                    <input type="hidden" name="existing_image_url" value="{{ section.image_url|default:'' }}">
+                    <textarea class="ap-initial-content" style="display:none">{{ section.content|default:"" }}</textarea>
+                    <div class="form-row">
+                        <div class="form-group"><label class="form-label">Title</label><input type="text" name="title" class="form-input" value="{{ section.title|default:'' }}"></div>
+                        <div class="form-group"><label class="form-label">Subtitle</label><input type="text" name="subtitle" class="form-input" value="{{ section.subtitle|default:'' }}"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label class="form-label">Icon</label><input type="text" name="icon" class="form-input" value="{{ section.icon|default:'' }}" placeholder="e.g. compass, eye"></div>
+                        <div class="form-group"><label class="form-label">Highlight text</label><input type="text" name="highlight_text" class="form-input" value="{{ section.highlight_text|default:'' }}"></div>
+                    </div>
+                    <div class="form-group"><label class="form-label">Section order</label><input type="number" name="section_order" class="form-input" value="{{ section.section_order|default:0 }}" min="0"></div>
+                    <div class="form-group">
+                        <label class="form-label">Content</label>
+                        <div class="editor-wrapper"><div class="quill-editor ap-editor"></div><input type="hidden" name="content" class="ap-content-input"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Image</label>
+                        <div class="image-upload ap-image-upload" onclick="this.querySelector('input[type=file]').click()">
+                            {% if section.image_url %}<div class="image-preview"><img src="{{ section.image_url }}" alt=""><button type="button" class="remove-image ap-remove-img">×</button></div>{% else %}<div class="upload-placeholder"><span>Upload Image</span></div>{% endif %}
+                            <input type="file" name="image" accept="image/*" style="display:none">
+                        </div>
+                    </div>
+                    <div class="form-actions"><button type="submit" class="btn-save ap-save-btn">Save this section</button></div>
+                </form>
+            </div>
+            {% empty %}
+            <p class="ap-empty">No Mission & Vision sections yet. Add content in Supabase <code>about_pages</code> with <code>page_key = 'mission_vision'</code> or they will appear here once saved.</p>
+            {% endfor %}
+        </div>
+
+    </div>
+</div>
+
+<link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+<style>
+.content-manager { max-width: 1200px; margin: 0 auto; }
+
+.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; padding-bottom: 24px; border-bottom: 1px solid #e5e7eb; }
+.page-title { font-size: 1.75rem; font-weight: 700; color: #111827; margin: 0 0 6px 0; }
+.page-subtitle { font-size: 0.95rem; color: #6b7280; margin: 0; }
+.view-live-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; background: #fff; color: #374151; border: 1px solid #d1d5db; border-radius: 10px; font-size: 0.9rem; font-weight: 500; text-decoration: none; transition: all 0.2s; }
+.view-live-btn:hover { background: #f9fafb; border-color: #9ca3af; color: #111827; }
+
+.tabs-nav { display: flex; gap: 4px; background: #f3f4f6; padding: 6px; border-radius: 14px 14px 0 0; }
+.tab-btn { display: flex; align-items: center; gap: 10px; padding: 14px 24px; background: transparent; border: none; border-radius: 10px; font-size: 0.9rem; font-weight: 500; color: #6b7280; cursor: pointer; transition: all 0.2s; flex: 1; justify-content: center; }
+.tab-btn:hover { background: rgba(255,255,255,0.5); color: #374151; }
+.tab-btn.active { background: #fff; color: #111827; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.tab-btn svg { opacity: 0.7; }
+.tab-btn.active svg { opacity: 1; }
+
+.tabs-content { background: #fff; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 14px 14px; }
+.tab-panel { display: none; padding: 32px; }
+.tab-panel.active { display: block; }
+
+.form-grid { display: grid; grid-template-columns: 1fr 320px; gap: 32px; }
+.form-grid.single-col { grid-template-columns: 1fr; }
+.form-main.full-width { max-width: 100%; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+.form-group { margin-bottom: 24px; }
+.form-label { display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 10px; }
+.required { color: #dc2626; }
+.form-input { width: 100%; padding: 14px 16px; border: 1.5px solid #e5e7eb; border-radius: 10px; font-size: 0.95rem; font-family: inherit; transition: all 0.2s; background: #fff; box-sizing: border-box; }
+.form-input:focus { outline: none; border-color: #111827; box-shadow: 0 0 0 3px rgba(17,24,39,0.08); }
+.form-hint { font-size: 0.8rem; color: #9ca3af; margin-top: 8px; }
+
+.editor-wrapper { border: 1.5px solid #e5e7eb; border-radius: 10px; overflow: hidden; background: #fff; transition: all 0.2s; }
+.editor-wrapper:focus-within { border-color: #111827; box-shadow: 0 0 0 3px rgba(17,24,39,0.08); }
+.editor-wrapper.tall .quill-editor { min-height: 350px; }
+.quill-editor { min-height: 280px; }
+.ql-toolbar.ql-snow { border: none !important; border-bottom: 1px solid #e5e7eb !important; background: #f9fafb; padding: 12px 16px !important; }
+.ql-container.ql-snow { border: none !important; font-size: 0.95rem; font-family: inherit; }
+.ql-editor { padding: 20px !important; min-height: 240px; line-height: 1.7; }
+.ql-editor p { margin-bottom: 1em; }
+.ql-editor ul, .ql-editor ol { padding-left: 1.5em; margin-bottom: 1em; }
+.ql-editor li { margin-bottom: 0.5em; }
+
+.image-upload { border: 2px dashed #e5e7eb; border-radius: 12px; overflow: hidden; cursor: pointer; transition: all 0.2s; background: #fafafa; }
+.image-upload:hover { border-color: #d1d5db; background: #f5f5f5; }
+.upload-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; color: #9ca3af; }
+.upload-placeholder svg { margin-bottom: 12px; opacity: 0.6; }
+.upload-placeholder span { font-size: 0.85rem; font-weight: 500; }
+.image-preview { position: relative; }
+.image-preview img { width: 100%; height: 180px; object-fit: cover; }
+.remove-image { position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.6); color: #fff; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+.remove-image:hover { background: #dc2626; }
+
+.status-card { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; margin-top: 20px; }
+.status-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; }
+.status-row:not(:last-child) { border-bottom: 1px solid #e5e7eb; }
+.status-label { font-size: 0.85rem; color: #6b7280; }
+.status-value { font-size: 0.85rem; font-weight: 600; color: #374151; }
+.status-value.active { color: #059669; }
+.status-value.draft { color: #d97706; }
+
+.cta-info-box { display: flex; gap: 14px; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 10px; padding: 16px 20px; margin-bottom: 24px; font-size: 0.85rem; color: #0369a1; }
+.cta-info-box svg { flex-shrink: 0; margin-top: 2px; }
+
+.form-actions { display: flex; justify-content: flex-end; padding-top: 24px; border-top: 1px solid #e5e7eb; margin-top: 32px; }
+.btn-save { display: inline-flex; align-items: center; gap: 10px; padding: 14px 28px; background: #111827; color: #fff; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+.btn-save:hover { background: #1f2937; }
+
+@media (max-width: 1024px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .form-sidebar { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .status-card { margin-top: 0; }
+}
+/* About Pages (About Ratel / Mission & Vision) */
+.ap-panel-header { margin-bottom: 12px; }
+.ap-panel-hint { font-size: 0.9rem; color: #6b7280; margin-bottom: 24px; }
+.ap-panel-hint a { color: #111827; text-decoration: underline; }
+.ap-section-card { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+.ap-section-heading { font-size: 1.1rem; font-weight: 600; color: #111827; margin: 0 0 16px 0; }
+.ap-editor { min-height: 200px; }
+.ap-empty { color: #6b7280; font-size: 0.9rem; padding: 24px; background: #f3f4f6; border-radius: 10px; }
+.ap-empty code { background: #e5e7eb; padding: 2px 6px; border-radius: 4px; font-size: 0.85em; }
+.ap-toast { position: fixed; bottom: 24px; right: 24px; padding: 14px 20px; border-radius: 10px; font-weight: 500; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+.ap-toast.success { background: #059669; color: #fff; }
+.ap-toast.error { background: #dc2626; color: #fff; }
+
+@media (max-width: 768px) {
+    .page-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .tabs-nav { flex-wrap: wrap; }
+    .tab-btn { flex: none; padding: 12px 16px; font-size: 0.85rem; }
+    .tab-btn svg { display: none; }
+    .form-row { grid-template-columns: 1fr; }
+    .form-sidebar { grid-template-columns: 1fr; }
+    .tab-panel { padding: 20px; }
+}
+</style>
+
+<script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Tab switching
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabPanels = document.querySelectorAll('.tab-panel');
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tabId = btn.dataset.tab;
+            tabBtns.forEach(b => b.classList.remove('active'));
+            tabPanels.forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('panel-' + tabId).classList.add('active');
+        });
+    });
+
+    // Quill toolbar
+    const toolbarOptions = [
+        [{ 'header': [2, 3, 4, false] }],
+        ['bold', 'italic', 'underline'],
+        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+        ['link'],
+        ['clean']
+    ];
+
+    // Initial content from Django
+    const initialContent = {
+        manifesto: `{{ sections.manifesto.content|default:"<p>We stand for truth in an age of deception.</p><p>We fight for justice where corruption thrives.</p><p>We amplify voices silenced by power.</p><p>We document what they want forgotten.</p><p>We build bridges where walls divide.</p><p><strong>We are the ratel — fearless, relentless, unstoppable.</strong></p>"|escapejs }}`,
+        why_ratel_exists: `{{ sections.why_ratel_exists.content|default:"<p>In a world where truth is twisted and voices are silenced, RATEL emerged as a beacon of resistance.</p><ul><li><strong>Accountability Matters</strong> — Those in power must answer to the people</li><li><strong>Truth Requires Defenders</strong> — Facts need champions</li><li><strong>Unity Creates Change</strong> — Together, we are stronger</li></ul>"|escapejs }}`,
+        what_we_stand_against: `{{ sections.what_we_stand_against.content|default:"<p>RATEL stands firmly against forces that undermine democracy:</p><ul><li><strong>Corruption</strong> — The abuse of power for personal gain</li><li><strong>Censorship</strong> — The suppression of truth</li><li><strong>Injustice</strong> — Systems favoring the powerful</li><li><strong>Apathy</strong> — The comfort of looking away</li></ul>"|escapejs }}`,
+        calls_to_action: `{{ sections.calls_to_action.content|default:"<h4>Understand the Movement</h4><p>Learn about our history, mission, and principles.</p><p><a href='/about/'>Learn More</a></p><h4>Watch the Evidence</h4><p>Access documented evidence and investigations.</p><p><a href='/media-vault/'>View Media</a></p><h4>Become a Member</h4><p>Join thousands who refuse to stay silent.</p><p><a href='/membership/'>Join Now</a></p>"|escapejs }}`
+    };
+
+    // Initialize editors
+    const sections = ['manifesto', 'why_ratel_exists', 'what_we_stand_against', 'calls_to_action'];
+    const editors = {};
+
+    sections.forEach(section => {
+        const editorEl = document.getElementById('editor-' + section);
+        if (editorEl) {
+            editors[section] = new Quill('#editor-' + section, {
+                theme: 'snow',
+                modules: { toolbar: toolbarOptions },
+                placeholder: 'Enter content here...'
+            });
+            if (initialContent[section]) {
+                editors[section].root.innerHTML = initialContent[section];
+            }
+            editors[section].on('text-change', function() {
+                document.getElementById('content-' + section).value = editors[section].root.innerHTML;
+            });
+            document.getElementById('content-' + section).value = editors[section].root.innerHTML;
+        }
+    });
+
+    // Form submission
+    document.querySelectorAll('.editor-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            sections.forEach(section => {
+                if (editors[section]) {
+                    document.getElementById('content-' + section).value = editors[section].root.innerHTML;
+                }
+            });
+        });
+    });
+
+    // About Pages: init Quill for each .ap-editor
+    const apToolbar = [[{ 'header': [2, 3, 4, false] }], ['bold', 'italic'], [{'list': 'ordered'}, {'list': 'bullet'}], ['link'], ['clean']];
+    document.querySelectorAll('.ap-section-form').forEach(form => {
+        const initialEl = form.querySelector('.ap-initial-content');
+        const editorEl = form.querySelector('.ap-editor');
+        const contentInput = form.querySelector('.ap-content-input');
+        if (!editorEl || !contentInput) return;
+        const q = new Quill(editorEl, { theme: 'snow', modules: { toolbar: apToolbar }, placeholder: 'Content...' });
+        if (initialEl && initialEl.value) q.root.innerHTML = initialEl.value;
+        contentInput.value = q.root.innerHTML;
+        q.on('text-change', () => { contentInput.value = q.root.innerHTML; });
+    });
+
+    // About Pages: image preview on file select
+    document.querySelectorAll('.ap-image-upload input[type=file]').forEach(input => {
+        input.addEventListener('change', function(e) {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const uploadArea = input.closest('.ap-image-upload');
+                    const placeholder = uploadArea.querySelector('.upload-placeholder');
+                    let preview = uploadArea.querySelector('.image-preview');
+                    if (placeholder) placeholder.remove();
+                    if (!preview) {
+                        preview = document.createElement('div');
+                        preview.className = 'image-preview';
+                        uploadArea.insertBefore(preview, uploadArea.firstChild);
+                    }
+                    preview.innerHTML = `<img src="${e.target.result}" alt="Preview"><button type="button" class="remove-image ap-remove-img" onclick="this.closest('.ap-image-upload').querySelector('input[type=file]').value=''; this.closest('.image-preview')?.remove(); const ph = document.createElement('div'); ph.className='upload-placeholder'; ph.innerHTML='<span>Upload Image</span>'; this.closest('.ap-image-upload').appendChild(ph);">×</button>`;
+                };
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+    });
+
+    // About Pages: submit via fetch (endpoint returns JSON)
+    document.querySelectorAll('.ap-section-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = form.querySelector('.ap-save-btn');
+            const origText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+            const formData = new FormData(form);
+            fetch(form.action, { method: 'POST', body: formData, headers: { 'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value }, credentials: 'same-origin' })
+                .then(r => r.json())
+                .then(data => {
+                    btn.disabled = false;
+                    btn.textContent = origText;
+                    const toast = document.createElement('div');
+                    toast.className = 'ap-toast ' + (data.success ? 'success' : 'error');
+                    toast.textContent = data.success ? (data.message || 'Saved!') : (data.error || 'Save failed');
+                    document.body.appendChild(toast);
+                    setTimeout(() => toast.remove(), 3500);
+                    if (data.success) {
+                        // Update image preview if new image_url returned
+                        if (data.image_url) {
+                            const uploadArea = form.querySelector('.ap-image-upload');
+                            const placeholder = uploadArea?.querySelector('.upload-placeholder');
+                            let preview = uploadArea?.querySelector('.image-preview');
+                            if (placeholder) placeholder.remove();
+                            if (!preview && uploadArea) {
+                                preview = document.createElement('div');
+                                preview.className = 'image-preview';
+                                uploadArea.insertBefore(preview, uploadArea.firstChild);
+                            }
+                            if (preview) {
+                                preview.innerHTML = `<img src="${data.image_url}" alt="Preview"><button type="button" class="remove-image ap-remove-img" onclick="this.closest('.ap-image-upload').querySelector('input[type=file]').value=''; this.closest('.image-preview')?.remove(); const ph = document.createElement('div'); ph.className='upload-placeholder'; ph.innerHTML='<span>Upload Image</span>'; this.closest('.ap-image-upload').appendChild(ph);">×</button>`;
+                            }
+                            // Update hidden existing_image_url
+                            const hiddenUrl = form.querySelector('input[name="existing_image_url"]');
+                            if (hiddenUrl) hiddenUrl.value = data.image_url;
+                        }
+                        // Reload after short delay to show updated data
+                        setTimeout(() => window.location.reload(), 1000);
+                    }
+                })
+                .catch(err => {
+                    btn.disabled = false;
+                    btn.textContent = origText;
+                    const toast = document.createElement('div');
+                    toast.className = 'ap-toast error';
+                    toast.textContent = 'Network error. Try again.';
+                    document.body.appendChild(toast);
+                    setTimeout(() => toast.remove(), 3500);
+                });
+        });
+    });
+});
+
+function previewImage(input, section) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const uploadArea = input.closest('.image-upload');
+            const placeholder = uploadArea.querySelector('.upload-placeholder');
+            let preview = uploadArea.querySelector('.image-preview');
+            if (placeholder) placeholder.remove();
+            if (!preview) {
+                preview = document.createElement('div');
+                preview.className = 'image-preview';
+                preview.id = 'preview-' + section;
+                uploadArea.insertBefore(preview, uploadArea.firstChild);
+            }
+            preview.innerHTML = `<img src="${e.target.result}" alt="Preview"><button type="button" class="remove-image" onclick="event.stopPropagation(); removeImage('${section}')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg></button>`;
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function removeImage(section) {
+    const input = document.getElementById('image-' + section);
+    const uploadArea = input.closest('.image-upload');
+    const preview = uploadArea.querySelector('.image-preview');
+    if (preview) preview.remove();
+    input.value = '';
+    const form = input.closest('form');
+    const hiddenUrl = form.querySelector('input[name="existing_image_url"]');
+    if (hiddenUrl) hiddenUrl.value = '';
+    if (!uploadArea.querySelector('.upload-placeholder')) {
+        const placeholder = document.createElement('div');
+        placeholder.className = 'upload-placeholder';
+        placeholder.id = 'placeholder-' + section;
+        placeholder.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg><span>Upload Image</span>`;
+        uploadArea.insertBefore(placeholder, uploadArea.firstChild);
+    }
+}
+</script>
+{% endblock %}

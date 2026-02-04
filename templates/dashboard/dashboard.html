@@ -1,0 +1,549 @@
+{% extends "dashboard/base_dashboard.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-header {
+        margin-bottom: 1.5rem;
+    }
+    .dashboard-header h1 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0 0 0.25rem 0;
+    }
+    .dashboard-header p {
+        color: #64748b;
+        font-size: 0.9rem;
+        margin: 0;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+    @media (max-width: 1200px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    @media (max-width: 640px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .stat-card {
+        background: #fff;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        padding: 1.25rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    .stat-icon i {
+        width: 24px;
+        height: 24px;
+    }
+    .stat-icon.blue { background: #dbeafe; color: #2563eb; }
+    .stat-icon.green { background: #dcfce7; color: #16a34a; }
+    .stat-icon.purple { background: #f3e8ff; color: #9333ea; }
+    .stat-icon.orange { background: #ffedd5; color: #ea580c; }
+
+    .stat-content {
+        flex: 1;
+        min-width: 0;
+    }
+    .stat-label {
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: #64748b;
+        margin-bottom: 0.25rem;
+    }
+    .stat-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #1e293b;
+        line-height: 1.2;
+    }
+    .stat-change {
+        font-size: 0.75rem;
+        margin-top: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    .stat-change.positive { color: #16a34a; }
+    .stat-change.neutral { color: #64748b; }
+    .stat-change i { width: 14px; height: 14px; }
+
+    /* Content Grid */
+    .content-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    @media (max-width: 1024px) {
+        .content-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .content-card {
+        background: #fff;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+    }
+    .content-card-header {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .content-card-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 0;
+    }
+    .content-card-title i {
+        width: 18px;
+        height: 18px;
+        color: #64748b;
+    }
+    .content-card-action {
+        font-size: 0.8rem;
+        color: #3b82f6;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .content-card-action:hover {
+        text-decoration: underline;
+    }
+    .content-card-body {
+        padding: 0;
+    }
+
+    /* Recent Members List */
+    .member-list-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #f1f5f9;
+        transition: background 0.2s;
+    }
+    .member-list-item:last-child {
+        border-bottom: none;
+    }
+    .member-list-item:hover {
+        background: #f8fafc;
+    }
+    .member-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #64748b;
+        flex-shrink: 0;
+        overflow: hidden;
+    }
+    .member-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .member-info {
+        flex: 1;
+        min-width: 0;
+    }
+    .member-name {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #1e293b;
+        margin: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .member-meta {
+        font-size: 0.75rem;
+        color: #64748b;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .member-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.65rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    .member-badge.nigerian { background: #dcfce7; color: #166534; }
+    .member-badge.foreigner { background: #dbeafe; color: #1e40af; }
+    .member-time {
+        font-size: 0.7rem;
+        color: #94a3b8;
+        white-space: nowrap;
+    }
+
+    /* Announcements List */
+    .announcement-item {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .announcement-item:last-child {
+        border-bottom: none;
+    }
+    .announcement-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+    }
+    .announcement-badges {
+        display: flex;
+        gap: 0.35rem;
+    }
+    .ann-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.65rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    .ann-badge.all { background: #f1f5f9; color: #475569; }
+    .ann-badge.nigerians { background: #dcfce7; color: #166534; }
+    .ann-badge.foreigners { background: #dbeafe; color: #1e40af; }
+    .ann-badge.high { background: #fee2e2; color: #991b1b; }
+    .announcement-date {
+        font-size: 0.7rem;
+        color: #94a3b8;
+    }
+    .announcement-title {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    /* Quick Actions */
+    .quick-actions-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        padding: 1.25rem;
+    }
+    @media (max-width: 640px) {
+        .quick-actions-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    .quick-action-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    .quick-action-btn:hover {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+    }
+    .quick-action-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+    }
+    .quick-action-icon i {
+        width: 18px;
+        height: 18px;
+        color: #475569;
+    }
+    .quick-action-text {
+        flex: 1;
+    }
+    .quick-action-title {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #1e293b;
+        margin: 0;
+    }
+    .quick-action-desc {
+        font-size: 0.75rem;
+        color: #64748b;
+        margin: 0;
+    }
+
+    /* Empty State */
+    .empty-state {
+        padding: 2rem 1.25rem;
+        text-align: center;
+        color: #94a3b8;
+    }
+    .empty-state i {
+        width: 40px;
+        height: 40px;
+        margin-bottom: 0.5rem;
+        opacity: 0.5;
+    }
+    .empty-state p {
+        margin: 0;
+        font-size: 0.85rem;
+    }
+
+    /* Full Width Card */
+    .full-width-card {
+        grid-column: 1 / -1;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Dashboard Header -->
+<div class="dashboard-header">
+    <h1>Admin Dashboard</h1>
+    <p>Welcome to the Ratel Movement administration panel</p>
+</div>
+
+<!-- Stats Grid -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon blue">
+            <i data-lucide="users"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-label">Total Members</div>
+            <div class="stat-value">{{ total_members|default:"0" }}</div>
+            <div class="stat-change neutral">
+                <i data-lucide="users"></i>
+                All registered members
+            </div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon green">
+            <i data-lucide="map-pin"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-label">Nigerian Members</div>
+            <div class="stat-value">{{ nigerian_members|default:"0" }}</div>
+            <div class="stat-change positive">
+                <i data-lucide="flag"></i>
+                Based in Nigeria
+            </div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon purple">
+            <i data-lucide="globe"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-label">Foreign Members</div>
+            <div class="stat-value">{{ foreign_members|default:"0" }}</div>
+            <div class="stat-change neutral">
+                <i data-lucide="plane"></i>
+                International members
+            </div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon orange">
+            <i data-lucide="megaphone"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-label">Announcements</div>
+            <div class="stat-value">{{ announcements_count|default:"0" }}</div>
+            <div class="stat-change neutral">
+                <i data-lucide="mail"></i>
+                {{ communications_count|default:"0" }} communications
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Content Grid -->
+<div class="content-grid">
+    <!-- Recent Members -->
+    <div class="content-card">
+        <div class="content-card-header">
+            <h3 class="content-card-title">
+                <i data-lucide="user-plus"></i>
+                Recent Members
+            </h3>
+            <a href="{% url 'dashboard_membership' %}" class="content-card-action">View All</a>
+        </div>
+        <div class="content-card-body">
+            {% if recent_members %}
+                {% for member in recent_members %}
+                <div class="member-list-item">
+                    <div class="member-avatar">
+                        {% if member.profile_image_url %}
+                            <img src="{{ member.profile_image_url }}" alt="{{ member.full_name }}">
+                        {% else %}
+                            {{ member.full_name|slice:":1"|upper }}
+                        {% endif %}
+                    </div>
+                    <div class="member-info">
+                        <p class="member-name">{{ member.full_name }}</p>
+                        <div class="member-meta">
+                            <span>{{ member.email|truncatechars:25 }}</span>
+                        </div>
+                    </div>
+                    <span class="member-badge {% if member.based_in_nigeria %}nigerian{% else %}foreigner{% endif %}">
+                        {% if member.based_in_nigeria %}Nigerian{% else %}Foreign{% endif %}
+                    </span>
+                    <span class="member-time">{{ member.created_at|slice:":10" }}</span>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i data-lucide="users"></i>
+                    <p>No members registered yet</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Recent Announcements -->
+    <div class="content-card">
+        <div class="content-card-header">
+            <h3 class="content-card-title">
+                <i data-lucide="megaphone"></i>
+                Recent Announcements
+            </h3>
+            <a href="{% url 'dashboard_announcements' %}" class="content-card-action">Manage</a>
+        </div>
+        <div class="content-card-body">
+            {% if recent_announcements %}
+                {% for ann in recent_announcements %}
+                <div class="announcement-item">
+                    <div class="announcement-header">
+                        <div class="announcement-badges">
+                            {% if ann.recipient_type == 'all_members' %}
+                                <span class="ann-badge all">All Members</span>
+                            {% elif ann.recipient_type == 'nigerians' %}
+                                <span class="ann-badge nigerians">Nigerians</span>
+                            {% elif ann.recipient_type == 'foreigners' %}
+                                <span class="ann-badge foreigners">Foreigners</span>
+                            {% endif %}
+                            {% if ann.priority == 'high' %}
+                                <span class="ann-badge high">Important</span>
+                            {% endif %}
+                        </div>
+                        <span class="announcement-date">{{ ann.created_at|slice:":10" }}</span>
+                    </div>
+                    <p class="announcement-title">{{ ann.title|truncatechars:50 }}</p>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i data-lucide="megaphone"></i>
+                    <p>No announcements yet</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="content-card full-width-card">
+    <div class="content-card-header">
+        <h3 class="content-card-title">
+            <i data-lucide="zap"></i>
+            Quick Actions
+        </h3>
+    </div>
+    <div class="quick-actions-grid">
+        <a href="{% url 'dashboard_membership' %}" class="quick-action-btn">
+            <div class="quick-action-icon">
+                <i data-lucide="users"></i>
+            </div>
+            <div class="quick-action-text">
+                <p class="quick-action-title">View Members</p>
+                <p class="quick-action-desc">Manage all registered members</p>
+            </div>
+        </a>
+        <a href="{% url 'dashboard_announcements' %}" class="quick-action-btn">
+            <div class="quick-action-icon">
+                <i data-lucide="megaphone"></i>
+            </div>
+            <div class="quick-action-text">
+                <p class="quick-action-title">Create Announcement</p>
+                <p class="quick-action-desc">Send updates to members</p>
+            </div>
+        </a>
+        <a href="{% url 'dashboard_communications' %}" class="quick-action-btn">
+            <div class="quick-action-icon">
+                <i data-lucide="mail"></i>
+            </div>
+            <div class="quick-action-text">
+                <p class="quick-action-title">Secure Communications</p>
+                <p class="quick-action-desc">Send private messages</p>
+            </div>
+        </a>
+        <a href="{% url 'dashboard_media_vault' %}" class="quick-action-btn">
+            <div class="quick-action-icon">
+                <i data-lucide="image"></i>
+            </div>
+            <div class="quick-action-text">
+                <p class="quick-action-title">Media Vault</p>
+                <p class="quick-action-desc">Manage photos and videos</p>
+            </div>
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Initialize Lucide icons
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+});
+</script>
+{% endblock %}

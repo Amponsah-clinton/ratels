@@ -1,0 +1,955 @@
+{% extends "base.html" %}
+
+{% block title %}Leadership - Ratel Movement{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ==================== PAGE LAYOUT ==================== */
+  .leadership-page {
+    background: #f8fafc;
+    min-height: 100vh;
+    padding-top: 60px;
+  }
+
+  .leadership-container {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 0 24px 80px 24px;
+  }
+
+  .leadership-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 48px;
+    align-items: start;
+  }
+
+  /* ==================== HERO SECTION ==================== */
+  .leadership-hero {
+    text-align: center;
+    padding: 40px 0 50px 0;
+    margin-top: 20px;
+  }
+
+  .leadership-hero-label {
+    display: inline-block;
+    padding: 8px 20px;
+    background: #0a0a0a;
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    border-radius: 100px;
+    margin-bottom: 1.5rem;
+  }
+
+  .leadership-hero h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 700;
+    color: #0a0a0a;
+    margin: 0 0 1rem 0;
+    letter-spacing: -0.02em;
+  }
+
+  .leadership-hero p {
+    font-size: 1.1rem;
+    color: #52525b;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  /* ==================== SIDEBAR NAVIGATION ==================== */
+  .leadership-sidebar {
+    position: sticky;
+    top: 100px;
+  }
+
+  .sidebar-nav {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    border: 1px solid #e2e8f0;
+  }
+
+  .sidebar-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    color: #52525b;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+    margin: 2px 0;
+  }
+
+  .sidebar-nav-item:hover {
+    background: #f8fafc;
+    color: #0a0a0a;
+  }
+
+  .sidebar-nav-item.active {
+    background: #fef2f2;
+    color: #dc2626;
+    border-left-color: #dc2626;
+  }
+
+  .sidebar-nav-item svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+
+  .sidebar-nav-item span {
+    flex: 1;
+  }
+
+  /* ==================== MAIN CONTENT ==================== */
+  .leadership-main {
+    min-width: 0;
+  }
+
+  .content-section {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 40px;
+    margin-bottom: 32px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+    border: 1px solid #e2e8f0;
+    scroll-margin-top: 100px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .section-icon {
+    width: 52px;
+    height: 52px;
+    background: #0a0a0a;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .section-icon svg {
+    width: 26px;
+    height: 26px;
+    color: #ffffff;
+  }
+
+  .section-title-group h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0a0a0a;
+    margin: 0 0 6px 0;
+  }
+
+  .section-title-group p {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin: 0;
+  }
+
+  /* ==================== FOUNDING VISION ==================== */
+  .vision-item {
+    padding: 24px 0;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .vision-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .vision-item:first-child {
+    padding-top: 0;
+  }
+
+  .vision-item h3 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #0a0a0a;
+    margin: 0 0 12px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .vision-item h3::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: #dc2626;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .vision-item p {
+    font-size: 0.95rem;
+    color: #52525b;
+    line-height: 1.8;
+    margin: 0;
+    padding-left: 18px;
+  }
+
+  /* ==================== LEADERSHIP COUNCIL ==================== */
+  .council-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+  }
+
+  .council-card {
+    background: #f8fafc;
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+    transition: all 0.3s ease;
+    border: 1px solid #e2e8f0;
+  }
+
+  .council-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+    border-color: transparent;
+  }
+
+  .council-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: #0a0a0a;
+    margin: 0 auto 16px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .council-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .council-avatar svg {
+    width: 40px;
+    height: 40px;
+    color: #ffffff;
+  }
+
+  .council-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #0a0a0a;
+    margin: 0 0 4px 0;
+  }
+
+  .council-position {
+    font-size: 0.85rem;
+    color: #dc2626;
+    font-weight: 500;
+    margin: 0 0 12px 0;
+  }
+
+  .council-bio {
+    font-size: 0.85rem;
+    color: #64748b;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .council-social {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .council-social a {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    transition: all 0.2s ease;
+  }
+
+  .council-social a:hover {
+    background: #0a0a0a;
+    border-color: #0a0a0a;
+    color: #ffffff;
+  }
+
+  .council-social svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* ==================== STRATEGIC COMMITTEES ==================== */
+  .committee-card {
+    background: #f8fafc;
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 20px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+  }
+
+  .committee-card:last-child {
+    margin-bottom: 0;
+  }
+
+  .committee-card:hover {
+    border-color: #0a0a0a;
+  }
+
+  .committee-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .committee-name {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #0a0a0a;
+    margin: 0 0 4px 0;
+  }
+
+  .committee-chair {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin: 0;
+  }
+
+  .committee-chair strong {
+    color: #0a0a0a;
+  }
+
+  .committee-description {
+    font-size: 0.9rem;
+    color: #52525b;
+    line-height: 1.7;
+    margin: 0 0 16px 0;
+  }
+
+  .committee-responsibilities {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .responsibility-tag {
+    padding: 6px 14px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 100px;
+    font-size: 0.8rem;
+    color: #52525b;
+  }
+
+  /* ==================== ADVISORY VOICES ==================== */
+  .advisor-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    padding: 28px;
+    background: #f8fafc;
+    border-radius: 16px;
+    margin-bottom: 20px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+  }
+
+  .advisor-card:last-child {
+    margin-bottom: 0;
+  }
+
+  .advisor-card:hover {
+    border-color: #dc2626;
+  }
+
+  .advisor-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 16px;
+    background: #0a0a0a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .advisor-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .advisor-avatar svg {
+    width: 32px;
+    height: 32px;
+    color: #ffffff;
+  }
+
+  .advisor-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .advisor-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #0a0a0a;
+    margin: 0 0 2px 0;
+  }
+
+  .advisor-title {
+    font-size: 0.85rem;
+    color: #dc2626;
+    font-weight: 500;
+    margin: 0 0 4px 0;
+  }
+
+  .advisor-org {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin: 0 0 12px 0;
+  }
+
+  .advisor-quote {
+    font-size: 0.9rem;
+    color: #52525b;
+    line-height: 1.7;
+    font-style: italic;
+    margin: 0;
+    padding-left: 16px;
+    border-left: 3px solid #dc2626;
+  }
+
+  /* ==================== CODE OF CONDUCT ==================== */
+  .conduct-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 24px 0;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .conduct-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .conduct-item:first-child {
+    padding-top: 0;
+  }
+
+  .conduct-icon {
+    width: 48px;
+    height: 48px;
+    background: #fef2f2;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .conduct-icon svg {
+    width: 24px;
+    height: 24px;
+    color: #dc2626;
+  }
+
+  .conduct-content h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #0a0a0a;
+    margin: 0 0 8px 0;
+  }
+
+  .conduct-content p {
+    font-size: 0.9rem;
+    color: #52525b;
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  /* ==================== EMPTY STATE ==================== */
+  .empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    color: #64748b;
+  }
+
+  .empty-state svg {
+    width: 48px;
+    height: 48px;
+    color: #cbd5e1;
+    margin-bottom: 16px;
+  }
+
+  .empty-state p {
+    font-size: 0.95rem;
+    margin: 0;
+  }
+
+  /* ==================== RESPONSIVE ==================== */
+  @media (max-width: 992px) {
+    .leadership-layout {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+
+    .leadership-sidebar {
+      position: static;
+    }
+
+    .sidebar-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 8px;
+      padding: 12px;
+    }
+
+    .sidebar-nav-item {
+      border-left: none;
+      border-bottom: 3px solid transparent;
+    }
+
+    .sidebar-nav-item.active {
+      border-left-color: transparent;
+      border-bottom-color: #dc2626;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .leadership-page {
+      padding-top: 20px;
+    }
+
+    .leadership-hero {
+      padding: 40px 0 30px 0;
+    }
+
+    .content-section {
+      padding: 28px 20px;
+      border-radius: 16px;
+    }
+
+    .section-header {
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .council-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .advisor-card {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .advisor-quote {
+      border-left: none;
+      padding-left: 0;
+      border-top: 3px solid #dc2626;
+      padding-top: 12px;
+    }
+
+    .sidebar-nav {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .sidebar-nav-item {
+      font-size: 0.8rem;
+      padding: 12px;
+    }
+
+    .sidebar-nav-item svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .leadership-container {
+      padding: 0 16px 60px 16px;
+    }
+
+    .content-section {
+      padding: 24px 16px;
+    }
+
+    .sidebar-nav {
+      grid-template-columns: 1fr;
+    }
+
+    .conduct-item {
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .committee-header {
+      flex-direction: column;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="leadership-page">
+  <!-- Hero Section -->
+  <div class="leadership-hero">
+    <span class="leadership-hero-label">Our Leadership</span>
+    <h1>Guiding the Movement</h1>
+    <p>Meet the dedicated individuals who provide strategic direction, accountability, and vision for the RATEL Movement.</p>
+  </div>
+
+  <div class="leadership-container">
+    <div class="leadership-layout">
+      <!-- Sidebar Navigation -->
+      <aside class="leadership-sidebar">
+        <nav class="sidebar-nav">
+          <a href="#founding-vision" class="sidebar-nav-item active">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            <span>Founding Vision</span>
+          </a>
+          <a href="#leadership-council" class="sidebar-nav-item">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            <span>Leadership Council</span>
+          </a>
+          <a href="#strategic-committees" class="sidebar-nav-item">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="7" height="7" x="3" y="3" rx="1"></rect>
+              <rect width="7" height="7" x="14" y="3" rx="1"></rect>
+              <rect width="7" height="7" x="14" y="14" rx="1"></rect>
+              <rect width="7" height="7" x="3" y="14" rx="1"></rect>
+            </svg>
+            <span>Strategic Committees</span>
+          </a>
+          <a href="#advisory-voices" class="sidebar-nav-item">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span>Advisory Voices</span>
+          </a>
+          <a href="#code-of-conduct" class="sidebar-nav-item">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"></path>
+              <path d="m9 12 2 2 4-4"></path>
+            </svg>
+            <span>Code of Conduct</span>
+          </a>
+        </nav>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="leadership-main">
+        <!-- Founding Vision Section -->
+        <section id="founding-vision" class="content-section">
+          <div class="section-header">
+            <div class="section-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </div>
+            <div class="section-title-group">
+              <h2>Founding Vision</h2>
+              <p>The principles and beliefs that gave birth to our movement</p>
+            </div>
+          </div>
+          <div class="vision-content">
+            {% if founding_vision %}
+              {% for item in founding_vision %}
+              <div class="vision-item">
+                <h3>{{ item.title }}</h3>
+                <p>{{ item.content }}</p>
+              </div>
+              {% endfor %}
+            {% else %}
+              <div class="empty-state">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                <p>Vision content coming soon.</p>
+              </div>
+            {% endif %}
+          </div>
+        </section>
+
+        <!-- Leadership Council Section -->
+        <section id="leadership-council" class="content-section">
+          <div class="section-header">
+            <div class="section-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+            </div>
+            <div class="section-title-group">
+              <h2>Leadership Council</h2>
+              <p>The individuals steering our movement forward</p>
+            </div>
+          </div>
+          {% if leadership_council %}
+          <div class="council-grid">
+            {% for leader in leadership_council %}
+            <div class="council-card">
+              <div class="council-avatar">
+                {% if leader.profile_image_url %}
+                <img src="{{ leader.profile_image_url }}" alt="{{ leader.full_name }}">
+                {% else %}
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                {% endif %}
+              </div>
+              <h3 class="council-name">{{ leader.full_name }}</h3>
+              <p class="council-position">{{ leader.position }}</p>
+              {% if leader.bio %}
+              <p class="council-bio">{{ leader.bio }}</p>
+              {% endif %}
+              {% if leader.email or leader.linkedin_url or leader.twitter_url %}
+              <div class="council-social">
+                {% if leader.email %}
+                <a href="mailto:{{ leader.email }}" title="Email">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="16" x="2" y="4" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>
+                </a>
+                {% endif %}
+                {% if leader.linkedin_url %}
+                <a href="{{ leader.linkedin_url }}" target="_blank" title="LinkedIn">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect width="4" height="12" x="2" y="9"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+                </a>
+                {% endif %}
+                {% if leader.twitter_url %}
+                <a href="{{ leader.twitter_url }}" target="_blank" title="Twitter">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path></svg>
+                </a>
+                {% endif %}
+              </div>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="empty-state">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            <p>Leadership council information coming soon.</p>
+          </div>
+          {% endif %}
+        </section>
+
+        <!-- Strategic Committees Section -->
+        <section id="strategic-committees" class="content-section">
+          <div class="section-header">
+            <div class="section-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="7" height="7" x="3" y="3" rx="1"></rect>
+                <rect width="7" height="7" x="14" y="3" rx="1"></rect>
+                <rect width="7" height="7" x="14" y="14" rx="1"></rect>
+                <rect width="7" height="7" x="3" y="14" rx="1"></rect>
+              </svg>
+            </div>
+            <div class="section-title-group">
+              <h2>Strategic Committees</h2>
+              <p>Specialized teams driving our initiatives</p>
+            </div>
+          </div>
+          {% if strategic_committees %}
+          <div class="committees-list">
+            {% for committee in strategic_committees %}
+            <div class="committee-card">
+              <div class="committee-header">
+                <div>
+                  <h3 class="committee-name">{{ committee.committee_name }}</h3>
+                  {% if committee.chairperson %}
+                  <p class="committee-chair">Chaired by <strong>{{ committee.chairperson }}</strong></p>
+                  {% endif %}
+                </div>
+              </div>
+              {% if committee.description %}
+              <p class="committee-description">{{ committee.description }}</p>
+              {% endif %}
+              {% if committee.responsibilities %}
+              <div class="committee-responsibilities">
+                {% for resp in committee.responsibilities %}
+                <span class="responsibility-tag">{{ resp }}</span>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="empty-state">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect width="7" height="7" x="3" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="14" rx="1"></rect><rect width="7" height="7" x="3" y="14" rx="1"></rect></svg>
+            <p>Committee information coming soon.</p>
+          </div>
+          {% endif %}
+        </section>
+
+        <!-- Advisory Voices Section -->
+        <section id="advisory-voices" class="content-section">
+          <div class="section-header">
+            <div class="section-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </div>
+            <div class="section-title-group">
+              <h2>Advisory Voices</h2>
+              <p>Expert guidance shaping our direction</p>
+            </div>
+          </div>
+          {% if advisory_voices %}
+          <div class="advisors-list">
+            {% for advisor in advisory_voices %}
+            <div class="advisor-card">
+              <div class="advisor-avatar">
+                {% if advisor.profile_image_url %}
+                <img src="{{ advisor.profile_image_url }}" alt="{{ advisor.full_name }}">
+                {% else %}
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                {% endif %}
+              </div>
+              <div class="advisor-content">
+                <h3 class="advisor-name">{{ advisor.full_name }}</h3>
+                {% if advisor.title %}
+                <p class="advisor-title">{{ advisor.title }}</p>
+                {% endif %}
+                {% if advisor.organization %}
+                <p class="advisor-org">{{ advisor.organization }}</p>
+                {% endif %}
+                {% if advisor.quote %}
+                <p class="advisor-quote">"{{ advisor.quote }}"</p>
+                {% endif %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="empty-state">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            <p>Advisory voices information coming soon.</p>
+          </div>
+          {% endif %}
+        </section>
+
+        <!-- Code of Conduct Section -->
+        <section id="code-of-conduct" class="content-section">
+          <div class="section-header">
+            <div class="section-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"></path>
+                <path d="m9 12 2 2 4-4"></path>
+              </svg>
+            </div>
+            <div class="section-title-group">
+              <h2>Code of Conduct</h2>
+              <p>The standards that guide our members</p>
+            </div>
+          </div>
+          {% if code_of_conduct %}
+          <div class="conduct-list">
+            {% for item in code_of_conduct %}
+            <div class="conduct-item">
+              <div class="conduct-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m9 12 2 2 4-4"></path>
+                  <circle cx="12" cy="12" r="10"></circle>
+                </svg>
+              </div>
+              <div class="conduct-content">
+                <h3>{{ item.section_title }}</h3>
+                <p>{{ item.content }}</p>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="empty-state">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"></path><path d="m9 12 2 2 4-4"></path></svg>
+            <p>Code of conduct coming soon.</p>
+          </div>
+          {% endif %}
+        </section>
+      </main>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function() {
+  const navItems = document.querySelectorAll('.sidebar-nav-item');
+  const sections = document.querySelectorAll('.content-section');
+
+  // Smooth scroll for nav items
+  navItems.forEach(item => {
+    item.addEventListener('click', function(e) {
+      e.preventDefault();
+      const targetId = this.getAttribute('href').substring(1);
+      const targetSection = document.getElementById(targetId);
+      if (targetSection) {
+        targetSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  });
+
+  // Update active nav on scroll
+  function updateActiveNav() {
+    let current = '';
+    sections.forEach(section => {
+      const sectionTop = section.offsetTop;
+      const sectionHeight = section.clientHeight;
+      if (window.scrollY >= sectionTop - 150) {
+        current = section.getAttribute('id');
+      }
+    });
+
+    navItems.forEach(item => {
+      item.classList.remove('active');
+      if (item.getAttribute('href') === '#' + current) {
+        item.classList.add('active');
+      }
+    });
+  }
+
+  window.addEventListener('scroll', updateActiveNav);
+  updateActiveNav();
+})();
+</script>
+{% endblock %}

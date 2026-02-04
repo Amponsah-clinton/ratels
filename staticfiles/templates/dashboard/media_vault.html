@@ -1,0 +1,235 @@
+{% extends "dashboard/base_dashboard.html" %}
+
+{% block title %}Media Vault{% endblock %}
+
+{% block content %}
+<div class="md-space-y-6">
+
+    <!-- Page Header -->
+    <div class="md-vault-header">
+        <div class="md-vault-header-content">
+            <h1 class="md-page-title">Media Vault</h1>
+            <p class="md-page-subtitle">Evidence, not noise. Manage all your media assets in one place.</p>
+        </div>
+        <div class="md-vault-header-actions">
+            <button class="md-btn md-btn-outline md-btn-sm" onclick="window.location.reload()">
+                <i data-lucide="refresh-cw" style="width:16px;height:16px;"></i>
+                Refresh
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="md-vault-stats">
+        <a href="{% url 'dashboard_media_videos' %}" class="md-vault-stat-card" style="text-decoration:none;color:inherit;">
+            <div class="md-vault-stat-icon videos">
+                <i data-lucide="video" style="width:24px;height:24px;"></i>
+            </div>
+            <div class="md-vault-stat-content">
+                <div class="md-vault-stat-label">Videos</div>
+                <div class="md-vault-stat-value">{{ video_count|default:"0" }}</div>
+                <div class="md-vault-stat-meta">{{ video_recent|default:"0" }} added this month</div>
+            </div>
+        </a>
+        <a href="{% url 'dashboard_media_audio' %}" class="md-vault-stat-card" style="text-decoration:none;color:inherit;">
+            <div class="md-vault-stat-icon audio">
+                <i data-lucide="mic" style="width:24px;height:24px;"></i>
+            </div>
+            <div class="md-vault-stat-content">
+                <div class="md-vault-stat-label">Audio</div>
+                <div class="md-vault-stat-value">{{ audio_count|default:"0" }}</div>
+                <div class="md-vault-stat-meta">{{ audio_recent|default:"0" }} added this month</div>
+            </div>
+        </a>
+        <a href="{% url 'dashboard_media_images' %}" class="md-vault-stat-card" style="text-decoration:none;color:inherit;">
+            <div class="md-vault-stat-icon images">
+                <i data-lucide="image" style="width:24px;height:24px;"></i>
+            </div>
+            <div class="md-vault-stat-content">
+                <div class="md-vault-stat-label">Images</div>
+                <div class="md-vault-stat-value">{{ image_count|default:"0" }}</div>
+                <div class="md-vault-stat-meta">{{ image_recent|default:"0" }} added this month</div>
+            </div>
+        </a>
+        <a href="{% url 'dashboard_media_documents' %}" class="md-vault-stat-card" style="text-decoration:none;color:inherit;">
+            <div class="md-vault-stat-icon documents">
+                <i data-lucide="file-text" style="width:24px;height:24px;"></i>
+            </div>
+            <div class="md-vault-stat-content">
+                <div class="md-vault-stat-label">Documents</div>
+                <div class="md-vault-stat-value">{{ document_count|default:"0" }}</div>
+                <div class="md-vault-stat-meta">{{ document_recent|default:"0" }} added this month</div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Quick Access Cards -->
+    <div class="md-grid md-grid-2">
+        <!-- Recent Videos -->
+        <div class="md-card">
+            <div class="md-card-header">
+                <div class="md-card-header-row">
+                    <h3 class="md-card-title-lg">Recent Videos</h3>
+                    <a href="{% url 'dashboard_media_videos' %}" class="md-btn md-btn-outline md-btn-sm">View All</a>
+                </div>
+            </div>
+            <div class="md-card-content">
+                {% if recent_videos %}
+                <div class="md-space-y-4">
+                    {% for video in recent_videos %}
+                    <div class="md-media-list-item" style="border:none;padding:0;">
+                        <div class="md-media-list-thumb">
+                            {% if video.thumbnail_url %}
+                            <img src="{{ video.thumbnail_url }}" alt="{{ video.title }}">
+                            {% else %}
+                            <div class="md-media-thumb-placeholder">
+                                <i data-lucide="video"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="md-media-list-content">
+                            <div class="md-media-list-title">{{ video.title }}</div>
+                            <div class="md-media-list-meta">
+                                <span class="md-media-badge {{ video.category }}" style="position:static;">{{ video.category|title }}</span>
+                                <span>{{ video.created_at|date:"M d, Y" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="md-text-muted md-text-sm" style="text-align:center;padding:24px 0;">
+                    <i data-lucide="video-off" style="width:32px;height:32px;opacity:0.5;display:block;margin:0 auto 8px;"></i>
+                    No videos uploaded yet
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Recent Documents -->
+        <div class="md-card">
+            <div class="md-card-header">
+                <div class="md-card-header-row">
+                    <h3 class="md-card-title-lg">Recent Documents</h3>
+                    <a href="{% url 'dashboard_media_documents' %}" class="md-btn md-btn-outline md-btn-sm">View All</a>
+                </div>
+            </div>
+            <div class="md-card-content">
+                {% if recent_documents %}
+                <div class="md-space-y-4">
+                    {% for doc in recent_documents %}
+                    <div class="md-media-list-item" style="border:none;padding:0;">
+                        <div class="md-media-list-thumb" style="background:#f3e8ff;">
+                            <div style="display:flex;align-items:center;justify-content:center;height:100%;color:#9333ea;">
+                                <i data-lucide="file-text" style="width:24px;height:24px;"></i>
+                            </div>
+                        </div>
+                        <div class="md-media-list-content">
+                            <div class="md-media-list-title">{{ doc.title }}</div>
+                            <div class="md-media-list-meta">
+                                <span class="md-media-badge {{ doc.category }}" style="position:static;">{{ doc.category|title }}</span>
+                                <span>{{ doc.created_at|date:"M d, Y" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="md-text-muted md-text-sm" style="text-align:center;padding:24px 0;">
+                    <i data-lucide="file-x" style="width:32px;height:32px;opacity:0.5;display:block;margin:0 auto 8px;"></i>
+                    No documents uploaded yet
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Overview -->
+    <div class="md-card">
+        <div class="md-card-header">
+            <h3 class="md-card-title-lg">Browse by Category</h3>
+        </div>
+        <div class="md-card-content">
+            <div class="md-grid md-grid-4">
+                <!-- Video Categories -->
+                <a href="{% url 'dashboard_media_videos' %}?category=short_clips" class="md-vault-stat-card" style="text-decoration:none;color:inherit;">
+                    <div class="md-vault-stat-icon" style="background:#dbeafe;color:#2563eb;">
+                        <i data-lucide="clapperboard" style="width:20px;height:20px;"></i>
+                    </div>
+                    <div class="md-vault-stat-content">
+                        <div class="md-vault-stat-label">Short Clips</div>
+                        <div class="md-vault-stat-value" style="font-size:18px;">Videos</div>
+                    </div>
+                </a>
+                <a href="{% url 'dashboard_media_videos' %}?category=documentaries" class="md-vault-stat-card" style="text-decoration:none;color:inherit;">
+                    <div class="md-vault-stat-icon" style="background:#fef3c7;color:#d97706;">
+                        <i data-lucide="film" style="width:20px;height:20px;"></i>
+                    </div>
+                    <div class="md-vault-stat-content">
+                        <div class="md-vault-stat-label">Documentaries</div>
+                        <div class="md-vault-stat-value" style="font-size:18px;">Videos</div>
+                    </div>
+                </a>
+                <a href="{% url 'dashboard_media_videos' %}?category=public_addresses" class="md-vault-stat-card" style="text-decoration:none;color:inherit;">
+                    <div class="md-vault-stat-icon" style="background:#dcfce7;color:#16a34a;">
+                        <i data-lucide="megaphone" style="width:20px;height:20px;"></i>
+                    </div>
+                    <div class="md-vault-stat-content">
+                        <div class="md-vault-stat-label">Public Addresses</div>
+                        <div class="md-vault-stat-value" style="font-size:18px;">Videos</div>
+                    </div>
+                </a>
+                <!-- Audio Categories -->
+                <a href="{% url 'dashboard_media_audio' %}?category=interviews" class="md-vault-stat-card" style="text-decoration:none;color:inherit;">
+                    <div class="md-vault-stat-icon" style="background:#fee2e2;color:#dc2626;">
+                        <i data-lucide="mic-2" style="width:20px;height:20px;"></i>
+                    </div>
+                    <div class="md-vault-stat-content">
+                        <div class="md-vault-stat-label">Interviews</div>
+                        <div class="md-vault-stat-value" style="font-size:18px;">Audio</div>
+                    </div>
+                </a>
+                <a href="{% url 'dashboard_media_audio' %}?category=statements" class="md-vault-stat-card" style="text-decoration:none;color:inherit;">
+                    <div class="md-vault-stat-icon" style="background:#e0e7ff;color:#4f46e5;">
+                        <i data-lucide="volume-2" style="width:20px;height:20px;"></i>
+                    </div>
+                    <div class="md-vault-stat-content">
+                        <div class="md-vault-stat-label">Statements</div>
+                        <div class="md-vault-stat-value" style="font-size:18px;">Audio</div>
+                    </div>
+                </a>
+                <!-- Image Categories -->
+                <a href="{% url 'dashboard_media_images' %}?category=evidence" class="md-vault-stat-card" style="text-decoration:none;color:inherit;">
+                    <div class="md-vault-stat-icon" style="background:#fce7f3;color:#db2777;">
+                        <i data-lucide="shield-check" style="width:20px;height:20px;"></i>
+                    </div>
+                    <div class="md-vault-stat-content">
+                        <div class="md-vault-stat-label">Evidence Images</div>
+                        <div class="md-vault-stat-value" style="font-size:18px;">Images</div>
+                    </div>
+                </a>
+                <a href="{% url 'dashboard_media_images' %}?category=campaign_visuals" class="md-vault-stat-card" style="text-decoration:none;color:inherit;">
+                    <div class="md-vault-stat-icon" style="background:#cffafe;color:#0891b2;">
+                        <i data-lucide="palette" style="width:20px;height:20px;"></i>
+                    </div>
+                    <div class="md-vault-stat-content">
+                        <div class="md-vault-stat-label">Campaign Visuals</div>
+                        <div class="md-vault-stat-value" style="font-size:18px;">Images</div>
+                    </div>
+                </a>
+                <!-- Document Categories -->
+                <a href="{% url 'dashboard_media_documents' %}?category=reports" class="md-vault-stat-card" style="text-decoration:none;color:inherit;">
+                    <div class="md-vault-stat-icon" style="background:#f3e8ff;color:#9333ea;">
+                        <i data-lucide="clipboard-list" style="width:20px;height:20px;"></i>
+                    </div>
+                    <div class="md-vault-stat-content">
+                        <div class="md-vault-stat-label">Reports</div>
+                        <div class="md-vault-stat-value" style="font-size:18px;">Documents</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

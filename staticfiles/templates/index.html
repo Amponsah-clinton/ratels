@@ -1,0 +1,577 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Ratel Movement - Fearless. Relentless. Unstoppable.{% endblock %}
+
+{% block extra_css %}
+<style>
+/* =====================================================
+   HERO SECTION - Manifesto
+   Modern, Minimal, High Impact Design
+   ===================================================== */
+
+.hero {
+    min-height: 100vh;
+    display: flex;
+    position: relative;
+    overflow: hidden;
+    background: #fafafa;
+}
+
+/* Left Side - Image */
+.hero-image {
+    position: relative;
+    width: 55%;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+.hero-image::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.15);
+    z-index: 1;
+}
+
+.hero-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+/* Diagonal Clip on Image */
+.hero-image::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: -1px;
+    width: 120px;
+    height: 100%;
+    background: #fafafa;
+    clip-path: polygon(100% 0, 100% 100%, 0 100%);
+    z-index: 2;
+}
+
+/* Right Side - Manifesto Content */
+.hero-content {
+    width: 45%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px 64px 80px 48px;
+    position: relative;
+    z-index: 3;
+}
+
+/* Subtle Accent Line */
+.hero-accent {
+    width: 48px;
+    height: 3px;
+    background: #0f172a;
+    margin-bottom: 32px;
+}
+
+/* Section Label */
+.hero-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #64748b;
+    margin-bottom: 24px;
+}
+
+/* Main Title */
+.hero-title {
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1.1;
+    color: #0f172a;
+    margin: 0 0 40px 0;
+    padding: 0;
+    letter-spacing: -0.02em;
+}
+
+/* Manifesto Lines */
+.manifesto {
+    margin-bottom: 48px;
+}
+
+.manifesto-line {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 16px;
+    opacity: 0;
+    transform: translateX(20px);
+    animation: fadeInLine 0.6s ease forwards;
+}
+
+.manifesto-line:nth-child(1) { animation-delay: 0.1s; }
+.manifesto-line:nth-child(2) { animation-delay: 0.2s; }
+.manifesto-line:nth-child(3) { animation-delay: 0.3s; }
+.manifesto-line:nth-child(4) { animation-delay: 0.4s; }
+.manifesto-line:nth-child(5) { animation-delay: 0.5s; }
+.manifesto-line:nth-child(6) { animation-delay: 0.6s; }
+.manifesto-line:nth-child(7) { animation-delay: 0.7s; }
+
+@keyframes fadeInLine {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.manifesto-bullet {
+    width: 6px;
+    height: 6px;
+    background: #0f172a;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 8px;
+}
+
+.manifesto-text {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: #334155;
+    font-weight: 400;
+    margin: 0;
+}
+
+/* Quote/Signature */
+.hero-signature {
+    padding-top: 32px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.hero-quote {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #0f172a;
+    font-style: italic;
+    margin: 0 0 8px 0;
+    letter-spacing: 0.02em;
+}
+
+.hero-attribution {
+    font-size: 0.8rem;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* CTA Button */
+.hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 32px;
+    background: #0f172a;
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 32px;
+}
+
+.hero-cta:hover {
+    background: #1e293b;
+    transform: translateX(4px);
+    color: #fff;
+}
+
+.hero-cta svg {
+    width: 18px;
+    height: 18px;
+    transition: transform 0.3s ease;
+}
+
+.hero-cta:hover svg {
+    transform: translateX(4px);
+}
+
+/* Scroll Indicator */
+.scroll-indicator {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    z-index: 10;
+}
+
+.scroll-indicator span {
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #94a3b8;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+}
+
+.scroll-line {
+    width: 1px;
+    height: 48px;
+    background: #cbd5e1;
+    position: relative;
+    overflow: hidden;
+}
+
+.scroll-line::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 16px;
+    background: #0f172a;
+    animation: scrollPulse 2s ease-in-out infinite;
+}
+
+@keyframes scrollPulse {
+    0%, 100% { top: -16px; }
+    50% { top: 48px; }
+}
+
+/* =====================================================
+   STATS SECTION
+   ===================================================== */
+
+.stats-section {
+    background: #0f172a;
+    padding: 80px 0;
+}
+
+.stats-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 48px;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 8px;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* =====================================================
+   ABOUT PREVIEW SECTION
+   ===================================================== */
+
+.about-preview {
+    padding: 120px 0;
+    background: #fff;
+}
+
+.about-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 24px;
+    text-align: center;
+}
+
+.about-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #64748b;
+    margin-bottom: 24px;
+}
+
+.about-title {
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 24px 0;
+    padding: 0;
+    line-height: 1.2;
+}
+
+.about-text {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #475569;
+    max-width: 700px;
+    margin: 0 auto 40px;
+}
+
+.about-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #0f172a;
+    text-decoration: none;
+    border-bottom: 2px solid #0f172a;
+    padding-bottom: 4px;
+    transition: all 0.3s ease;
+}
+
+.about-link:hover {
+    gap: 12px;
+}
+
+/* =====================================================
+   RESPONSIVE DESIGN
+   ===================================================== */
+
+@media (max-width: 1024px) {
+    .hero {
+        flex-direction: column;
+        min-height: auto;
+    }
+
+    .hero-image {
+        width: 100%;
+        min-height: 50vh;
+        order: 1;
+    }
+
+    .hero-image::after {
+        display: none;
+    }
+
+    .hero-content {
+        width: 100%;
+        min-height: auto;
+        padding: 64px 32px;
+        order: 2;
+    }
+
+    .scroll-indicator {
+        display: none;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 40px;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-content {
+        padding: 48px 24px;
+    }
+
+    .hero-title {
+        font-size: 1.75rem;
+        margin-bottom: 32px;
+    }
+
+    .manifesto-text {
+        font-size: 0.95rem;
+    }
+
+    .hero-cta {
+        padding: 14px 24px;
+        font-size: 0.8rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 32px;
+    }
+
+    .stat-number {
+        font-size: 2.25rem;
+    }
+
+    .about-preview {
+        padding: 80px 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-image {
+        min-height: 40vh;
+    }
+
+    .hero-content {
+        padding: 40px 20px;
+    }
+
+    .hero-label {
+        font-size: 0.65rem;
+    }
+
+    .hero-title {
+        font-size: 1.5rem;
+    }
+
+    .manifesto-line {
+        gap: 12px;
+    }
+
+    .manifesto-text {
+        font-size: 0.9rem;
+    }
+
+    .hero-quote {
+        font-size: 0.95rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+    }
+
+    .stat-number {
+        font-size: 1.75rem;
+    }
+
+    .stat-label {
+        font-size: 0.7rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Manifesto -->
+<section class="hero">
+    <!-- Left: Image -->
+    <div class="hero-image">
+        <img src="{% if manifesto.image_url %}{{ manifesto.image_url }}{% else %}https://images.unsplash.com/photo-1529156069898-49953e39b3ac?ixlib=rb-4.0.3&auto=format&fit=crop&w=2832&q=80{% endif %}"
+             alt="Ratel Movement - Standing for Justice">
+    </div>
+
+    <!-- Right: Manifesto Content -->
+    <div class="hero-content">
+        <div class="hero-accent"></div>
+        <span class="hero-label">{{ manifesto.subtitle|default:"The Ratel Movement" }}</span>
+        <h1 class="hero-title">{{ manifesto.title|default:"Our Manifesto" }}</h1>
+
+        <div class="manifesto">
+            {% if manifesto.content %}
+                {% for line in manifesto_lines %}
+                <div class="manifesto-line">
+                    <span class="manifesto-bullet"></span>
+                    <p class="manifesto-text">{{ line }}</p>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="manifesto-line">
+                    <span class="manifesto-bullet"></span>
+                    <p class="manifesto-text">We stand for truth in an age of deception.</p>
+                </div>
+                <div class="manifesto-line">
+                    <span class="manifesto-bullet"></span>
+                    <p class="manifesto-text">We fight for justice where corruption thrives.</p>
+                </div>
+                <div class="manifesto-line">
+                    <span class="manifesto-bullet"></span>
+                    <p class="manifesto-text">We amplify voices silenced by power.</p>
+                </div>
+                <div class="manifesto-line">
+                    <span class="manifesto-bullet"></span>
+                    <p class="manifesto-text">We document what they want forgotten.</p>
+                </div>
+                <div class="manifesto-line">
+                    <span class="manifesto-bullet"></span>
+                    <p class="manifesto-text">We build bridges where walls divide.</p>
+                </div>
+                <div class="manifesto-line">
+                    <span class="manifesto-bullet"></span>
+                    <p class="manifesto-text">We are the ratel — fearless, relentless, unstoppable.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="hero-signature">
+            <p class="hero-quote">"Neutrality is complicity."</p>
+            <span class="hero-attribution">— Ratel Movement</span>
+        </div>
+
+        <a href="{% url 'membership' %}" class="hero-cta">
+            Join the Movement
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+        </a>
+    </div>
+
+    <!-- Scroll Indicator -->
+    <div class="scroll-indicator">
+        <span>Scroll</span>
+        <div class="scroll-line"></div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="stats-section">
+    <div class="stats-container">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number">10K+</div>
+                <div class="stat-label">Members</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">36</div>
+                <div class="stat-label">States</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">50+</div>
+                <div class="stat-label">Initiatives</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">Active</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About Preview Section -->
+<section class="about-preview">
+    <div class="about-container">
+        <span class="about-label">Who We Are</span>
+        <h2 class="about-title">The Ratel Spirit: Fearless by Nature</h2>
+        <p class="about-text">
+            Named after the honey badger — nature's most fearless creature — the Ratel Movement
+            embodies relentless courage in the face of injustice. We are citizens united by a
+            common purpose: to hold power accountable and build a Nigeria that works for all.
+        </p>
+        <a href="{% url 'about_ratel' %}" class="about-link">
+            Learn More About Us
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+        </a>
+    </div>
+</section>
+{% endblock %}

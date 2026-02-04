@@ -1,0 +1,115 @@
+{% extends "dashboard/base_dashboard.html" %}
+
+{% block title %}Reports{% endblock %}
+
+{% block content %}
+<div class="md-space-y-6">
+
+    <!-- Page Header -->
+    <div class="md-page-header-row">
+        <div>
+            <h1 class="md-page-title">Reports &amp; Analytics</h1>
+            <p class="md-page-subtitle">View your performance metrics</p>
+        </div>
+        <button class="md-btn md-btn-outline md-btn-sm">
+            <i data-lucide="download" style="width:16px;height:16px;"></i>
+            Export Report
+        </button>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="md-grid md-grid-3">
+        <div class="md-card">
+            <div class="md-card-header">
+                <h3 class="md-card-title-lg">Sales Performance</h3>
+            </div>
+            <div class="md-card-content">
+                <div class="md-report-stat-value">$234,567</div>
+                <div class="md-report-change positive">
+                    <i data-lucide="trending-up" style="width:16px;height:16px;"></i>
+                    <span>+18% from last month</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="md-card">
+            <div class="md-card-header">
+                <h3 class="md-card-title-lg">Conversion Rate</h3>
+            </div>
+            <div class="md-card-content">
+                <div class="md-report-stat-value">28.5%</div>
+                <div class="md-report-change positive">
+                    <i data-lucide="trending-up" style="width:16px;height:16px;"></i>
+                    <span>+3.2% from last month</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="md-card">
+            <div class="md-card-header">
+                <h3 class="md-card-title-lg">Average Deal Size</h3>
+            </div>
+            <div class="md-card-content">
+                <div class="md-report-stat-value">$42,300</div>
+                <div class="md-report-change negative">
+                    <i data-lucide="trending-down" style="width:16px;height:16px;"></i>
+                    <span>-2.1% from last month</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Revenue Chart -->
+    <div class="md-card">
+        <div class="md-card-header">
+            <h3 class="md-card-title-lg">Revenue by Month</h3>
+        </div>
+        <div class="md-card-content">
+            <div class="md-chart-container-lg">
+                <canvas id="mdReportsRevenueChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Products & Doughnut Chart -->
+    <div class="md-grid md-grid-2">
+        <div class="md-card">
+            <div class="md-card-header">
+                <h3 class="md-card-title-lg">Top Performing Products</h3>
+            </div>
+            <div class="md-card-content">
+                <div class="md-product-list">
+                    <div class="md-product-item">
+                        <span class="md-product-name">Enterprise Solution</span>
+                        <span class="md-product-revenue">$125,000</span>
+                    </div>
+                    <div class="md-product-item">
+                        <span class="md-product-name">Cloud Migration</span>
+                        <span class="md-product-revenue">$89,500</span>
+                    </div>
+                    <div class="md-product-item">
+                        <span class="md-product-name">Data Analytics Platform</span>
+                        <span class="md-product-revenue">$67,000</span>
+                    </div>
+                    <div class="md-product-item">
+                        <span class="md-product-name">CRM Implementation</span>
+                        <span class="md-product-revenue">$45,000</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="md-card">
+            <div class="md-card-header">
+                <h3 class="md-card-title-lg">Deal Stage Distribution</h3>
+            </div>
+            <div class="md-card-content">
+                <div class="md-chart-container-lg" style="display:flex;align-items:center;justify-content:center;">
+                    <canvas id="mdReportsDoughnutChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

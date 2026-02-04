@@ -1,0 +1,669 @@
+{% extends "dashboard/base_dashboard.html" %}
+
+{% block title %}About / Manifesto Management{% endblock %}
+
+{% block content %}
+<div class="md-space-y-6">
+
+    <!-- Page Header -->
+    <div class="md-page-header-row">
+        <div>
+            <h1 class="md-page-title">About / Manifesto</h1>
+            <p class="md-page-subtitle">Manage your manifesto content that appears on the landing page</p>
+        </div>
+    </div>
+
+    <!-- Manifesto Editor Card -->
+    <div class="manifesto-editor-card">
+        <div class="editor-header">
+            <div class="editor-header-left">
+                <div class="editor-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" x2="8" y1="13" y2="13"/>
+                        <line x1="16" x2="8" y1="17" y2="17"/>
+                        <line x1="10" x2="8" y1="9" y2="9"/>
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="editor-title">Manifesto Editor</h2>
+                    <p class="editor-subtitle">Edit the manifesto shown on your homepage hero section</p>
+                </div>
+            </div>
+            <div class="editor-status">
+                {% if manifesto %}
+                <span class="status-badge active">
+                    <span class="status-dot"></span>
+                    Active
+                </span>
+                {% else %}
+                <span class="status-badge draft">
+                    <span class="status-dot"></span>
+                    Not Set
+                </span>
+                {% endif %}
+            </div>
+        </div>
+
+        <form method="POST" action="{% url 'dashboard_about_save' %}" enctype="multipart/form-data" class="editor-form">
+            {% csrf_token %}
+            <input type="hidden" name="manifesto_id" value="{{ manifesto.id|default:'' }}">
+            <input type="hidden" name="existing_image_url" value="{{ manifesto.image_url|default:'' }}">
+
+            <div class="editor-body">
+                <!-- Left Column: Text Content -->
+                <div class="editor-main">
+                    <div class="form-section">
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Title
+                                    <span class="form-hint-inline">Displayed as heading</span>
+                                </label>
+                                <input type="text" name="title" class="form-input"
+                                       value="{{ manifesto.title|default:'Our Manifesto' }}"
+                                       placeholder="e.g., Our Manifesto">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Subtitle
+                                    <span class="form-hint-inline">Label above title</span>
+                                </label>
+                                <input type="text" name="subtitle" class="form-input"
+                                       value="{{ manifesto.subtitle|default:'The Ratel Movement' }}"
+                                       placeholder="e.g., The Ratel Movement">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                Manifesto Content <span class="required">*</span>
+                                <span class="form-hint-inline">One statement per line (5-7 lines recommended)</span>
+                            </label>
+                            <textarea name="content" class="form-textarea" rows="8" required
+                                      placeholder="We stand for truth in an age of deception.
+We fight for justice where corruption thrives.
+We amplify voices silenced by power.
+We document what they want forgotten.
+We build bridges where walls divide.
+We are the ratel — fearless, relentless, unstoppable.">{{ manifesto.content|default:"We stand for truth in an age of deception.
+We fight for justice where corruption thrives.
+We amplify voices silenced by power.
+We document what they want forgotten.
+We build bridges where walls divide.
+We are the ratel — fearless, relentless, unstoppable." }}</textarea>
+                            <p class="form-hint">Each line will appear as a separate statement with a bullet point.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Image Upload -->
+                <div class="editor-sidebar">
+                    <div class="form-section">
+                        <label class="form-label">Hero Image</label>
+                        <div class="image-upload-area" id="imageUploadArea">
+                            {% if manifesto.image_url %}
+                            <div class="image-preview" id="imagePreview">
+                                <img src="{{ manifesto.image_url }}" alt="Current manifesto image" id="previewImg">
+                                <button type="button" class="image-remove-btn" onclick="removeImage()">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+                                </button>
+                            </div>
+                            {% else %}
+                            <div class="image-placeholder" id="imagePlaceholder">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+                                    <circle cx="9" cy="9" r="2"/>
+                                    <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+                                </svg>
+                                <span>Click or drag to upload</span>
+                                <span class="upload-hint">Recommended: 1920x1080px</span>
+                            </div>
+                            {% endif %}
+                            <input type="file" name="image" id="imageInput" accept="image/*" class="hidden-input" onchange="previewImage(this)">
+                        </div>
+                        <p class="form-hint">This image appears on the left side of the hero section.</p>
+                    </div>
+
+                    <!-- Preview Card -->
+                    <div class="preview-card">
+                        <h4 class="preview-title">Preview</h4>
+                        <div class="preview-content">
+                            <div class="preview-label" id="previewSubtitle">{{ manifesto.subtitle|default:"The Ratel Movement" }}</div>
+                            <div class="preview-heading" id="previewTitle">{{ manifesto.title|default:"Our Manifesto" }}</div>
+                            <div class="preview-lines" id="previewLines">
+                                {% for line in manifesto.content|default:"We stand for truth..."|linebreaksbr %}
+                                <div class="preview-line">
+                                    <span class="preview-bullet"></span>
+                                    <span>{{ line|striptags }}</span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="editor-footer">
+                <div class="footer-left">
+                    {% if manifesto.updated_at %}
+                    <span class="last-updated">Last updated: {{ manifesto.updated_at|date:"M d, Y H:i" }}</span>
+                    {% endif %}
+                </div>
+                <div class="footer-actions">
+                    <a href="{% url 'index' %}" target="_blank" class="btn-secondary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+                        View Live
+                    </a>
+                    <button type="submit" class="btn-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+<style>
+/* Manifesto Editor Styles */
+.manifesto-editor-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.editor-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 28px;
+    border-bottom: 1px solid #e2e8f0;
+    background: #fafafa;
+}
+
+.editor-header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.editor-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0f172a;
+    color: #fff;
+    border-radius: 12px;
+}
+
+.editor-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin: 0 0 4px 0;
+    padding: 0;
+}
+
+.editor-subtitle {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin: 0;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 100px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.status-badge.active {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-badge.draft {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.editor-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.editor-body {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 0;
+}
+
+.editor-main {
+    padding: 28px;
+    border-right: 1px solid #e2e8f0;
+}
+
+.editor-sidebar {
+    padding: 28px;
+    background: #fafafa;
+}
+
+.form-section {
+    margin-bottom: 24px;
+}
+
+.form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 10px;
+}
+
+.form-hint-inline {
+    font-weight: 400;
+    color: #94a3b8;
+    font-size: 0.75rem;
+}
+
+.required {
+    color: #ef4444;
+}
+
+.form-input,
+.form-textarea {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    transition: all 0.2s;
+    background: #fff;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: #0f172a;
+    box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.08);
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 200px;
+    line-height: 1.7;
+}
+
+.form-hint {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin: 8px 0 0 0;
+}
+
+/* Image Upload */
+.image-upload-area {
+    position: relative;
+    border: 2px dashed #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #fff;
+}
+
+.image-upload-area:hover {
+    border-color: #cbd5e1;
+    background: #f8fafc;
+}
+
+.image-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    color: #94a3b8;
+    text-align: center;
+}
+
+.image-placeholder svg {
+    margin-bottom: 12px;
+}
+
+.image-placeholder span {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #64748b;
+}
+
+.upload-hint {
+    font-size: 0.75rem !important;
+    color: #94a3b8 !important;
+    margin-top: 4px;
+}
+
+.image-preview {
+    position: relative;
+}
+
+.image-preview img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.image-remove-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.image-remove-btn:hover {
+    background: #ef4444;
+}
+
+.hidden-input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* Preview Card */
+.preview-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.preview-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 14px 16px;
+    border-bottom: 1px solid #e2e8f0;
+    margin: 0;
+}
+
+.preview-content {
+    padding: 20px;
+}
+
+.preview-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #94a3b8;
+    margin-bottom: 8px;
+}
+
+.preview-heading {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 16px;
+}
+
+.preview-lines {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.preview-line {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 0.75rem;
+    color: #475569;
+    line-height: 1.5;
+}
+
+.preview-bullet {
+    width: 4px;
+    height: 4px;
+    background: #0f172a;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 6px;
+}
+
+/* Editor Footer */
+.editor-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 28px;
+    border-top: 1px solid #e2e8f0;
+    background: #fafafa;
+}
+
+.last-updated {
+    font-size: 0.8rem;
+    color: #94a3b8;
+}
+
+.footer-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-primary,
+.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    border: none;
+}
+
+.btn-primary {
+    background: #0f172a;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background: #1e293b;
+}
+
+.btn-secondary {
+    background: #fff;
+    color: #374151;
+    border: 1px solid #e2e8f0;
+}
+
+.btn-secondary:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .editor-body {
+        grid-template-columns: 1fr;
+    }
+
+    .editor-main {
+        border-right: none;
+        border-bottom: 1px solid #e2e8f0;
+    }
+}
+
+@media (max-width: 768px) {
+    .editor-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .form-row-2 {
+        grid-template-columns: 1fr;
+    }
+
+    .editor-footer {
+        flex-direction: column;
+        gap: 16px;
+        align-items: stretch;
+    }
+
+    .footer-actions {
+        justify-content: stretch;
+    }
+
+    .footer-actions > * {
+        flex: 1;
+        justify-content: center;
+    }
+}
+</style>
+
+<script>
+// Image upload area click handler
+document.getElementById('imageUploadArea').addEventListener('click', function(e) {
+    if (e.target.closest('.image-remove-btn')) return;
+    document.getElementById('imageInput').click();
+});
+
+// Preview image before upload
+function previewImage(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const area = document.getElementById('imageUploadArea');
+
+            // Check if preview already exists
+            let preview = document.getElementById('imagePreview');
+            if (!preview) {
+                preview = document.createElement('div');
+                preview.id = 'imagePreview';
+                preview.className = 'image-preview';
+                preview.innerHTML = `
+                    <img id="previewImg" alt="Preview">
+                    <button type="button" class="image-remove-btn" onclick="removeImage()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>
+                    </button>
+                `;
+
+                // Remove placeholder
+                const placeholder = document.getElementById('imagePlaceholder');
+                if (placeholder) placeholder.remove();
+
+                area.insertBefore(preview, area.firstChild);
+            }
+
+            document.getElementById('previewImg').src = e.target.result;
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+// Remove image
+function removeImage() {
+    const preview = document.getElementById('imagePreview');
+    const area = document.getElementById('imageUploadArea');
+    const input = document.getElementById('imageInput');
+
+    if (preview) {
+        preview.remove();
+    }
+
+    // Reset input
+    input.value = '';
+
+    // Clear existing image URL
+    document.querySelector('input[name="existing_image_url"]').value = '';
+
+    // Add placeholder back if not exists
+    if (!document.getElementById('imagePlaceholder')) {
+        const placeholder = document.createElement('div');
+        placeholder.id = 'imagePlaceholder';
+        placeholder.className = 'image-placeholder';
+        placeholder.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+                <circle cx="9" cy="9" r="2"/>
+                <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+            </svg>
+            <span>Click or drag to upload</span>
+            <span class="upload-hint">Recommended: 1920x1080px</span>
+        `;
+        area.insertBefore(placeholder, area.firstChild);
+    }
+}
+
+// Live preview updates
+document.querySelector('input[name="title"]').addEventListener('input', function() {
+    document.getElementById('previewTitle').textContent = this.value || 'Our Manifesto';
+});
+
+document.querySelector('input[name="subtitle"]').addEventListener('input', function() {
+    document.getElementById('previewSubtitle').textContent = this.value || 'The Ratel Movement';
+});
+
+document.querySelector('textarea[name="content"]').addEventListener('input', function() {
+    const lines = this.value.split('\n').filter(line => line.trim());
+    const container = document.getElementById('previewLines');
+    container.innerHTML = '';
+
+    lines.forEach(line => {
+        const div = document.createElement('div');
+        div.className = 'preview-line';
+        div.innerHTML = `
+            <span class="preview-bullet"></span>
+            <span>${line.trim()}</span>
+        `;
+        container.appendChild(div);
+    });
+});
+</script>
+{% endblock %}

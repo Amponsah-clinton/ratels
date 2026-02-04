@@ -1,0 +1,233 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Member Area{% endblock %} - Ratel Movement</title>
+    <link rel="icon" href="https://res.cloudinary.com/dmqizfpyz/image/upload/v1769424497/mmm_lyzhlw.png" type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/dashboard_material.css' %}">
+    <style>
+        /* Renew overlay: full-screen, flat UI, no gradients */
+        .md-renew-overlay { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+        .md-renew-overlay[aria-hidden="true"],
+        html.renew-overlay-dismissed .md-renew-overlay { display: none; }
+        .md-renew-overlay-backdrop { position: absolute; inset: 0; background: rgba(24, 24, 27, 0.6); }
+        .md-renew-overlay-card { position: relative; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; max-width: 420px; width: 100%; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); overflow: hidden; }
+        .md-renew-overlay-close { position: absolute; top: 12px; right: 12px; width: 40px; height: 40px; border: none; background: #f4f4f5; color: #18181b; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+        .md-renew-overlay-close:hover { background: #e5e7eb; }
+        .md-renew-overlay-body { padding: 2rem 2rem 2rem; text-align: center; }
+        .md-renew-overlay-icon { width: 80px; height: 80px; margin: 0 auto 1.25rem; background: #f4f4f5; color: #18181b; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .md-renew-overlay-title { font-size: 1.35rem; font-weight: 600; color: #18181b; margin: 0 0 0.75rem; }
+        .md-renew-overlay-text { font-size: 0.95rem; color: #71717a; margin: 0 0 1.5rem; line-height: 1.5; }
+        .md-renew-overlay-btn { display: inline-block; padding: 12px 24px; background: #18181b; color: #ffffff; border-radius: 8px; font-weight: 500; text-decoration: none; transition: background 0.2s; }
+        .md-renew-overlay-btn:hover { background: #3f3f46; color: #ffffff; }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+<div class="md-app">
+
+    <!-- Renew membership full-screen overlay (no gradient, flat UI) -->
+    {% if show_renew_overlay %}
+    <script>try{if(sessionStorage.getItem('member_renew_overlay_dismissed')==='1')document.documentElement.classList.add('renew-overlay-dismissed');}catch(e){}</script>
+    <div class="md-renew-overlay" id="mdRenewOverlay" role="dialog" aria-modal="true" aria-labelledby="renew-overlay-title">
+        <div class="md-renew-overlay-backdrop"></div>
+        <div class="md-renew-overlay-card">
+            <button type="button" class="md-renew-overlay-close" id="mdRenewOverlayClose" aria-label="Close">
+                <i data-lucide="x" style="width:24px;height:24px;"></i>
+            </button>
+            <div class="md-renew-overlay-body">
+                <div class="md-renew-overlay-icon">
+                    <i data-lucide="credit-card" style="width:48px;height:48px;"></i>
+                </div>
+                <h2 class="md-renew-overlay-title" id="renew-overlay-title">Membership renewal required</h2>
+                <p class="md-renew-overlay-text">Your membership has expired or is not yet active. Renew now to continue accessing member benefits.</p>
+                <a href="{% url 'member_renew' %}" class="md-renew-overlay-btn">Renew membership</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Sidebar Overlay (mobile) -->
+    <div class="md-sidebar-overlay" id="mdSidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="md-sidebar" id="mdSidebar">
+        <div class="md-sidebar-header">
+            <a href="{% url 'member_dashboard' %}" class="md-sidebar-brand">Member Area</a>
+            <button class="md-sidebar-toggle" id="mdSidebarToggle" aria-label="Toggle sidebar">
+                <i data-lucide="chevron-left" style="width:20px;height:20px;"></i>
+            </button>
+        </div>
+        <nav class="md-sidebar-nav">
+            <a href="{% url 'member_dashboard' %}" class="md-nav-item {% if active_page == 'dashboard' %}active{% endif %}">
+                <i data-lucide="layout-dashboard"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="{% url 'member_announcements' %}" class="md-nav-item {% if active_page == 'announcements' %}active{% endif %}">
+                <i data-lucide="megaphone"></i>
+                <span>Announcements</span>
+            </a>
+            <a href="{% url 'member_communications' %}" class="md-nav-item {% if active_page == 'communications' %}active{% endif %}">
+                <i data-lucide="mail"></i>
+                <span>Communications</span>
+            </a>
+            <a href="{% url 'member_resources' %}" class="md-nav-item {% if active_page == 'resources' %}active{% endif %}">
+                <i data-lucide="book-open"></i>
+                <span>Exclusive Resources</span>
+            </a>
+            <a href="{% url 'member_events' %}" class="md-nav-item {% if active_page == 'events' %}active{% endif %}">
+                <i data-lucide="calendar"></i>
+                <span>Event Invitations</span>
+            </a>
+            <a href="{% url 'member_profile' %}" class="md-nav-item {% if active_page == 'profile' %}active{% endif %}">
+                <i data-lucide="user"></i>
+                <span>My Profile</span>
+            </a>
+            <a href="{% url 'member_subscriptions' %}" class="md-nav-item {% if active_page == 'subscriptions' %}active{% endif %}">
+                <i data-lucide="file-text"></i>
+                <span>My Subscriptions</span>
+            </a>
+            <a href="{% url 'member_renew' %}" class="md-nav-item {% if active_page == 'renew' %}active{% endif %}">
+                <i data-lucide="credit-card"></i>
+                <span>Renew Membership</span>
+            </a>
+            <a href="{% url 'index' %}" class="md-nav-item">
+                <i data-lucide="home"></i>
+                <span>Back to Website</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="md-main">
+
+        <!-- Navbar -->
+        <nav class="md-navbar">
+            <div class="md-navbar-inner">
+                <div class="md-navbar-left">
+                    <button class="md-hamburger" id="mdHamburger" aria-label="Toggle menu">
+                        <i data-lucide="menu" style="width:20px;height:20px;"></i>
+                    </button>
+                    <form class="md-search-form" onsubmit="return false;">
+                        <span class="md-search-icon">
+                            <i data-lucide="search" style="width:18px;height:18px;"></i>
+                        </span>
+                        <input type="search" class="md-search-input" placeholder="Search...">
+                    </form>
+                </div>
+                <div class="md-navbar-right">
+                    <button class="md-navbar-sidebar-toggle" id="mdNavbarSidebarToggle" aria-label="Toggle sidebar">
+                        <i data-lucide="menu" style="width:20px;height:20px;"></i>
+                    </button>
+                    <div class="md-account">
+                        <button class="md-account-btn" id="mdAccountBtn">
+                            <div class="md-account-avatar">
+                                <i data-lucide="user" style="width:18px;height:18px;"></i>
+                            </div>
+                            <span class="md-account-name">{{ member_name|default:"Member" }}</span>
+                            <i data-lucide="chevron-down" style="width:16px;height:16px;" class="md-account-chevron"></i>
+                        </button>
+                        <div class="md-account-dropdown" id="mdAccountDropdown">
+                            <div class="md-account-info">
+                                <div class="md-account-info-name">{{ member_name|default:"Member" }}</div>
+                                <div class="md-account-info-email">{{ member_email|default:"member@example.com" }}</div>
+                            </div>
+                            <a href="{% url 'member_profile' %}" class="md-account-dropdown-item">
+                                <i data-lucide="user" style="width:16px;height:16px;"></i>
+                                <span>My Profile</span>
+                            </a>
+                            <a href="{% url 'index' %}" class="md-account-dropdown-item">
+                                <i data-lucide="home" style="width:16px;height:16px;"></i>
+                                <span>Back to Website</span>
+                            </a>
+                            <a href="{% url 'auth_logout' %}" class="md-account-dropdown-item danger">
+                                <i data-lucide="log-out" style="width:16px;height:16px;"></i>
+                                <span>Logout</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="md-mobile-search">
+                <form class="md-search-form" onsubmit="return false;">
+                    <span class="md-search-icon">
+                        <i data-lucide="search" style="width:18px;height:18px;"></i>
+                    </span>
+                    <input type="search" class="md-search-input" placeholder="Search...">
+                </form>
+            </div>
+        </nav>
+
+        <!-- Page Content -->
+        <div class="md-content">
+            {% if messages %}
+                <div class="md-alerts" style="margin-bottom: 1rem;">
+                    {% for message in messages %}
+                        <div class="md-alert md-alert-{{ message.tags|default:'info' }}" style="padding:10px 14px;border-radius:8px;margin-bottom:6px;font-size:0.85rem;
+                            {% if 'error' in message.tags %}
+                                background:#fee2e2;color:#7f1d1d;border:1px solid #fecaca;
+                            {% elif 'success' in message.tags %}
+                                background:#dcfce7;color:#14532d;border:1px solid #bbf7d0;
+                            {% else %}
+                                background:#e0f2fe;color:#0f172a;border:1px solid #bae6fd;
+                            {% endif %}
+                        ">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            {% block content %}{% endblock %}
+        </div>
+
+        <!-- Footer -->
+        <footer class="md-footer">
+            <div class="md-footer-inner">
+                <div class="md-footer-left">
+                    <span>&copy; 2026, made with</span>
+                    <span class="md-footer-heart">&hearts;</span>
+                    <span>by</span>
+                    <a href="{% url 'index' %}" class="md-footer-link">Ratel Movement</a>
+                </div>
+                <div class="md-footer-right">
+                    <a href="{% url 'index' %}">Home</a>
+                    <a href="{% url 'about' %}">About Us</a>
+                    <a href="{% url 'contact' %}">Contact</a>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script src="{% static 'js/dashboard_material.js' %}"></script>
+{% if show_renew_overlay %}
+<script>
+(function() {
+    var key = 'member_renew_overlay_dismissed';
+    var overlay = document.getElementById('mdRenewOverlay');
+    var closeBtn = document.getElementById('mdRenewOverlayClose');
+    if (overlay && sessionStorage.getItem(key) === '1') {
+        overlay.setAttribute('aria-hidden', 'true');
+    }
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function() {
+            try { sessionStorage.setItem(key, '1'); } catch (e) {}
+            document.documentElement.classList.add('renew-overlay-dismissed');
+            if (overlay) overlay.setAttribute('aria-hidden', 'true');
+        });
+    }
+})();
+</script>
+{% endif %}
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

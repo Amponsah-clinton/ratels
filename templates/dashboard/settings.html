@@ -1,0 +1,757 @@
+{% extends "dashboard/base_dashboard.html" %}
+
+{% block title %}Ideology Management{% endblock %}
+
+{% block extra_css %}
+<style>
+    .ideology-tabs {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .ideology-tab {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.625rem 1rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #64748b;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+    }
+    .ideology-tab:hover {
+        background: #f1f5f9;
+        color: #334155;
+        border-color: #cbd5e1;
+    }
+    .ideology-tab.active {
+        background: #1e293b;
+        color: #fff;
+        border-color: #1e293b;
+    }
+    .ideology-tab svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .section-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        transition: all 0.2s ease;
+    }
+    .section-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    .section-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+    .section-card-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .section-card-subtitle {
+        font-size: 0.875rem;
+        color: #64748b;
+        margin: 0.25rem 0 0 0;
+    }
+    .section-card-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+    .section-card-content {
+        font-size: 0.9rem;
+        color: #475569;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+    .section-items {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    .section-item {
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 1rem;
+        border-left: 3px solid #1e293b;
+    }
+    .section-item-title {
+        font-weight: 600;
+        color: #1e293b;
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+    }
+    .section-item-desc {
+        font-size: 0.85rem;
+        color: #64748b;
+    }
+
+    .btn-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border: 1px solid #e5e7eb;
+        background: #fff;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .btn-icon:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+    }
+    .btn-icon.danger:hover {
+        background: #fef2f2;
+        border-color: #fecaca;
+        color: #dc2626;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        border-radius: 9999px;
+    }
+    .status-badge.active {
+        background: #dcfce7;
+        color: #166534;
+    }
+    .status-badge.inactive {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+    }
+    .modal-overlay.active {
+        display: flex;
+    }
+    .modal-content {
+        background: #fff;
+        border-radius: 16px;
+        width: 100%;
+        max-width: 700px;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+    }
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .modal-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+    }
+    .modal-close {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #64748b;
+        padding: 0.25rem;
+    }
+    .modal-close:hover {
+        color: #1e293b;
+    }
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+    .form-label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+    .form-input, .form-select, .form-textarea {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        background: #fff;
+        transition: all 0.2s ease;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+        outline: none;
+        border-color: #1e293b;
+        box-shadow: 0 0 0 3px rgba(30,41,59,0.1);
+    }
+    .form-textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+    .form-hint {
+        font-size: 0.8rem;
+        color: #64748b;
+        margin-top: 0.25rem;
+    }
+
+    .items-builder {
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 1rem;
+        background: #f8fafc;
+    }
+    .items-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+    .item-entry {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 1rem;
+    }
+    .item-entry-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+    }
+    .item-entry-number {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #64748b;
+        text-transform: uppercase;
+    }
+    .item-remove-btn {
+        background: none;
+        border: none;
+        color: #dc2626;
+        cursor: pointer;
+        padding: 0.25rem;
+    }
+    .add-item-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px dashed #cbd5e1;
+        background: transparent;
+        color: #64748b;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .add-item-btn:hover {
+        border-color: #1e293b;
+        color: #1e293b;
+        background: #f8fafc;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+    @media (max-width: 640px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 0.75rem;
+        justify-content: flex-end;
+        padding-top: 1rem;
+        border-top: 1px solid #e5e7eb;
+        margin-top: 1.5rem;
+    }
+    .btn-save {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background: #1e293b;
+        color: #fff;
+        font-size: 0.9rem;
+        font-weight: 500;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .btn-save:hover {
+        background: #334155;
+    }
+    .btn-cancel {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background: #fff;
+        color: #64748b;
+        font-size: 0.9rem;
+        font-weight: 500;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .btn-cancel:hover {
+        background: #f8fafc;
+        color: #1e293b;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        background: #f8fafc;
+        border-radius: 12px;
+        border: 2px dashed #e2e8f0;
+    }
+    .empty-state-icon {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 1rem;
+        color: #94a3b8;
+    }
+    .empty-state-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+    }
+    .empty-state-text {
+        color: #64748b;
+        margin-bottom: 1.5rem;
+    }
+
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    .form-checkbox {
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
+        accent-color: #1e293b;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 0.75rem;
+    }
+    .btn-add {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.625rem 1rem;
+        background: #1e293b;
+        color: #fff;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .btn-add:hover {
+        background: #334155;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="md-space-y-6">
+
+    <!-- Page Header -->
+    <div class="md-page-header" style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;">
+        <div>
+            <h1 class="md-page-title">Ideology Management</h1>
+            <p class="md-page-subtitle">Manage the intellectual backbone of the RATEL Movement</p>
+        </div>
+        <div class="header-actions">
+            <button type="button" class="btn-add" onclick="openAddModal()">
+                <i data-lucide="plus" style="width:18px;height:18px;"></i>
+                Add Section
+            </button>
+        </div>
+    </div>
+
+    <!-- Section Tabs -->
+    <div class="ideology-tabs">
+        <a href="{% url 'dashboard_settings' %}" class="ideology-tab {% if not current_section %}active{% endif %}">
+            <i data-lucide="layout-grid"></i>
+            All Sections
+        </a>
+        {% for sk in section_keys %}
+        <a href="{% url 'dashboard_settings' %}?section={{ sk.key }}" class="ideology-tab {% if current_section == sk.key %}active{% endif %}">
+            <i data-lucide="{{ sk.icon }}"></i>
+            {{ sk.label }}
+        </a>
+        {% endfor %}
+    </div>
+
+    <!-- Sections List -->
+    {% if sections %}
+        {% for section in sections %}
+        <div class="section-card">
+            <div class="section-card-header">
+                <div>
+                    <h3 class="section-card-title">
+                        <i data-lucide="{{ section.section_icon|default:'book-open' }}" style="width:20px;height:20px;color:#1e293b;"></i>
+                        {{ section.section_title }}
+                        <span class="status-badge {% if section.is_active %}active{% else %}inactive{% endif %}">
+                            {% if section.is_active %}Active{% else %}Inactive{% endif %}
+                        </span>
+                    </h3>
+                    {% if section.section_subtitle %}
+                    <p class="section-card-subtitle">{{ section.section_subtitle }}</p>
+                    {% endif %}
+                </div>
+                <div class="section-card-actions">
+                    <button type="button" class="btn-icon" onclick="editSection('{{ section.id }}')" title="Edit">
+                        <i data-lucide="pencil" style="width:16px;height:16px;"></i>
+                    </button>
+                    <button type="button" class="btn-icon danger" onclick="deleteSection('{{ section.id }}', '{{ section.section_title|escapejs }}')" title="Delete">
+                        <i data-lucide="trash-2" style="width:16px;height:16px;"></i>
+                    </button>
+                </div>
+            </div>
+
+            {% if section.content %}
+            <div class="section-card-content">
+                {{ section.content|truncatewords:50 }}
+            </div>
+            {% endif %}
+
+            {% if section.items %}
+            <div class="section-items">
+                {% for item in section.items %}
+                <div class="section-item">
+                    <div class="section-item-title">{{ item.title }}</div>
+                    <div class="section-item-desc">{{ item.description|truncatewords:30 }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <i data-lucide="book-open" class="empty-state-icon"></i>
+            <h3 class="empty-state-title">No Ideology Sections Found</h3>
+            <p class="empty-state-text">Get started by adding your first ideology section or run the SQL schema in Supabase.</p>
+            <button type="button" class="btn-add" onclick="openAddModal()">
+                <i data-lucide="plus" style="width:18px;height:18px;"></i>
+                Add First Section
+            </button>
+        </div>
+    {% endif %}
+
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="modal-overlay" id="sectionModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modalTitle">Add Ideology Section</h3>
+            <button type="button" class="modal-close" onclick="closeModal()">
+                <i data-lucide="x" style="width:20px;height:20px;"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="sectionForm" method="POST" action="{% url 'dashboard_ideology_save' %}">
+                {% csrf_token %}
+                <input type="hidden" name="section_id" id="sectionId">
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Section Key *</label>
+                        <select name="section_key" id="sectionKey" class="form-select" required>
+                            <option value="">Select a section type...</option>
+                            <option value="core_beliefs">Core Beliefs</option>
+                            <option value="justice_power_resistance">Justice, Power & Resistance</option>
+                            <option value="civic_responsibility">Civic Responsibility</option>
+                            <option value="non_negotiable_principles">Non-Negotiable Principles</option>
+                            <option value="what_ratel_is_not">What RATEL Is Not</option>
+                            <option value="custom">Custom Section</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Section Title *</label>
+                        <input type="text" name="section_title" id="sectionTitle" class="form-input" required placeholder="e.g., Core Beliefs">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Subtitle</label>
+                    <input type="text" name="section_subtitle" id="sectionSubtitle" class="form-input" placeholder="A brief description of this section">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Icon</label>
+                        <select name="section_icon" id="sectionIcon" class="form-select">
+                            <option value="heart">Heart</option>
+                            <option value="scale">Scale (Justice)</option>
+                            <option value="users">Users</option>
+                            <option value="shield">Shield</option>
+                            <option value="x-circle">X Circle</option>
+                            <option value="book-open">Book Open</option>
+                            <option value="flag">Flag</option>
+                            <option value="star">Star</option>
+                            <option value="target">Target</option>
+                            <option value="compass">Compass</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Display Order</label>
+                        <input type="number" name="display_order" id="displayOrder" class="form-input" value="0" min="0">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Main Content</label>
+                    <textarea name="content" id="sectionContent" class="form-textarea" rows="4" placeholder="The main introductory text for this section..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Items / Principles</label>
+                    <div class="items-builder">
+                        <div class="items-list" id="itemsList">
+                            <!-- Items will be added dynamically -->
+                        </div>
+                        <button type="button" class="add-item-btn" onclick="addItem()">
+                            <i data-lucide="plus" style="width:16px;height:16px;"></i>
+                            Add Item
+                        </button>
+                    </div>
+                    <p class="form-hint">Add principles, beliefs, or key points for this section</p>
+                </div>
+
+                <input type="hidden" name="items" id="itemsJson">
+
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" name="is_active" id="isActive" class="form-checkbox" checked>
+                        <label for="isActive" class="form-label" style="margin:0;">Active (visible on public page)</label>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-save">
+                        <i data-lucide="save" style="width:18px;height:18px;"></i>
+                        Save Section
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    let itemCounter = 0;
+
+    function openAddModal() {
+        document.getElementById('modalTitle').textContent = 'Add Ideology Section';
+        document.getElementById('sectionForm').reset();
+        document.getElementById('sectionId').value = '';
+        document.getElementById('itemsList').innerHTML = '';
+        itemCounter = 0;
+        document.getElementById('isActive').checked = true;
+        document.getElementById('sectionModal').classList.add('active');
+        lucide.createIcons();
+    }
+
+    function closeModal() {
+        document.getElementById('sectionModal').classList.remove('active');
+    }
+
+    function addItem(title = '', description = '') {
+        itemCounter++;
+        const itemsList = document.getElementById('itemsList');
+        const itemHtml = `
+            <div class="item-entry" data-item-id="${itemCounter}">
+                <div class="item-entry-header">
+                    <span class="item-entry-number">Item ${itemCounter}</span>
+                    <button type="button" class="item-remove-btn" onclick="removeItem(${itemCounter})">
+                        <i data-lucide="trash-2" style="width:16px;height:16px;"></i>
+                    </button>
+                </div>
+                <div class="form-group" style="margin-bottom:0.75rem;">
+                    <input type="text" class="form-input item-title" placeholder="Item title" value="${escapeHtml(title)}">
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <textarea class="form-textarea item-description" rows="2" placeholder="Item description">${escapeHtml(description)}</textarea>
+                </div>
+            </div>
+        `;
+        itemsList.insertAdjacentHTML('beforeend', itemHtml);
+        lucide.createIcons();
+    }
+
+    function removeItem(id) {
+        const item = document.querySelector(`[data-item-id="${id}"]`);
+        if (item) item.remove();
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    function collectItems() {
+        const items = [];
+        document.querySelectorAll('.item-entry').forEach(entry => {
+            const title = entry.querySelector('.item-title').value.trim();
+            const description = entry.querySelector('.item-description').value.trim();
+            if (title) {
+                items.push({ title, description });
+            }
+        });
+        return items;
+    }
+
+    // Form submission
+    document.getElementById('sectionForm').addEventListener('submit', function(e) {
+        const items = collectItems();
+        document.getElementById('itemsJson').value = JSON.stringify(items);
+    });
+
+    // Edit section
+    async function editSection(id) {
+        try {
+            const response = await fetch('{% url "dashboard_ideology_get" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ id })
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                const section = data.section;
+                document.getElementById('modalTitle').textContent = 'Edit Ideology Section';
+                document.getElementById('sectionId').value = section.id;
+                document.getElementById('sectionKey').value = section.section_key || '';
+                document.getElementById('sectionTitle').value = section.section_title || '';
+                document.getElementById('sectionSubtitle').value = section.section_subtitle || '';
+                document.getElementById('sectionIcon').value = section.section_icon || 'book-open';
+                document.getElementById('sectionContent').value = section.content || '';
+                document.getElementById('displayOrder').value = section.display_order || 0;
+                document.getElementById('isActive').checked = section.is_active;
+
+                // Load items
+                document.getElementById('itemsList').innerHTML = '';
+                itemCounter = 0;
+                if (section.items && Array.isArray(section.items)) {
+                    section.items.forEach(item => {
+                        addItem(item.title, item.description);
+                    });
+                }
+
+                document.getElementById('sectionModal').classList.add('active');
+                lucide.createIcons();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        } catch (error) {
+            alert('Error loading section: ' + error.message);
+        }
+    }
+
+    // Delete section
+    async function deleteSection(id, title) {
+        if (!confirm(`Are you sure you want to delete "${title}"? This action cannot be undone.`)) {
+            return;
+        }
+
+        try {
+            const response = await fetch('{% url "dashboard_ideology_delete" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ id })
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        } catch (error) {
+            alert('Error deleting section: ' + error.message);
+        }
+    }
+
+    // Close modal on overlay click
+    document.getElementById('sectionModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeModal();
+        }
+    });
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeModal();
+        }
+    });
+</script>
+{% endblock %}

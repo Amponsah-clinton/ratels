@@ -1,0 +1,100 @@
+{% extends "dashboard/base_dashboard.html" %}
+
+{% block title %}Settings{% endblock %}
+
+{% block content %}
+<div class="md-space-y-6">
+
+    <!-- Page Header -->
+    <div class="md-page-header">
+        <h1 class="md-page-title">Settings</h1>
+        <p class="md-page-subtitle">Manage your application preferences</p>
+    </div>
+
+    <!-- Profile Settings -->
+    <div class="md-card">
+        <div class="md-card-header">
+            <h3 class="md-card-title-lg">Profile Settings</h3>
+        </div>
+        <div class="md-card-content">
+            <div class="md-space-y-4">
+                <div class="md-form-group">
+                    <label class="md-form-label">Full Name</label>
+                    <input type="text" class="md-form-input" placeholder="John Doe">
+                </div>
+                <div class="md-form-group">
+                    <label class="md-form-label">Email Address</label>
+                    <input type="email" class="md-form-input" placeholder="john@example.com">
+                </div>
+                <div class="md-form-group">
+                    <label class="md-form-label">Job Title</label>
+                    <input type="text" class="md-form-input" placeholder="Sales Manager">
+                </div>
+                <button class="md-btn md-btn-primary md-btn-sm">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Preferences -->
+    <div class="md-card">
+        <div class="md-card-header">
+            <h3 class="md-card-title-lg">Notification Preferences</h3>
+        </div>
+        <div class="md-card-content">
+            <div class="md-space-y-4">
+                <div class="md-notification-row">
+                    <div class="md-notification-info">
+                        <div class="md-notification-title">Email Notifications</div>
+                        <div class="md-notification-desc">Receive email updates for important events</div>
+                    </div>
+                    <input type="checkbox" class="md-toggle" checked>
+                </div>
+                <div class="md-notification-row">
+                    <div class="md-notification-info">
+                        <div class="md-notification-title">Deal Updates</div>
+                        <div class="md-notification-desc">Get notified when deals change status</div>
+                    </div>
+                    <input type="checkbox" class="md-toggle" checked>
+                </div>
+                <div class="md-notification-row">
+                    <div class="md-notification-info">
+                        <div class="md-notification-title">Task Reminders</div>
+                        <div class="md-notification-desc">Receive reminders for upcoming tasks</div>
+                    </div>
+                    <input type="checkbox" class="md-toggle">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Display Settings -->
+    <div class="md-card">
+        <div class="md-card-header">
+            <h3 class="md-card-title-lg">Display Settings</h3>
+        </div>
+        <div class="md-card-content">
+            <div class="md-space-y-4">
+                <div class="md-form-group">
+                    <label class="md-form-label">Theme</label>
+                    <select class="md-form-select">
+                        <option>Light</option>
+                        <option>Dark</option>
+                        <option>System</option>
+                    </select>
+                </div>
+                <div class="md-form-group">
+                    <label class="md-form-label">Language</label>
+                    <select class="md-form-select">
+                        <option>English</option>
+                        <option>Spanish</option>
+                        <option>French</option>
+                        <option>German</option>
+                    </select>
+                </div>
+                <button class="md-btn md-btn-primary md-btn-sm">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

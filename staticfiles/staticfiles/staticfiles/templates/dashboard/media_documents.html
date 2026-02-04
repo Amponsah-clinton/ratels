@@ -1,0 +1,375 @@
+{% extends "dashboard/base_dashboard.html" %}
+
+{% block title %}Documents - Media Vault{% endblock %}
+
+{% block content %}
+<div class="md-space-y-6">
+
+    <!-- Page Header -->
+    <div class="md-vault-header">
+        <div class="md-vault-header-content">
+            <h1 class="md-page-title">Documents</h1>
+            <p class="md-page-subtitle">Reports, PDFs, and official letters</p>
+        </div>
+        <div class="md-vault-header-actions">
+            <div class="md-view-toggle">
+                <button class="md-view-btn active" id="gridViewBtn" onclick="setView('grid')">
+                    <i data-lucide="grid-3x3" style="width:18px;height:18px;"></i>
+                </button>
+                <button class="md-view-btn" id="listViewBtn" onclick="setView('list')">
+                    <i data-lucide="list" style="width:18px;height:18px;"></i>
+                </button>
+            </div>
+            <button class="md-btn md-btn-primary md-btn-sm" onclick="openUploadModal()">
+                <i data-lucide="plus" style="width:16px;height:16px;"></i>
+                Add Document
+            </button>
+        </div>
+    </div>
+
+    <!-- Category Tabs -->
+    <div class="md-vault-tabs">
+        <button class="md-vault-tab {% if not current_category or current_category == 'all' %}active{% endif %}" onclick="filterCategory('all')">
+            All Documents
+        </button>
+        <button class="md-vault-tab {% if current_category == 'reports' %}active{% endif %}" onclick="filterCategory('reports')">
+            Reports
+        </button>
+        <button class="md-vault-tab {% if current_category == 'pdfs' %}active{% endif %}" onclick="filterCategory('pdfs')">
+            PDFs
+        </button>
+        <button class="md-vault-tab {% if current_category == 'official_letters' %}active{% endif %}" onclick="filterCategory('official_letters')">
+            Official Letters
+        </button>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="md-filter-bar">
+        <div class="md-filter-search">
+            <span class="md-filter-search-icon">
+                <i data-lucide="search"></i>
+            </span>
+            <input type="text" class="md-filter-search-input" placeholder="Search documents..." id="searchInput" onkeyup="searchMedia()">
+        </div>
+        <select class="md-filter-select" id="sortSelect" onchange="sortMedia()">
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="title">Title A-Z</option>
+        </select>
+    </div>
+
+    <!-- Document Grid -->
+    <div class="md-media-grid" id="mediaGrid">
+        {% if documents %}
+            {% for doc in documents %}
+            <div class="md-media-card" data-title="{{ doc.title|lower }}" data-category="{{ doc.category }}" data-date="{{ doc.created_at|date:'Y-m-d' }}">
+                <div class="md-media-thumb md-doc-thumb">
+                    {% if doc.preview_image_url %}
+                    <img src="{{ doc.preview_image_url }}" alt="{{ doc.title }}">
+                    {% else %}
+                    <div class="md-doc-icon" style="background:#f3e8ff;">
+                        {% if doc.category == 'reports' %}
+                        <i data-lucide="clipboard-list" style="color:#9333ea;"></i>
+                        {% elif doc.category == 'official_letters' %}
+                        <i data-lucide="mail" style="color:#9333ea;"></i>
+                        {% else %}
+                        <i data-lucide="file-text" style="color:#9333ea;"></i>
+                        {% endif %}
+                        <span class="md-doc-ext">{{ doc.mime_type|default:"PDF"|slice:"-3:" }}</span>
+                    </div>
+                    {% endif %}
+                    <span class="md-media-badge {{ doc.category }}">{{ doc.category|cut:"_"|title }}</span>
+                </div>
+                <div class="md-media-body">
+                    <h3 class="md-media-title">{{ doc.title }}</h3>
+                    <p class="md-media-desc">{{ doc.description|default:"No description" }}</p>
+                    <div class="md-media-meta">
+                        {% if doc.author %}
+                        <span class="md-media-meta-item">
+                            <i data-lucide="user"></i>
+                            {{ doc.author }}
+                        </span>
+                        {% endif %}
+                        <span class="md-media-meta-item">
+                            <i data-lucide="calendar"></i>
+                            {{ doc.created_at|date:"M d, Y" }}
+                        </span>
+                        {% if doc.page_count %}
+                        <span class="md-media-meta-item">
+                            <i data-lucide="file"></i>
+                            {{ doc.page_count }} pages
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="md-media-actions">
+                    <a href="{{ doc.file_url }}" target="_blank" class="md-media-action-btn primary">
+                        <i data-lucide="eye"></i>
+                        View
+                    </a>
+                    <a href="{{ doc.file_url }}" download class="md-media-action-btn secondary">
+                        <i data-lucide="download"></i>
+                        Download
+                    </a>
+                    <button class="md-media-action-btn danger" onclick="deleteMedia('{{ doc.id }}', 'document')">
+                        <i data-lucide="trash-2"></i>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="md-empty-state" style="grid-column: 1 / -1;">
+                <i data-lucide="file-x" class="md-empty-icon"></i>
+                <h3 class="md-empty-title">No documents yet</h3>
+                <p class="md-empty-desc">Upload reports, PDFs, and official letters to maintain a comprehensive document archive. Supported formats: PDF, DOC, DOCX</p>
+                <button class="md-btn md-btn-primary" onclick="openUploadModal()">
+                    <i data-lucide="upload" style="width:18px;height:18px;"></i>
+                    Upload Document
+                </button>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- List View -->
+    <div class="md-media-list" id="mediaList" style="display:none;">
+        {% if documents %}
+            {% for doc in documents %}
+            <div class="md-media-list-item" data-title="{{ doc.title|lower }}" data-category="{{ doc.category }}" data-date="{{ doc.created_at|date:'Y-m-d' }}">
+                <div class="md-media-list-thumb" style="background:#f3e8ff;width:60px;height:60px;">
+                    <div style="display:flex;align-items:center;justify-content:center;height:100%;color:#9333ea;">
+                        <i data-lucide="file-text" style="width:24px;height:24px;"></i>
+                    </div>
+                </div>
+                <div class="md-media-list-content">
+                    <div class="md-media-list-title">{{ doc.title }}</div>
+                    <div class="md-media-list-meta">
+                        <span class="md-media-badge {{ doc.category }}" style="position:static;">{{ doc.category|cut:"_"|title }}</span>
+                        {% if doc.author %}<span>{{ doc.author }}</span>{% endif %}
+                        <span>{{ doc.created_at|date:"M d, Y" }}</span>
+                    </div>
+                </div>
+                <div class="md-flex md-gap-2">
+                    <a href="{{ doc.file_url }}" target="_blank" class="md-media-action-btn primary">
+                        <i data-lucide="eye"></i>
+                    </a>
+                    <a href="{{ doc.file_url }}" download class="md-media-action-btn secondary">
+                        <i data-lucide="download"></i>
+                    </a>
+                    <button class="md-media-action-btn danger" onclick="deleteMedia('{{ doc.id }}', 'document')">
+                        <i data-lucide="trash-2"></i>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- Upload Modal -->
+<div class="md-modal-overlay" id="uploadModal">
+    <div class="md-modal">
+        <div class="md-modal-header">
+            <h2 class="md-modal-title">Add New Document</h2>
+            <button class="md-modal-close" onclick="closeUploadModal()">
+                <i data-lucide="x" style="width:20px;height:20px;"></i>
+            </button>
+        </div>
+        <form method="POST" action="{% url 'dashboard_media_documents_save' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="md-modal-body">
+                <div class="md-space-y-4">
+                    <div class="md-form-group full-width">
+                        <label class="md-form-label">Title *</label>
+                        <input type="text" name="title" class="md-form-input" placeholder="Enter document title" required>
+                    </div>
+                    <div class="md-form-row">
+                        <div class="md-form-group">
+                            <label class="md-form-label">Category *</label>
+                            <select name="category" class="md-form-select" required>
+                                <option value="">Select category</option>
+                                <option value="reports">Reports</option>
+                                <option value="pdfs">PDFs</option>
+                                <option value="official_letters">Official Letters</option>
+                            </select>
+                        </div>
+                        <div class="md-form-group">
+                            <label class="md-form-label">Author</label>
+                            <input type="text" name="author" class="md-form-input" placeholder="e.g., Research Team">
+                        </div>
+                    </div>
+                    <div class="md-form-group full-width">
+                        <label class="md-form-label">Description</label>
+                        <textarea name="description" class="md-form-textarea" placeholder="Describe the document content..."></textarea>
+                    </div>
+                    <div class="md-form-group full-width">
+                        <label class="md-form-label">Document File *</label>
+                        <div class="md-upload-zone" id="docDropZone" onclick="document.getElementById('docFile').click()">
+                            <i data-lucide="upload-cloud" class="md-upload-icon"></i>
+                            <p class="md-upload-text">Click to upload or drag and drop</p>
+                            <p class="md-upload-hint">PDF, DOC, DOCX up to 50MB</p>
+                        </div>
+                        <input type="file" name="document_file" id="docFile" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display:none;" onchange="handleFileSelect(this, 'docDropZone')">
+                    </div>
+                    <div class="md-form-row">
+                        <div class="md-form-group">
+                            <label class="md-form-label">Document Date</label>
+                            <input type="date" name="document_date" class="md-form-input">
+                        </div>
+                        <div class="md-form-group">
+                            <label class="md-form-label">Reference Number</label>
+                            <input type="text" name="reference_number" class="md-form-input" placeholder="e.g., REF-2024-001">
+                        </div>
+                    </div>
+                    <div class="md-form-group full-width">
+                        <label class="md-form-label">Source</label>
+                        <input type="text" name="source" class="md-form-input" placeholder="e.g., Internal, Government, External">
+                    </div>
+                    <div class="md-form-group full-width">
+                        <label class="md-notification-row" style="cursor:pointer;">
+                            <input type="checkbox" name="is_confidential" class="md-toggle">
+                            <div class="md-notification-info">
+                                <div class="md-notification-title">Mark as Confidential</div>
+                                <div class="md-notification-desc">Confidential documents are only visible to admins</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="md-modal-footer">
+                <button type="button" class="md-btn md-btn-outline" onclick="closeUploadModal()">Cancel</button>
+                <button type="submit" class="md-btn md-btn-primary">
+                    <i data-lucide="upload" style="width:16px;height:16px;"></i>
+                    Upload Document
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    function setView(view) {
+        const grid = document.getElementById('mediaGrid');
+        const list = document.getElementById('mediaList');
+        const gridBtn = document.getElementById('gridViewBtn');
+        const listBtn = document.getElementById('listViewBtn');
+
+        if (view === 'grid') {
+            grid.style.display = 'grid';
+            list.style.display = 'none';
+            gridBtn.classList.add('active');
+            listBtn.classList.remove('active');
+        } else {
+            grid.style.display = 'none';
+            list.style.display = 'flex';
+            gridBtn.classList.remove('active');
+            listBtn.classList.add('active');
+        }
+        localStorage.setItem('docViewMode', view);
+    }
+
+    const savedView = localStorage.getItem('docViewMode');
+    if (savedView) setView(savedView);
+
+    function filterCategory(category) {
+        const url = new URL(window.location.href);
+        if (category === 'all') {
+            url.searchParams.delete('category');
+        } else {
+            url.searchParams.set('category', category);
+        }
+        window.location.href = url.toString();
+    }
+
+    function searchMedia() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        const cards = document.querySelectorAll('.md-media-card, .md-media-list-item');
+        cards.forEach(card => {
+            const title = card.getAttribute('data-title');
+            card.style.display = title.includes(query) ? '' : 'none';
+        });
+    }
+
+    function sortMedia() {
+        const sort = document.getElementById('sortSelect').value;
+        const grid = document.getElementById('mediaGrid');
+        const cards = Array.from(grid.querySelectorAll('.md-media-card'));
+
+        cards.sort((a, b) => {
+            if (sort === 'newest') {
+                return new Date(b.getAttribute('data-date')) - new Date(a.getAttribute('data-date'));
+            } else if (sort === 'oldest') {
+                return new Date(a.getAttribute('data-date')) - new Date(b.getAttribute('data-date'));
+            } else {
+                return a.getAttribute('data-title').localeCompare(b.getAttribute('data-title'));
+            }
+        });
+        cards.forEach(card => grid.appendChild(card));
+    }
+
+    function openUploadModal() {
+        document.getElementById('uploadModal').classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeUploadModal() {
+        document.getElementById('uploadModal').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    document.getElementById('uploadModal').addEventListener('click', function(e) {
+        if (e.target === this) closeUploadModal();
+    });
+
+    function handleFileSelect(input, zoneId) {
+        const zone = document.getElementById(zoneId);
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            const ext = file.name.split('.').pop().toUpperCase();
+            zone.innerHTML = `
+                <i data-lucide="file-check" class="md-upload-icon" style="color:var(--md-green);"></i>
+                <p class="md-upload-text">${file.name}</p>
+                <p class="md-upload-hint">${ext} - ${(file.size / 1024 / 1024).toFixed(2)} MB</p>
+            `;
+            lucide.createIcons();
+        }
+    }
+
+    const dropZone = document.getElementById('docDropZone');
+    if (dropZone) {
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, e => { e.preventDefault(); e.stopPropagation(); }, false);
+        });
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
+        });
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
+        });
+        dropZone.addEventListener('drop', function(e) {
+            document.getElementById('docFile').files = e.dataTransfer.files;
+            handleFileSelect(document.getElementById('docFile'), 'docDropZone');
+        }, false);
+    }
+
+    function deleteMedia(id, type) {
+        if (confirm('Are you sure you want to delete this ' + type + '?')) {
+            fetch('{% url "dashboard_media_documents_delete" %}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                body: JSON.stringify({ id: id })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) window.location.reload();
+                else alert('Failed to delete: ' + (data.error || 'Unknown error'));
+            });
+        }
+    }
+
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+</script>
+{% endblock %}

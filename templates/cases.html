@@ -1,0 +1,507 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Cases & Investigations - Ratel Movement{% endblock %}
+
+{% block extra_css %}
+<style>
+/* =====================================================
+   CASES PAGE - Card-based, Editorial UI
+   ===================================================== */
+.cases-section {
+    padding: 100px 0 80px;
+    background: #fafbfc;
+    min-height: 80vh;
+}
+
+.cases-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+/* Header */
+.cases-header {
+    margin-bottom: 2.5rem;
+    text-align: center;
+}
+
+.cases-label {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #64748b;
+    margin-bottom: 0.75rem;
+}
+
+.cases-title {
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 0.75rem 0;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+}
+
+.cases-subtitle {
+    font-size: 1.05rem;
+    color: #64748b;
+    max-width: 560px;
+    margin: 0 auto;
+    line-height: 1.65;
+}
+
+/* Search and Filter */
+.cases-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+    flex-wrap: wrap;
+}
+
+.cases-search {
+    flex: 1;
+    min-width: 260px;
+    position: relative;
+}
+
+.cases-search-input {
+    width: 100%;
+    padding: 12px 16px 12px 42px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    background: #ffffff;
+    color: #0f172a;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.cases-search-input:focus {
+    outline: none;
+    border-color: #0f172a;
+    box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.06);
+}
+
+.cases-search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    pointer-events: none;
+}
+
+.cases-filter {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.cases-filter-btn {
+    padding: 10px 18px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #475569;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.cases-filter-btn:hover {
+    border-color: #cbd5e1;
+    background: #f8fafc;
+    color: #0f172a;
+}
+
+.cases-filter-btn.active {
+    background: #0f172a;
+    border-color: #0f172a;
+    color: #ffffff;
+}
+
+.cases-results {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin-bottom: 1.25rem;
+}
+
+.cases-results strong {
+    color: #0f172a;
+    font-weight: 600;
+}
+
+/* Card Grid */
+.cases-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 1.5rem;
+}
+
+.cases-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    overflow: hidden;
+    transition: box-shadow 0.25s ease, border-color 0.25s ease, transform 0.2s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.cases-card:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+    transform: translateY(-2px);
+}
+
+.cases-card-header {
+    padding: 1.5rem 1.5rem 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.cases-card-date {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.cases-card-date i {
+    font-size: 0.75rem;
+    color: #94a3b8;
+}
+
+.cases-card-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    flex-shrink: 0;
+}
+
+.cases-card-status.active {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.cases-card-status.solved {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.cases-card-status.completed {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+.cases-card-status.pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.cases-card-status.closed {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.cases-card-number {
+    font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: 0.03em;
+    padding: 0 1.5rem;
+    margin-top: 0.5rem;
+}
+
+.cases-card-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0.75rem 1.5rem 0;
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.cases-card-desc {
+    font-size: 0.9rem;
+    color: #64748b;
+    line-height: 1.6;
+    margin: 0.75rem 1.5rem 1.25rem;
+    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.cases-card-footer {
+    padding: 1rem 1.5rem 1.5rem;
+    border-top: 1px solid #f1f5f9;
+    background: #fafbfc;
+}
+
+.cases-card-file {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    background: #0f172a;
+    color: #ffffff;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: background 0.2s, color 0.2s;
+    width: 100%;
+    justify-content: center;
+}
+
+.cases-card-file:hover {
+    background: #1e293b;
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.cases-card-file i {
+    font-size: 1rem;
+}
+
+.cases-card-no-file {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: #f1f5f9;
+    color: #94a3b8;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border-radius: 8px;
+}
+
+.cases-card-no-file i {
+    font-size: 0.9rem;
+}
+
+/* Empty State */
+.cases-empty {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: #ffffff;
+    border: 2px dashed #e2e8f0;
+    border-radius: 14px;
+}
+
+.cases-empty-icon {
+    font-size: 3rem;
+    color: #cbd5e1;
+    margin-bottom: 1.25rem;
+}
+
+.cases-empty h3 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 0.5rem 0;
+}
+
+.cases-empty p {
+    font-size: 1rem;
+    color: #64748b;
+    margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .cases-section {
+        padding: 80px 0 60px;
+    }
+
+    .cases-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .cases-search {
+        min-width: 100%;
+    }
+
+    .cases-grid {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+    }
+
+    .cases-card-header {
+        padding: 1.25rem 1.25rem 0;
+    }
+
+    .cases-card-title {
+        font-size: 1.05rem;
+        margin: 0.5rem 1.25rem 0;
+    }
+
+    .cases-card-desc {
+        margin: 0.5rem 1.25rem 1rem;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+    }
+
+    .cases-card-number {
+        padding: 0 1.25rem;
+    }
+
+    .cases-card-footer {
+        padding: 1rem 1.25rem 1.25rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="cases-section">
+    <div class="cases-container">
+        <header class="cases-header">
+            <span class="cases-label">Legal &amp; Investigations</span>
+            <h1 class="cases-title">Cases &amp; Investigations</h1>
+            <p class="cases-subtitle">Track ongoing cases, investigations, and legal matters. Stay informed about our pursuit of justice and accountability.</p>
+        </header>
+
+        <div class="cases-controls">
+            <div class="cases-search">
+                <svg class="cases-search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <input type="text" id="casesSearch" class="cases-search-input" placeholder="Search by title, case number, or description..." value="{{ search_query }}">
+            </div>
+            <div class="cases-filter">
+                <button class="cases-filter-btn {% if status_filter == 'all' %}active{% endif %}" data-status="all">All</button>
+                <button class="cases-filter-btn {% if status_filter == 'active' %}active{% endif %}" data-status="active">Active</button>
+                <button class="cases-filter-btn {% if status_filter == 'solved' %}active{% endif %}" data-status="solved">Solved</button>
+                <button class="cases-filter-btn {% if status_filter == 'completed' %}active{% endif %}" data-status="completed">Completed</button>
+            </div>
+        </div>
+
+        <p class="cases-results">
+            Showing <strong id="resultsCount">{{ cases|length }}</strong> case<span id="resultsPlural">{% if cases|length != 1 %}s{% endif %}</span>
+        </p>
+
+        {% if cases %}
+        <div class="cases-grid" id="casesGrid">
+            {% for case in cases %}
+            <article class="cases-card" data-status="{{ case.status }}" data-title="{{ case.title|lower }}" data-case-no="{{ case.case_number|lower }}" data-description="{{ case.description|lower|default:'' }}">
+                <div class="cases-card-header">
+                    <span class="cases-card-date">
+                        <i class="fa fa-calendar"></i>
+                        {% if case.date_reported %}
+                            {{ case.date_reported|date:"M d, Y" }}
+                        {% elif case.created_at %}
+                            {{ case.created_at|date:"M d, Y" }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </span>
+                    <span class="cases-card-status {{ case.status }}">{{ case.status }}</span>
+                </div>
+                <span class="cases-card-number">{{ case.case_number }}</span>
+                <h2 class="cases-card-title">{{ case.title }}</h2>
+                <p class="cases-card-desc">{{ case.short_description|default:case.description|truncatewords:22|default:"No description available." }}</p>
+                <div class="cases-card-footer">
+                    {% if case.file_url %}
+                    <a href="{{ case.file_url }}" target="_blank" rel="noopener" class="cases-card-file">
+                        <i class="fa fa-file-pdf-o"></i>
+                        {% if case.file_name %}
+                            {{ case.file_name|truncatechars:28 }}
+                        {% else %}
+                            View document
+                        {% endif %}
+                    </a>
+                    {% else %}
+                    <div class="cases-card-no-file">
+                        <i class="fa fa-file-o"></i>
+                        No document attached
+                    </div>
+                    {% endif %}
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="cases-empty">
+            <div class="cases-empty-icon">
+                <i class="fa fa-folder-open"></i>
+            </div>
+            <h3>No cases found</h3>
+            <p>There are no cases matching your criteria. Try changing the filter or search term.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function() {
+    const searchInput = document.getElementById('casesSearch');
+    const filterBtns = document.querySelectorAll('.cases-filter-btn');
+    const cards = document.querySelectorAll('.cases-card');
+    const resultsCount = document.getElementById('resultsCount');
+    const resultsPlural = document.getElementById('resultsPlural');
+    let currentStatus = '{{ status_filter }}';
+
+    function filterCases() {
+        const searchTerm = (searchInput && searchInput.value) ? searchInput.value.toLowerCase().trim() : '';
+        let visibleCount = 0;
+
+        cards.forEach(card => {
+            const status = card.dataset.status;
+            const title = card.dataset.title || '';
+            const caseNo = card.dataset.caseNo || '';
+            const description = card.dataset.description || '';
+            const statusMatch = currentStatus === 'all' || status === currentStatus;
+            const searchMatch = !searchTerm || title.includes(searchTerm) || caseNo.includes(searchTerm) || description.includes(searchTerm);
+
+            if (statusMatch && searchMatch) {
+                card.style.display = '';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        if (resultsCount) resultsCount.textContent = visibleCount;
+        if (resultsPlural) resultsPlural.textContent = visibleCount !== 1 ? 's' : '';
+    }
+
+    if (searchInput) searchInput.addEventListener('input', filterCases);
+
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            filterBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentStatus = this.dataset.status;
+            filterCases();
+            const url = new URL(window.location);
+            if (currentStatus === 'all') url.searchParams.delete('status');
+            else url.searchParams.set('status', currentStatus);
+            window.history.pushState({}, '', url);
+        });
+    });
+})();
+</script>
+{% endblock %}

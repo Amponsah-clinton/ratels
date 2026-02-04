@@ -1,0 +1,1726 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ blog.title }} - Ratel Movement{% endblock %}
+
+{% block extra_head %}
+<!-- Open Graph / Social Sharing -->
+<meta property="og:title" content="{{ blog.title }}">
+<meta property="og:description" content="{{ blog.excerpt|default:blog.meta_description|default:'Read this article from Ratel Movement' }}">
+{% if blog.featured_image_url %}
+<meta property="og:image" content="{{ blog.featured_image_url }}">
+{% endif %}
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary_large_image">
+{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* =====================================================
+   BLOG DETAIL PAGE - Premium News Article Design
+   ===================================================== */
+:root {
+    --article-primary: #bb1919;
+    --article-dark: #0f172a;
+    --article-gray: #64748b;
+    --article-light: #f8fafc;
+    --article-border: #e2e8f0;
+}
+
+.article-page {
+    clear: both;
+    background: #fff;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* ===== HERO SECTION ===== */
+.article-hero {
+    position: relative;
+    height: 70vh;
+    min-height: 500px;
+    max-height: 700px;
+    overflow: hidden;
+    background: var(--article-dark);
+}
+.article-hero-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.7;
+}
+.article-hero-placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.article-hero-placeholder svg {
+    width: 120px;
+    height: 120px;
+    color: rgba(255,255,255,0.1);
+}
+.article-hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to top, rgba(15,23,42,0.95) 0%, rgba(15,23,42,0.4) 50%, rgba(15,23,42,0.2) 100%);
+}
+.article-hero-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 60px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+.article-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    font-size: 0.875rem;
+}
+.article-breadcrumb a {
+    color: rgba(255,255,255,0.7);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.article-breadcrumb a:hover {
+    color: #fff;
+}
+.article-breadcrumb span {
+    color: rgba(255,255,255,0.4);
+}
+.article-category-badge {
+    display: inline-block;
+    padding: 8px 18px;
+    background: var(--article-primary);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+.article-hero-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: #fff;
+    margin: 0 0 24px 0;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+}
+.article-hero-meta {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+.article-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255,255,255,0.8);
+    font-size: 0.9rem;
+}
+.article-meta-item svg {
+    opacity: 0.7;
+}
+.article-author-name {
+    font-weight: 600;
+    color: #fff;
+}
+
+/* ===== MAIN CONTENT AREA ===== */
+.article-main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 60px 2rem 80px;
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 60px;
+}
+
+/* ===== ARTICLE CONTENT ===== */
+.article-content-wrapper {
+    max-width: 720px;
+}
+
+/* Share Bar (Floating) */
+.share-bar-floating {
+    position: fixed;
+    left: max(20px, calc((100vw - 1200px) / 2 - 80px));
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 100;
+    background: #fff;
+    padding: 16px 12px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    border: 1px solid var(--article-border);
+}
+.share-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--article-gray);
+    background: var(--article-light);
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+.share-btn:hover {
+    background: var(--article-dark);
+    color: #fff;
+}
+.share-btn.twitter:hover { background: #1da1f2; }
+.share-btn.facebook:hover { background: #1877f2; }
+.share-btn.linkedin:hover { background: #0a66c2; }
+.share-btn.whatsapp:hover { background: #25d366; }
+.share-btn.copy:hover { background: var(--article-primary); }
+
+/* Excerpt/Lead */
+.article-lead {
+    font-size: 1.35rem;
+    font-weight: 500;
+    color: var(--article-dark);
+    line-height: 1.7;
+    margin: 0 0 40px 0;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--article-border);
+}
+
+/* Article Body */
+.article-body {
+    font-family: 'Merriweather', Georgia, serif;
+    font-size: 1.125rem;
+    line-height: 1.9;
+    color: #334155;
+}
+.article-body h2 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--article-dark);
+    margin: 48px 0 20px 0;
+    line-height: 1.3;
+}
+.article-body h3 {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--article-dark);
+    margin: 40px 0 16px 0;
+    line-height: 1.4;
+}
+.article-body h4 {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #475569;
+    margin: 32px 0 12px 0;
+}
+.article-body p {
+    margin-bottom: 24px;
+}
+.article-body ul, .article-body ol {
+    margin: 24px 0;
+    padding-left: 28px;
+}
+.article-body li {
+    margin-bottom: 12px;
+}
+.article-body a {
+    color: var(--article-primary);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 0.2s;
+}
+.article-body a:hover {
+    color: #a01515;
+}
+.article-body blockquote {
+    position: relative;
+    margin: 40px 0;
+    padding: 32px 40px;
+    background: var(--article-light);
+    border-left: 4px solid var(--article-primary);
+    border-radius: 0 12px 12px 0;
+    font-style: italic;
+    font-size: 1.2rem;
+    color: #475569;
+}
+.article-body blockquote::before {
+    content: '"';
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    font-size: 4rem;
+    color: var(--article-primary);
+    opacity: 0.2;
+    font-family: Georgia, serif;
+    line-height: 1;
+}
+.article-body img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    margin: 32px 0;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+.article-body code {
+    background: #fef2f2;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    color: var(--article-primary);
+    font-family: 'Consolas', monospace;
+}
+.article-body pre {
+    background: #1e293b;
+    color: #e2e8f0;
+    border-radius: 12px;
+    padding: 24px;
+    overflow-x: auto;
+    margin: 32px 0;
+}
+.article-body pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+}
+
+/* Tags */
+.article-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 48px;
+    padding-top: 32px;
+    border-top: 1px solid var(--article-border);
+}
+.article-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: var(--article-light);
+    color: var(--article-gray);
+    font-size: 0.85rem;
+    font-weight: 500;
+    border-radius: 20px;
+    border: 1px solid var(--article-border);
+    text-decoration: none;
+    transition: all 0.2s;
+}
+.article-tag:hover {
+    background: var(--article-dark);
+    color: #fff;
+    border-color: var(--article-dark);
+}
+
+/* Author Box */
+.author-box {
+    display: flex;
+    gap: 24px;
+    margin-top: 48px;
+    padding: 32px;
+    background: var(--article-light);
+    border-radius: 16px;
+}
+.author-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--article-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 2rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+.author-info h4 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--article-dark);
+    margin: 0 0 4px 0;
+}
+.author-info .author-role {
+    font-size: 0.875rem;
+    color: var(--article-gray);
+    margin: 0 0 12px 0;
+}
+.author-info .author-bio {
+    font-size: 0.95rem;
+    color: #475569;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* ===== SIDEBAR ===== */
+.article-sidebar {
+    position: sticky;
+    top: 30px;
+    height: fit-content;
+}
+
+/* Table of Contents */
+.toc-widget {
+    background: #fff;
+    border: 1px solid var(--article-border);
+    border-radius: 12px;
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+.toc-header {
+    background: var(--article-dark);
+    color: #fff;
+    padding: 16px 20px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.toc-body {
+    padding: 20px;
+}
+.toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.toc-item {
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+.toc-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.toc-item:first-child {
+    padding-top: 0;
+}
+.toc-link {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    color: var(--article-gray);
+    text-decoration: none;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    transition: color 0.2s;
+}
+.toc-link:hover {
+    color: var(--article-primary);
+}
+.toc-number {
+    width: 24px;
+    height: 24px;
+    background: var(--article-light);
+    color: var(--article-gray);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+.toc-link:hover .toc-number {
+    background: var(--article-primary);
+    color: #fff;
+}
+
+/* Share Widget */
+.share-widget {
+    background: #fff;
+    border: 1px solid var(--article-border);
+    border-radius: 12px;
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+.share-header {
+    background: var(--article-light);
+    padding: 16px 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--article-dark);
+    border-bottom: 1px solid var(--article-border);
+}
+.share-body {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+.share-widget-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+}
+.share-widget-btn.twitter {
+    background: #e8f5fd;
+    color: #1da1f2;
+}
+.share-widget-btn.twitter:hover {
+    background: #1da1f2;
+    color: #fff;
+}
+.share-widget-btn.facebook {
+    background: #e7f0ff;
+    color: #1877f2;
+}
+.share-widget-btn.facebook:hover {
+    background: #1877f2;
+    color: #fff;
+}
+.share-widget-btn.linkedin {
+    background: #e8f4f8;
+    color: #0a66c2;
+}
+.share-widget-btn.linkedin:hover {
+    background: #0a66c2;
+    color: #fff;
+}
+.share-widget-btn.whatsapp {
+    background: #e7faf0;
+    color: #25d366;
+}
+.share-widget-btn.whatsapp:hover {
+    background: #25d366;
+    color: #fff;
+}
+
+/* Newsletter Widget */
+.newsletter-widget {
+    background: linear-gradient(135deg, var(--article-dark) 0%, #1e293b 100%);
+    border-radius: 12px;
+    padding: 28px;
+    color: #fff;
+}
+.newsletter-widget h4 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+}
+.newsletter-widget p {
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.7);
+    line-height: 1.5;
+    margin: 0 0 20px 0;
+}
+.newsletter-widget input {
+    width: 100%;
+    padding: 14px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+}
+.newsletter-widget input::placeholder {
+    color: rgba(255,255,255,0.5);
+}
+.newsletter-widget button {
+    width: 100%;
+    padding: 14px;
+    background: var(--article-primary);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.newsletter-widget button:hover {
+    background: #a01515;
+}
+
+/* Sidebar Related Articles Widget */
+.sidebar-related-widget {
+    background: #fff;
+    border: 1px solid var(--article-border);
+    border-radius: 12px;
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+.sidebar-related-header {
+    background: var(--article-dark);
+    color: #fff;
+    padding: 16px 20px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.sidebar-related-body {
+    padding: 0;
+}
+.sidebar-related-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.sidebar-related-item {
+    border-bottom: 1px solid #f1f5f9;
+}
+.sidebar-related-item:last-child {
+    border-bottom: none;
+}
+.sidebar-related-link {
+    display: flex;
+    gap: 14px;
+    padding: 16px;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+.sidebar-related-link:hover {
+    background: #f8fafc;
+}
+.sidebar-related-thumb {
+    width: 72px;
+    height: 72px;
+    border-radius: 8px;
+    object-fit: cover;
+    flex-shrink: 0;
+    background: #f1f5f9;
+}
+.sidebar-related-thumb-placeholder {
+    width: 72px;
+    height: 72px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: #94a3b8;
+}
+.sidebar-related-content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.sidebar-related-category {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--article-primary);
+    margin-bottom: 4px;
+}
+.sidebar-related-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--article-dark);
+    line-height: 1.4;
+    margin: 0 0 6px 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    transition: color 0.2s;
+}
+.sidebar-related-link:hover .sidebar-related-title {
+    color: var(--article-primary);
+}
+.sidebar-related-meta {
+    font-size: 0.75rem;
+    color: var(--article-gray);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.sidebar-related-meta svg {
+    width: 12px;
+    height: 12px;
+    opacity: 0.6;
+}
+
+/* ===== RELATED ARTICLES ===== */
+.related-section {
+    background: var(--article-light);
+    padding: 80px 0;
+    border-top: 1px solid var(--article-border);
+}
+.related-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+.related-header {
+    text-align: center;
+    margin-bottom: 48px;
+}
+.related-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--article-dark);
+    margin: 0 0 12px 0;
+}
+.related-subtitle {
+    font-size: 1.1rem;
+    color: var(--article-gray);
+    margin: 0;
+}
+.related-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+}
+.related-card {
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    transition: all 0.3s ease;
+}
+.related-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+}
+.related-card-image {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+}
+.related-card-placeholder {
+    width: 100%;
+    height: 220px;
+    background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+}
+.related-card-body {
+    padding: 24px;
+}
+.related-card-category {
+    display: inline-block;
+    padding: 5px 12px;
+    background: #fef2f2;
+    color: var(--article-primary);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-radius: 4px;
+    margin-bottom: 12px;
+}
+.related-card-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--article-dark);
+    margin: 0 0 12px 0;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.related-card-title a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.related-card-title a:hover {
+    color: var(--article-primary);
+}
+.related-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 0.85rem;
+    color: var(--article-gray);
+}
+
+/* ===== COMMENTS SECTION (threaded, no gradients) ===== */
+.comments-section {
+    margin-top: 56px;
+    padding-top: 40px;
+    border-top: 1px solid var(--article-border);
+}
+.comments-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 28px;
+}
+.comments-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--article-dark);
+    margin: 0;
+}
+.comments-count {
+    font-size: 0.9rem;
+    color: var(--article-gray);
+    font-weight: 500;
+}
+.comment-form-card {
+    background: var(--article-light);
+    border: 1px solid var(--article-border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 32px;
+}
+.comment-form-card label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--article-dark);
+    margin-bottom: 6px;
+}
+.comment-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+@media (max-width: 600px) {
+    .comment-form-row { grid-template-columns: 1fr; }
+}
+.comment-form-card input,
+.comment-form-card textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--article-border);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    background: #fff;
+    color: var(--article-dark);
+}
+.comment-form-card input:focus,
+.comment-form-card textarea:focus {
+    outline: none;
+    border-color: var(--article-primary);
+    box-shadow: 0 0 0 2px rgba(187, 25, 25, 0.12);
+}
+.comment-form-card textarea {
+    min-height: 100px;
+    resize: vertical;
+    margin-bottom: 16px;
+}
+.comment-submit-btn {
+    padding: 12px 24px;
+    background: var(--article-primary);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.comment-submit-btn:hover {
+    background: #9a1414;
+}
+.comment-submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Comment list */
+.comment-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.comment-item {
+    margin-bottom: 0;
+}
+.comment-block {
+    display: flex;
+    gap: 14px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--article-border);
+}
+.comment-block:last-child {
+    border-bottom: none;
+}
+.comment-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--article-dark);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+}
+.comment-body-wrap {
+    flex: 1;
+    min-width: 0;
+}
+.comment-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+.comment-author {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--article-dark);
+}
+.comment-time {
+    font-size: 0.8rem;
+    color: var(--article-gray);
+}
+.comment-text {
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: #334155;
+    margin-bottom: 10px;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+.comment-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+.comment-like-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 0;
+    background: none;
+    border: none;
+    font-size: 0.85rem;
+    color: var(--article-gray);
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.comment-like-btn:hover {
+    color: var(--article-primary);
+}
+.comment-like-btn.liked {
+    color: var(--article-primary);
+}
+.comment-reply-btn {
+    background: none;
+    border: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--article-gray);
+    cursor: pointer;
+    padding: 6px 0;
+    transition: color 0.2s;
+}
+.comment-reply-btn:hover {
+    color: var(--article-primary);
+}
+
+/* Threaded replies */
+.comment-replies {
+    margin-left: 54px;
+    padding-left: 20px;
+    border-left: 2px solid var(--article-border);
+    margin-top: 4px;
+}
+@media (max-width: 600px) {
+    .comment-replies {
+        margin-left: 24px;
+        padding-left: 14px;
+    }
+}
+.comment-replies .comment-block {
+    padding: 12px 0;
+}
+.comment-replies .comment-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 0.8rem;
+}
+.comment-reply-form {
+    margin-top: 12px;
+    margin-bottom: 8px;
+    padding: 16px;
+    background: #fff;
+    border: 1px solid var(--article-border);
+    border-radius: 10px;
+}
+.comment-reply-form textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--article-border);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    min-height: 80px;
+    resize: vertical;
+    margin-bottom: 10px;
+}
+.comment-reply-form .row-buttons {
+    display: flex;
+    gap: 10px;
+}
+.comment-reply-form button[type="submit"] {
+    padding: 8px 18px;
+    background: var(--article-primary);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+.comment-reply-form button[type="button"].cancel-reply {
+    padding: 8px 18px;
+    background: #fff;
+    color: var(--article-gray);
+    border: 1px solid var(--article-border);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+.comments-loading,
+.comments-empty {
+    text-align: center;
+    padding: 32px 16px;
+    color: var(--article-gray);
+    font-size: 0.95rem;
+}
+.comments-error {
+    padding: 16px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    color: #991b1b;
+    font-size: 0.9rem;
+    margin-bottom: 16px;
+}
+
+/* Back Button */
+.back-nav {
+    position: fixed;
+    top: 30px;
+    left: max(30px, calc((100vw - 1200px) / 2 - 80px));
+    z-index: 100;
+}
+.back-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: #fff;
+    color: var(--article-dark);
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    border: 1px solid var(--article-border);
+    transition: all 0.2s;
+}
+.back-btn:hover {
+    background: var(--article-dark);
+    color: #fff;
+    border-color: var(--article-dark);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1400px) {
+    .share-bar-floating,
+    .back-nav {
+        display: none;
+    }
+}
+
+@media (max-width: 1024px) {
+    .article-main {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+    .article-content-wrapper {
+        max-width: 100%;
+    }
+    .article-sidebar {
+        position: static;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+    .sidebar-related-widget {
+        grid-column: span 2;
+    }
+    .sidebar-related-list {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .sidebar-related-item {
+        border-bottom: none;
+        border-right: 1px solid #f1f5f9;
+    }
+    .sidebar-related-item:nth-child(2n) {
+        border-right: none;
+    }
+    .sidebar-related-item:nth-child(n+3) {
+        border-top: 1px solid #f1f5f9;
+    }
+    .newsletter-widget {
+        grid-column: span 2;
+    }
+    .related-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .article-hero {
+        height: 60vh;
+        min-height: 400px;
+    }
+    .article-hero-content {
+        padding: 30px 20px;
+    }
+    .article-hero-title {
+        font-size: 2rem;
+    }
+    .article-hero-meta {
+        gap: 16px;
+    }
+    .article-main {
+        padding: 40px 1rem 60px;
+    }
+    .article-lead {
+        font-size: 1.15rem;
+    }
+    .article-body {
+        font-size: 1rem;
+    }
+    .article-body h2 {
+        font-size: 1.5rem;
+    }
+    .article-sidebar {
+        grid-template-columns: 1fr;
+    }
+    .sidebar-related-widget {
+        grid-column: span 1;
+    }
+    .sidebar-related-list {
+        display: block;
+    }
+    .sidebar-related-item {
+        border-right: none;
+        border-bottom: 1px solid #f1f5f9;
+        border-top: none !important;
+    }
+    .sidebar-related-item:last-child {
+        border-bottom: none;
+    }
+    .newsletter-widget {
+        grid-column: span 1;
+    }
+    .related-grid {
+        grid-template-columns: 1fr;
+    }
+    .related-title {
+        font-size: 1.75rem;
+    }
+    .author-box {
+        flex-direction: column;
+        text-align: center;
+    }
+    .author-avatar {
+        margin: 0 auto;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<article class="article-page">
+    <!-- Back Navigation (Desktop) -->
+    <nav class="back-nav">
+        <a href="{% url 'blog' %}" class="back-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+            All Articles
+        </a>
+    </nav>
+
+    <!-- Floating Share Bar (Desktop) -->
+    <div class="share-bar-floating">
+        <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ blog.title|urlencode }}" target="_blank" class="share-btn twitter" title="Share on Twitter">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank" class="share-btn facebook" title="Share on Facebook">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        </a>
+        <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ request.build_absolute_uri }}&title={{ blog.title|urlencode }}" target="_blank" class="share-btn linkedin" title="Share on LinkedIn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        </a>
+        <a href="https://wa.me/?text={{ blog.title|urlencode }}%20{{ request.build_absolute_uri }}" target="_blank" class="share-btn whatsapp" title="Share on WhatsApp">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        </a>
+        <button class="share-btn copy" onclick="navigator.clipboard.writeText(window.location.href); this.innerHTML='<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'20\' height=\'20\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\'><polyline points=\'20 6 9 17 4 12\'/></svg>'; setTimeout(() => this.innerHTML='<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'20\' height=\'20\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\'><rect width=\'14\' height=\'14\' x=\'8\' y=\'8\' rx=\'2\' ry=\'2\'/><path d=\'M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\'/></svg>', 2000)" title="Copy Link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+        </button>
+    </div>
+
+    <!-- Hero Section -->
+    <header class="article-hero">
+        {% if blog.featured_image_url %}
+        <img src="{{ blog.featured_image_url }}" alt="{{ blog.title }}" class="article-hero-image">
+        {% else %}
+        <div class="article-hero-placeholder">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+        </div>
+        {% endif %}
+        <div class="article-hero-overlay"></div>
+        <div class="article-hero-content">
+            <nav class="article-breadcrumb">
+                <a href="{% url 'index' %}">Home</a>
+                <span>/</span>
+                <a href="{% url 'blog' %}">Blog</a>
+                <span>/</span>
+                <a href="{% url 'blog' %}?category={{ blog.category|default:'general' }}">{{ blog.category|default:"General"|title }}</a>
+            </nav>
+            <span class="article-category-badge">{{ blog.category|default:"General" }}</span>
+            <h1 class="article-hero-title">{{ blog.title }}</h1>
+            <div class="article-hero-meta">
+                <span class="article-meta-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span class="article-author-name">{{ blog.author_name|default:"Ratel Movement" }}</span>
+                </span>
+                {% if blog.published_at %}
+                <span class="article-meta-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    {{ blog.published_at|date:"F d, Y" }}
+                </span>
+                {% endif %}
+                <span class="article-meta-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    {{ blog.reading_time|default:5 }} min read
+                </span>
+                {% if blog.view_count %}
+                <span class="article-meta-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    {{ blog.view_count }} views
+                </span>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="article-main">
+        <div class="article-content-wrapper">
+            {% if blog.excerpt %}
+            <p class="article-lead">{{ blog.excerpt }}</p>
+            {% endif %}
+
+            <div class="article-body">
+                {{ blog.content|safe }}
+            </div>
+
+            {% if blog.tags %}
+            <div class="article-tags">
+                {% for tag in blog.tags %}
+                <a href="{% url 'blog' %}?q={{ tag }}" class="article-tag">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                    {{ tag }}
+                </a>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Author Box -->
+            <div class="author-box">
+                <div class="author-avatar">
+                    {{ blog.author_name|default:"R"|first|upper }}
+                </div>
+                <div class="author-info">
+                    <h4>{{ blog.author_name|default:"Ratel Movement" }}</h4>
+                    <p class="author-role">Author</p>
+                    <p class="author-bio">Contributing writer at Ratel Movement, focusing on analysis, insights, and perspectives that matter.</p>
+                </div>
+            </div>
+
+            <!-- Comments Section -->
+            <section class="comments-section" id="comments-section" data-blog-id="{{ blog.id }}">
+                <div class="comments-header">
+                    <h2 class="comments-title">Comments</h2>
+                    <span class="comments-count" id="comments-count">0 comments</span>
+                </div>
+                <div class="comment-form-card">
+                    <form id="comment-form" class="comment-form">{% csrf_token %}
+                        <div class="comment-form-row">
+                            <div>
+                                <label for="comment-author">Your name</label>
+                                <input type="text" id="comment-author" name="author_name" required placeholder="Name" maxlength="255">
+                            </div>
+                            <div>
+                                <label for="comment-email">Email (optional)</label>
+                                <input type="email" id="comment-email" name="author_email" placeholder="you@example.com">
+                            </div>
+                        </div>
+                        <label for="comment-body">Comment</label>
+                        <textarea id="comment-body" name="body" required placeholder="Add a comment…" maxlength="5000"></textarea>
+                        <button type="submit" class="comment-submit-btn" id="comment-submit-btn">Post comment</button>
+                    </form>
+                </div>
+                <div id="comments-loading" class="comments-loading">Loading comments…</div>
+                <div id="comments-error" class="comments-error" style="display: none;"></div>
+                <ul class="comment-list" id="comment-list" style="display: none;"></ul>
+                <div id="comments-empty" class="comments-empty" style="display: none;">No comments yet. Be the first to comment.</div>
+            </section>
+        </div>
+
+        <!-- Sidebar -->
+        <aside class="article-sidebar">
+            <!-- Share Widget -->
+            <div class="share-widget">
+                <div class="share-header">Share This Article</div>
+                <div class="share-body">
+                    <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ blog.title|urlencode }}" target="_blank" class="share-widget-btn twitter">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                        Twitter
+                    </a>
+                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank" class="share-widget-btn facebook">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                        Facebook
+                    </a>
+                    <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ request.build_absolute_uri }}&title={{ blog.title|urlencode }}" target="_blank" class="share-widget-btn linkedin">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                        LinkedIn
+                    </a>
+                    <a href="https://wa.me/?text={{ blog.title|urlencode }}%20{{ request.build_absolute_uri }}" target="_blank" class="share-widget-btn whatsapp">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                        WhatsApp
+                    </a>
+                </div>
+            </div>
+
+            <!-- Related Articles in Sidebar -->
+            {% if related_blogs %}
+            <div class="sidebar-related-widget">
+                <div class="sidebar-related-header">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+                    Related Articles
+                </div>
+                <div class="sidebar-related-body">
+                    <ul class="sidebar-related-list">
+                        {% for related in related_blogs %}
+                        <li class="sidebar-related-item">
+                            <a href="{% url 'blog_detail' related.slug %}" class="sidebar-related-link">
+                                {% if related.featured_image_url %}
+                                <img src="{{ related.featured_image_url }}" alt="{{ related.title }}" class="sidebar-related-thumb">
+                                {% else %}
+                                <div class="sidebar-related-thumb-placeholder">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                                </div>
+                                {% endif %}
+                                <div class="sidebar-related-content">
+                                    <span class="sidebar-related-category">{{ related.category|default:"General" }}</span>
+                                    <h4 class="sidebar-related-title">{{ related.title }}</h4>
+                                    <div class="sidebar-related-meta">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                        {{ related.reading_time|default:5 }} min read
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Newsletter -->
+            <div class="newsletter-widget">
+                <h4>Stay Updated</h4>
+                <p>Get the latest articles delivered to your inbox.</p>
+                <form onsubmit="event.preventDefault(); alert('Newsletter signup coming soon!');">
+                    <input type="email" placeholder="Enter your email" required>
+                    <button type="submit">Subscribe</button>
+                </form>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Related Articles -->
+    {% if related_blogs %}
+    <section class="related-section">
+        <div class="related-container">
+            <div class="related-header">
+                <h2 class="related-title">Related Articles</h2>
+                <p class="related-subtitle">Continue reading more from {{ blog.category|default:"General"|title }}</p>
+            </div>
+            <div class="related-grid">
+                {% for related in related_blogs %}
+                <article class="related-card">
+                    {% if related.featured_image_url %}
+                    <img src="{{ related.featured_image_url }}" alt="{{ related.title }}" class="related-card-image">
+                    {% else %}
+                    <div class="related-card-placeholder">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                    </div>
+                    {% endif %}
+                    <div class="related-card-body">
+                        <span class="related-card-category">{{ related.category|default:"General" }}</span>
+                        <h3 class="related-card-title">
+                            <a href="{% url 'blog_detail' related.slug %}">{{ related.title }}</a>
+                        </h3>
+                        <div class="related-card-meta">
+                            {% if related.published_at %}
+                            <span>{{ related.published_at|date:"M d, Y" }}</span>
+                            {% endif %}
+                            <span>{{ related.reading_time|default:5 }} min read</span>
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+</article>
+
+<script>
+(function() {
+    var blogId = document.getElementById('comments-section').getAttribute('data-blog-id');
+    var listEl = document.getElementById('comment-list');
+    var loadingEl = document.getElementById('comments-loading');
+    var emptyEl = document.getElementById('comments-empty');
+    var errorEl = document.getElementById('comments-error');
+    var countEl = document.getElementById('comments-count');
+    var commentForm = document.getElementById('comment-form');
+    var commentSubmitBtn = document.getElementById('comment-submit-btn');
+
+    var FINGERPRINT_KEY = 'blog_comment_fp';
+    function getFingerprint() {
+        var fp = localStorage.getItem(FINGERPRINT_KEY);
+        if (!fp) {
+            fp = 'fp_' + Math.random().toString(36).slice(2) + '_' + Date.now();
+            localStorage.setItem(FINGERPRINT_KEY, fp);
+        }
+        return fp;
+    }
+    var fingerprint = getFingerprint();
+
+    function getCookie(name) {
+        var v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+        return v ? v[2] : null;
+    }
+
+    function csrfHeader() {
+        var csrf = document.querySelector('[name=csrfmiddlewaretoken]');
+        if (csrf) return { 'X-CSRFToken': csrf.value };
+        var c = getCookie('csrftoken');
+        return c ? { 'X-CSRFToken': c } : {};
+    }
+
+    function showError(msg) {
+        errorEl.textContent = msg;
+        errorEl.style.display = 'block';
+        setTimeout(function() { errorEl.style.display = 'none'; }, 5000);
+    }
+
+    function buildTree(comments) {
+        var byId = {};
+        var roots = [];
+        comments.forEach(function(c) { byId[c.id] = Object.assign({}, c, { replies: [] }); });
+        comments.forEach(function(c) {
+            var node = byId[c.id];
+            if (!c.parent_id) roots.push(node);
+            else if (byId[c.parent_id]) byId[c.parent_id].replies.push(node);
+            else roots.push(node);
+        });
+        roots.sort(function(a, b) { return new Date(a.created_at) - new Date(b.created_at); });
+        roots.forEach(function(r) { r.replies.sort(function(a, b) { return new Date(a.created_at) - new Date(b.created_at); }); });
+        return roots;
+    }
+
+    function formatTime(iso) {
+        if (!iso) return '';
+        var d = new Date(iso.replace('Z', '+00:00'));
+        var now = new Date();
+        var diff = (now - d) / 1000;
+        if (diff < 60) return 'Just now';
+        if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+        if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+        if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
+        return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: d.getFullYear() !== now.getFullYear() ? 'numeric' : undefined });
+    }
+
+    function escapeHtml(s) {
+        if (!s) return '';
+        var div = document.createElement('div');
+        div.textContent = s;
+        return div.innerHTML;
+    }
+
+    function renderComment(c, isReply) {
+        var block = document.createElement('div');
+        block.className = 'comment-block';
+        block.setAttribute('data-comment-id', c.id);
+        var initial = (c.author_name || 'U').charAt(0).toUpperCase();
+        var likedClass = c.user_liked ? ' liked' : '';
+        block.innerHTML =
+            '<div class="comment-avatar">' + escapeHtml(initial) + '</div>' +
+            '<div class="comment-body-wrap">' +
+                '<div class="comment-meta">' +
+                    '<span class="comment-author">' + escapeHtml(c.author_name || 'Anonymous') + '</span>' +
+                    '<span class="comment-time">' + formatTime(c.created_at) + '</span>' +
+                '</div>' +
+                '<div class="comment-text">' + escapeHtml(c.body) + '</div>' +
+                '<div class="comment-actions">' +
+                    '<button type="button" class="comment-like-btn' + likedClass + '" data-comment-id="' + escapeHtml(c.id) + '" data-like-count="' + (c.like_count || 0) + '" title="Like">' +
+                        '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="' + (c.user_liked ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>' +
+                        '<span class="like-count">' + (c.like_count || 0) + '</span>' +
+                    '</button>' +
+                    (!isReply ? '<button type="button" class="comment-reply-btn" data-comment-id="' + escapeHtml(c.id) + '" data-author="' + escapeHtml(c.author_name || '') + '">Reply</button>' : '') +
+                '</div>' +
+            '</div>';
+        return block;
+    }
+
+    function renderReplies(replies, parentId, likedIds) {
+        if (!replies.length) return '';
+        var wrap = document.createElement('div');
+        wrap.className = 'comment-replies';
+        replies.forEach(function(r) {
+            r.user_liked = likedIds.indexOf(r.id) !== -1;
+            var li = document.createElement('li');
+            li.className = 'comment-item';
+            li.appendChild(renderComment(r, true));
+            wrap.appendChild(li);
+        });
+        return wrap;
+    }
+
+    function renderTree(tree, likedIds) {
+        var fragment = document.createDocumentFragment();
+        tree.forEach(function(c) {
+            c.user_liked = likedIds.indexOf(c.id) !== -1;
+            var li = document.createElement('li');
+            li.className = 'comment-item';
+            li.setAttribute('data-comment-id', c.id);
+            li.appendChild(renderComment(c, false));
+            if (c.replies && c.replies.length) {
+                var repliesWrap = renderReplies(c.replies, c.id, likedIds);
+                li.appendChild(repliesWrap);
+            }
+            fragment.appendChild(li);
+        });
+        return fragment;
+    }
+
+    function loadComments() {
+        loadingEl.style.display = 'block';
+        listEl.style.display = 'none';
+        emptyEl.style.display = 'none';
+        errorEl.style.display = 'none';
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/api/blog/comments/?blog_id=' + encodeURIComponent(blogId));
+        xhr.onload = function() {
+            loadingEl.style.display = 'none';
+            var res = JSON.parse(xhr.responseText || '{}');
+            if (!res.success) {
+                showError(res.error || 'Failed to load comments');
+                emptyEl.style.display = 'block';
+                emptyEl.textContent = 'Could not load comments.';
+                return;
+            }
+            var comments = res.comments || [];
+            var commentIds = comments.map(function(c) { return c.id; });
+            if (commentIds.length === 0) {
+                listEl.style.display = 'none';
+                emptyEl.style.display = 'block';
+                countEl.textContent = '0 comments';
+                return;
+            }
+            var xhr2 = new XMLHttpRequest();
+            xhr2.open('GET', '/api/blog/comments/likes-check/?comment_ids=' + commentIds.join(',') + '&visitor_fingerprint=' + encodeURIComponent(fingerprint));
+            xhr2.onload = function() {
+                var res2 = JSON.parse(xhr2.responseText || '{}');
+                var likedIds = res2.liked_ids || [];
+                var tree = buildTree(comments);
+                listEl.innerHTML = '';
+                listEl.appendChild(renderTree(tree, likedIds));
+                listEl.style.display = 'block';
+                countEl.textContent = comments.length + (comments.length === 1 ? ' comment' : ' comments');
+                bindLikeAndReply();
+            };
+            xhr2.send();
+        };
+        xhr.onerror = function() {
+            loadingEl.style.display = 'none';
+            showError('Network error loading comments.');
+            emptyEl.style.display = 'block';
+            emptyEl.textContent = 'Could not load comments.';
+        };
+        xhr.send();
+    }
+
+    function bindLikeAndReply() {
+        listEl.querySelectorAll('.comment-like-btn').forEach(function(btn) {
+            btn.onclick = function() {
+                var cid = btn.getAttribute('data-comment-id');
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', '/api/blog/comments/like/');
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                Object.keys(csrfHeader()).forEach(function(k) { xhr.setRequestHeader(k, csrfHeader()[k]); });
+                xhr.onload = function() {
+                    var res = JSON.parse(xhr.responseText || '{}');
+                    if (res.success) {
+                        btn.classList.toggle('liked', res.liked);
+                        var span = btn.querySelector('.like-count');
+                        if (span) span.textContent = res.like_count;
+                        btn.setAttribute('data-like-count', res.like_count);
+                        var svg = btn.querySelector('svg');
+                        if (svg) svg.setAttribute('fill', res.liked ? 'currentColor' : 'none');
+                    }
+                };
+                xhr.send(JSON.stringify({ comment_id: cid, visitor_fingerprint: fingerprint }));
+            };
+        });
+        listEl.querySelectorAll('.comment-reply-btn').forEach(function(btn) {
+            btn.onclick = function() {
+                var cid = btn.getAttribute('data-comment-id');
+                var author = btn.getAttribute('data-author');
+                var existing = document.getElementById('reply-form-' + cid);
+                if (existing) { existing.remove(); return; }
+                var block = listEl.querySelector('.comment-block[data-comment-id="' + cid + '"]');
+                if (!block) block = listEl.querySelector('[data-comment-id="' + cid + '"]');
+                var wrap = block ? block.closest('.comment-item') : null;
+                if (!wrap) return;
+                var form = document.createElement('div');
+                form.id = 'reply-form-' + cid;
+                form.className = 'comment-reply-form';
+                form.innerHTML =
+                    '<textarea placeholder="Write a reply…" maxlength="5000" required></textarea>' +
+                    '<div class="row-buttons">' +
+                        '<button type="submit">Reply</button>' +
+                        '<button type="button" class="cancel-reply">Cancel</button>' +
+                    '</div>';
+                var textarea = form.querySelector('textarea');
+                var repliesDiv = wrap.querySelector('.comment-replies');
+                if (repliesDiv) {
+                    repliesDiv.insertBefore(form, repliesDiv.firstChild);
+                } else {
+                    repliesDiv = document.createElement('div');
+                    repliesDiv.className = 'comment-replies';
+                    repliesDiv.appendChild(form);
+                    wrap.appendChild(repliesDiv);
+                }
+                form.querySelector('button[type="submit"]').onclick = function() {
+                    var body = textarea.value.trim();
+                    if (!body) return;
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('POST', '/api/blog/comments/create/');
+                    xhr.setRequestHeader('Content-Type', 'application/json');
+                    Object.keys(csrfHeader()).forEach(function(k) { xhr.setRequestHeader(k, csrfHeader()[k]); });
+                    xhr.onload = function() {
+                        var res = JSON.parse(xhr.responseText || '{}');
+                        if (res.success) {
+                            form.remove();
+                            loadComments();
+                        } else {
+                            showError(res.error || 'Failed to post reply');
+                        }
+                    };
+                    xhr.send(JSON.stringify({
+                        blog_id: blogId,
+                        parent_id: cid,
+                        author_name: document.getElementById('comment-author').value.trim() || 'Anonymous',
+                        author_email: document.getElementById('comment-email').value.trim(),
+                        body: body
+                    }));
+                };
+                form.querySelector('.cancel-reply').onclick = function() { form.remove(); };
+                textarea.focus();
+            };
+        });
+    }
+
+    commentForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var author = document.getElementById('comment-author').value.trim();
+        var body = document.getElementById('comment-body').value.trim();
+        if (!author || !body) return;
+        commentSubmitBtn.disabled = true;
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/api/blog/comments/create/');
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        Object.keys(csrfHeader()).forEach(function(k) { xhr.setRequestHeader(k, csrfHeader()[k]); });
+        xhr.onload = function() {
+            commentSubmitBtn.disabled = false;
+            var res = JSON.parse(xhr.responseText || '{}');
+            if (res.success) {
+                document.getElementById('comment-body').value = '';
+                loadComments();
+            } else {
+                showError(res.error || 'Failed to post comment');
+            }
+        };
+        xhr.onerror = function() {
+            commentSubmitBtn.disabled = false;
+            showError('Network error.');
+        };
+        xhr.send(JSON.stringify({
+            blog_id: blogId,
+            author_name: author,
+            author_email: document.getElementById('comment-email').value.trim(),
+            body: body
+        }));
+    });
+
+    loadComments();
+})();
+</script>
+{% endblock %}

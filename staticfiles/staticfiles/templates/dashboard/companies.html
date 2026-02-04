@@ -1,0 +1,116 @@
+{% extends "dashboard/base_dashboard.html" %}
+
+{% block title %}Companies{% endblock %}
+
+{% block content %}
+<div class="md-space-y-6">
+
+    <!-- Page Header -->
+    <div class="md-page-header-row">
+        <div>
+            <h1 class="md-page-title">Companies</h1>
+            <p class="md-page-subtitle">Manage your company relationships</p>
+        </div>
+        <button class="md-btn md-btn-primary md-btn-sm">
+            <i data-lucide="plus" style="width:16px;height:16px;"></i>
+            Add Company
+        </button>
+    </div>
+
+    <!-- Search -->
+    <div class="md-card">
+        <div class="md-search-card-inner">
+            <i data-lucide="search" style="width:16px;height:16px;color:var(--md-muted);"></i>
+            <input type="text" class="md-search-card-input" placeholder="Search companies...">
+        </div>
+    </div>
+
+    <!-- Company Cards -->
+    <div class="md-grid md-grid-3">
+        <div class="md-card">
+            <div class="md-card-content" style="padding-top:16px;">
+                <div class="md-flex md-items-start md-gap-4">
+                    <div class="md-company-icon">
+                        <i data-lucide="building-2" style="width:24px;height:24px;"></i>
+                    </div>
+                    <div class="md-contact-info">
+                        <div class="md-contact-name" style="font-size:18px;">Acme Corporation</div>
+                        <div class="md-contact-role">Technology</div>
+                        <div class="md-company-stats">
+                            <div class="md-company-stat">
+                                <span class="md-company-stat-label">
+                                    <i data-lucide="users" style="width:14px;height:14px;"></i> Contacts
+                                </span>
+                                <span class="md-company-stat-value">12</span>
+                            </div>
+                            <div class="md-company-stat">
+                                <span class="md-company-stat-label">
+                                    <i data-lucide="dollar-sign" style="width:14px;height:14px;"></i> Revenue
+                                </span>
+                                <span class="md-company-stat-value">$125,000</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="md-card">
+            <div class="md-card-content" style="padding-top:16px;">
+                <div class="md-flex md-items-start md-gap-4">
+                    <div class="md-company-icon">
+                        <i data-lucide="building-2" style="width:24px;height:24px;"></i>
+                    </div>
+                    <div class="md-contact-info">
+                        <div class="md-contact-name" style="font-size:18px;">Tech Solutions Inc</div>
+                        <div class="md-contact-role">Software Development</div>
+                        <div class="md-company-stats">
+                            <div class="md-company-stat">
+                                <span class="md-company-stat-label">
+                                    <i data-lucide="users" style="width:14px;height:14px;"></i> Contacts
+                                </span>
+                                <span class="md-company-stat-value">8</span>
+                            </div>
+                            <div class="md-company-stat">
+                                <span class="md-company-stat-label">
+                                    <i data-lucide="dollar-sign" style="width:14px;height:14px;"></i> Revenue
+                                </span>
+                                <span class="md-company-stat-value">$89,500</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="md-card">
+            <div class="md-card-content" style="padding-top:16px;">
+                <div class="md-flex md-items-start md-gap-4">
+                    <div class="md-company-icon">
+                        <i data-lucide="building-2" style="width:24px;height:24px;"></i>
+                    </div>
+                    <div class="md-contact-info">
+                        <div class="md-contact-name" style="font-size:18px;">InnovateCo</div>
+                        <div class="md-contact-role">Consulting</div>
+                        <div class="md-company-stats">
+                            <div class="md-company-stat">
+                                <span class="md-company-stat-label">
+                                    <i data-lucide="users" style="width:14px;height:14px;"></i> Contacts
+                                </span>
+                                <span class="md-company-stat-value">15</span>
+                            </div>
+                            <div class="md-company-stat">
+                                <span class="md-company-stat-label">
+                                    <i data-lucide="dollar-sign" style="width:14px;height:14px;"></i> Revenue
+                                </span>
+                                <span class="md-company-stat-value">$210,000</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

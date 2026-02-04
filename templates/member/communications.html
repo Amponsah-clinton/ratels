@@ -1,0 +1,394 @@
+{% extends "member/base_member.html" %}
+
+{% block title %}Communications{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        margin-bottom: 1.5rem;
+    }
+    .page-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+    }
+    .page-subtitle {
+        color: #64748b;
+        font-size: 0.9rem;
+        margin: 0.25rem 0 0 0;
+    }
+
+    .comm-layout {
+        display: grid;
+        grid-template-columns: 350px 1fr;
+        gap: 1.5rem;
+        min-height: 500px;
+    }
+    @media (max-width: 1024px) {
+        .comm-layout {
+            grid-template-columns: 1fr;
+        }
+        .comm-detail-panel {
+            display: none;
+        }
+        .comm-detail-panel.active {
+            display: flex;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 200;
+            border-radius: 0;
+        }
+    }
+
+    .comm-list-panel {
+        background: #fff;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+    .comm-list-header {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #e2e8f0;
+        font-weight: 600;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .comm-list-header i {
+        width: 18px;
+        height: 18px;
+        color: #64748b;
+    }
+    .comm-list {
+        flex: 1;
+        overflow-y: auto;
+    }
+    .comm-item {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #f1f5f9;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .comm-item:hover {
+        background: #f8fafc;
+    }
+    .comm-item.active {
+        background: #eff6ff;
+        border-left: 3px solid #3b82f6;
+    }
+    .comm-item-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+    }
+    .comm-item-sender {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .comm-item-sender .urgent-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #ef4444;
+    }
+    .comm-item-time {
+        font-size: 0.7rem;
+        color: #94a3b8;
+    }
+    .comm-item-subject {
+        font-size: 0.85rem;
+        color: #475569;
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .comm-item-preview {
+        font-size: 0.8rem;
+        color: #94a3b8;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .comm-detail-panel {
+        background: #fff;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        display: flex;
+        flex-direction: column;
+    }
+    .comm-detail-header {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+    .comm-detail-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0 0 0.5rem 0;
+    }
+    .comm-detail-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        font-size: 0.8rem;
+        color: #64748b;
+    }
+    .comm-detail-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+    .comm-detail-meta-item i {
+        width: 14px;
+        height: 14px;
+    }
+    .comm-detail-close {
+        display: none;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #64748b;
+        padding: 0.5rem;
+    }
+    @media (max-width: 1024px) {
+        .comm-detail-close {
+            display: block;
+        }
+    }
+
+    .comm-detail-body {
+        flex: 1;
+        padding: 1.5rem;
+        overflow-y: auto;
+    }
+    .comm-detail-content {
+        color: #475569;
+        font-size: 1rem;
+        line-height: 1.8;
+        white-space: pre-line;
+    }
+
+    .comm-detail-footer {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid #e2e8f0;
+        background: #f8fafc;
+    }
+    .ack-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.625rem 1.25rem;
+        background: #1e293b;
+        color: #fff;
+        font-size: 0.85rem;
+        font-weight: 500;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .ack-btn:hover {
+        background: #334155;
+    }
+    .ack-btn.acknowledged {
+        background: #16a34a;
+        cursor: default;
+    }
+    .ack-btn i {
+        width: 16px;
+        height: 16px;
+    }
+
+    .empty-detail {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #94a3b8;
+        padding: 2rem;
+        text-align: center;
+    }
+    .empty-detail i {
+        width: 64px;
+        height: 64px;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+    .empty-detail h3 {
+        font-size: 1.1rem;
+        color: #64748b;
+        margin: 0 0 0.5rem 0;
+    }
+    .empty-detail p {
+        font-size: 0.9rem;
+        margin: 0;
+    }
+
+    .priority-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    .priority-badge.urgent { background: #fee2e2; color: #991b1b; }
+    .priority-badge.high { background: #ffedd5; color: #9a3412; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Secure Communications</h1>
+    <p class="page-subtitle">Secure and confidential communications from leadership</p>
+</div>
+
+<div class="comm-layout">
+    <!-- Communications List -->
+    <div class="comm-list-panel">
+        <div class="comm-list-header">
+            <i data-lucide="mail"></i>
+            Inbox ({{ communications|length }})
+        </div>
+        <div class="comm-list">
+            {% if communications %}
+                {% for comm in communications %}
+                <div class="comm-item" onclick="selectCommunication(this, '{{ comm.subject|escapejs }}', '{{ comm.message|escapejs }}', '{{ comm.sender_name|default:"Leadership"|escapejs }}', '{{ comm.sender_role|default:""|escapejs }}', '{{ comm.created_at|slice:":10" }}', {{ comm.is_urgent|yesno:'true,false' }}, {{ comm.requires_acknowledgment|yesno:'true,false' }}, '{{ comm.priority|default:"normal" }}')">
+                    <div class="comm-item-header">
+                        <span class="comm-item-sender">
+                            {% if comm.is_urgent %}<span class="urgent-dot"></span>{% endif %}
+                            {{ comm.sender_name|default:"Leadership" }}
+                        </span>
+                        <span class="comm-item-time">{{ comm.created_at|slice:":10" }}</span>
+                    </div>
+                    <div class="comm-item-subject">{{ comm.subject }}</div>
+                    <div class="comm-item-preview">{{ comm.message|truncatechars:50 }}</div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div style="padding:3rem 1.5rem;text-align:center;color:#94a3b8;">
+                    <p>No communications</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Communication Detail -->
+    <div class="comm-detail-panel" id="commDetail">
+        <div class="empty-detail" id="emptyDetail">
+            <i data-lucide="mail"></i>
+            <h3>Select a communication</h3>
+            <p>Choose a message from the list to view its contents</p>
+        </div>
+
+        <div id="commContent" style="display:none;flex-direction:column;height:100%;">
+            <div class="comm-detail-header">
+                <div>
+                    <h2 class="comm-detail-title" id="detailSubject"></h2>
+                    <div class="comm-detail-meta">
+                        <span class="comm-detail-meta-item" id="detailSender">
+                            <i data-lucide="user"></i>
+                            <span></span>
+                        </span>
+                        <span class="comm-detail-meta-item" id="detailDate">
+                            <i data-lucide="calendar"></i>
+                            <span></span>
+                        </span>
+                        <span id="detailPriority"></span>
+                    </div>
+                </div>
+                <button class="comm-detail-close" onclick="closeDetail()">
+                    <i data-lucide="x" style="width:24px;height:24px;"></i>
+                </button>
+            </div>
+            <div class="comm-detail-body">
+                <div class="comm-detail-content" id="detailMessage"></div>
+            </div>
+            <div class="comm-detail-footer" id="detailFooter" style="display:none;">
+                <button class="ack-btn" id="ackBtn" onclick="acknowledgeCommunication()">
+                    <i data-lucide="check"></i>
+                    Acknowledge Receipt
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function selectCommunication(el, subject, message, sender, role, date, isUrgent, requiresAck, priority) {
+    document.querySelectorAll('.comm-item').forEach(item => item.classList.remove('active'));
+    el.classList.add('active');
+
+    document.getElementById('emptyDetail').style.display = 'none';
+    document.getElementById('commContent').style.display = 'flex';
+    document.getElementById('commDetail').classList.add('active');
+
+    document.getElementById('detailSubject').textContent = subject;
+
+    // Convert escaped newlines back to actual line breaks and format the message
+    const formattedMessage = message
+        .replace(/\\n/g, '\n')  // Convert \n string to actual newlines
+        .replace(/\\r/g, '')     // Remove carriage returns
+        .trim();
+    document.getElementById('detailMessage').textContent = formattedMessage;
+
+    document.querySelector('#detailSender span').textContent = sender + (role ? ' - ' + role : '');
+    document.querySelector('#detailDate span').textContent = date;
+
+    const priorityEl = document.getElementById('detailPriority');
+    if (isUrgent || priority === 'high') {
+        priorityEl.innerHTML = `<span class="priority-badge ${isUrgent ? 'urgent' : 'high'}">${isUrgent ? 'Urgent' : 'High Priority'}</span>`;
+    } else {
+        priorityEl.innerHTML = '';
+    }
+
+    document.getElementById('detailFooter').style.display = requiresAck ? 'block' : 'none';
+    lucide.createIcons();
+}
+
+function closeDetail() {
+    document.getElementById('commDetail').classList.remove('active');
+    document.getElementById('emptyDetail').style.display = 'flex';
+    document.getElementById('commContent').style.display = 'none';
+    document.querySelectorAll('.comm-item').forEach(item => item.classList.remove('active'));
+}
+
+function acknowledgeCommunication() {
+    const btn = document.getElementById('ackBtn');
+    btn.classList.add('acknowledged');
+    btn.innerHTML = '<i data-lucide="check"></i> Acknowledged';
+    btn.disabled = true;
+    lucide.createIcons();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const firstComm = document.querySelector('.comm-item');
+    if (firstComm && window.innerWidth > 1024) {
+        firstComm.click();
+    }
+});
+</script>
+{% endblock %}

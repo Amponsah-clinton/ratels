@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:themewagon.github.io)",
+      "Bash(wc:*)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:www.creative-tim.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:api.github.com)",
+      "Bash(python manage.py check:*)",
+      "Bash(pip show:*)",
+      "Bash(timeout 10 python:*)",
+      "Bash(python -c \"\nimport requests\n\nSUPABASE_URL = ''https://vhovrdqfpsdeynsmvleu.supabase.co''\nSUPABASE_SERVICE_KEY = ''eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZob3ZyZHFmcHNkZXluc212bGV1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2OTM1NTgyOCwiZXhwIjoyMDg0OTMxODI4fQ.YZ2Y6U7YxyfnjpvXTXSNSUSdR-tsrXmm60ofzRoJum8''\n\nbase_url = SUPABASE_URL.rstrip\\(''/''\\)\ntable_url = f''{base_url}/rest/v1/members''\nheaders = {\n    ''apikey'': SUPABASE_SERVICE_KEY,\n    ''Authorization'': f''Bearer {SUPABASE_SERVICE_KEY}'',\n    ''Accept'': ''application/json'',\n}\nparams = {\n    ''select'': ''member_id,full_name,membership_type,status'',\n    ''order'': ''created_at.desc'',\n}\n\nresp = requests.get\\(table_url, headers=headers, params=params, timeout=10\\)\nprint\\(f''Status: {resp.status_code}''\\)\nprint\\(f''Response: {resp.text[:500]}''\\)\n\ndata = resp.json\\(\\)\nprint\\(f''Total members: {len\\(data\\)}''\\)\nfor m in data:\n    print\\(f\"\"  - {m.get\\(''full_name''\\)}: membership_type=''{m.get\\(''membership_type''\\)}''\"\"\\)\n\")",
+      "Bash(python:*)",
+      "WebFetch(domain:scholarindexing.academicdigital.space)",
+      "Bash(curl:*)",
+      "Bash(dir:*)",
+      "Bash(git remote:*)"
+    ]
+  }
+}

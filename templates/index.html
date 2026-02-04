@@ -1,0 +1,2538 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Ratel Movement - Home{% endblock %}
+
+{% block extra_css %}
+<style>
+/* =====================================================
+   GLOBAL FIXES
+   ===================================================== */
+html, body {
+    overflow-x: hidden;
+    width: 100%;
+}
+
+/* Allow header to overflow for dropdowns */
+.header_section,
+.header_section .container-fluid,
+.header_section .header_main {
+    overflow: visible !important;
+}
+
+/* Only hide overflow on content containers, not header */
+.container-fluid:not(.header_main) {
+    overflow-x: hidden;
+    max-width: 100vw;
+}
+
+/* =====================================================
+   HERO SECTION
+   ===================================================== */
+.banner_section {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+    float: none !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    overflow: hidden !important;
+    background-size: cover !important;
+    background-position: center !important;
+}
+
+.banner_section .image_1 {
+    max-width: 100%;
+    height: auto;
+}
+
+.carousel-inner {
+    width: 100%;
+}
+/* Hero video (replaces carousel when set - matches carousel design) */
+.banner_section video.image_1 {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+.hero-quote-container {
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 1.5rem 1rem 2rem;
+}
+
+.hero-quote {
+    font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+    font-weight: 500;
+    line-height: 1.4;
+    color: #ffffff;
+    font-style: italic;
+    margin: 0 0 0.5rem 0;
+    letter-spacing: 0.02em;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.hero-attribution {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #f0f0f0;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    display: block;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+
+/* =====================================================
+   MANIFESTO SECTION
+   ===================================================== */
+.manifesto-hero {
+    display: flex !important;
+    min-height: 520px;
+    height: auto;
+    overflow: visible;
+    background: #ffffff;
+    clear: both;
+    float: none !important;
+    width: 100% !important;
+    position: relative;
+    z-index: 1;
+    margin-top: 0;
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.manifesto-content {
+    flex: 1;
+    padding: 4rem 2rem 4rem 0;
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+    float: none !important;
+}
+
+.manifesto-main {
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: 3rem;
+}
+
+.manifesto-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #6b7280;
+    margin-bottom: 16px;
+    display: block;
+}
+
+.manifesto-title {
+    font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+    font-weight: 800;
+    line-height: 1.15;
+    color: #111827;
+    margin: 0 0 20px 0;
+}
+
+.manifesto-divider {
+    width: 50px;
+    height: 4px;
+    background: #111827;
+    margin-bottom: 24px;
+}
+
+.manifesto-rich-content {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: #4b5563;
+    margin-bottom: 28px;
+}
+
+.manifesto-rich-content p {
+    margin-bottom: 0.9em;
+}
+
+.manifesto-rich-content strong {
+    color: #111827;
+    font-weight: 600;
+}
+
+.manifesto-rich-content ul {
+    padding-left: 1.25em;
+    margin-bottom: 0.9em;
+}
+
+.manifesto-rich-content li {
+    margin-bottom: 0.5em;
+}
+
+.manifesto-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 28px;
+    background: #111827;
+    color: #fff;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    font-size: 0.85rem;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.25s ease;
+}
+
+.manifesto-cta:hover {
+    background: #1f2937;
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+.manifesto-image {
+    flex: 1;
+    min-height: 520px;
+    position: relative;
+    overflow: hidden;
+    clip-path: polygon(12% 0, 100% 0, 100% 100%, 0% 100%);
+}
+
+.manifesto-image img {
+    width: 100%;
+    height: 100%;
+    min-height: 520px;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+}
+
+.manifesto-image-placeholder {
+    width: 100%;
+    height: 100%;
+    min-height: 520px;
+    background: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    font-size: 0.9rem;
+}
+
+/* =====================================================
+   LANDING SECTIONS - Clean Design
+   ===================================================== */
+.landing-section {
+    padding: 100px 0;
+    clear: both;
+}
+
+.section-light { background: #ffffff; }
+.section-dark { background: #111827; }
+.section-alt { background: #f8fafc; }
+
+.section-container {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.section-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+}
+
+.section-grid.reverse { direction: rtl; }
+.section-grid.reverse > * { direction: ltr; }
+
+.section-label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #6b7280;
+    margin-bottom: 16px;
+}
+
+.section-label.light { color: #9ca3af; }
+.section-label.center { text-align: center; }
+
+.section-title {
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: #111827;
+    margin: 0 0 20px 0;
+    line-height: 1.15;
+}
+
+.section-title.light { color: #ffffff; }
+
+/* =====================================================
+   FEATURED MEMBERS - Modern profile cards, large image (no gradients)
+   ===================================================== */
+.members-section {
+    padding: 100px 0;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+}
+.members-container {
+    max-width: 1150px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+.members-header {
+    text-align: center;
+    margin-bottom: 56px;
+}
+.members-badge {
+    display: inline-block;
+    padding: 8px 18px;
+    background: #111827;
+    color: #ffffff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border-radius: 4px;
+    margin-bottom: 16px;
+}
+.members-title {
+    font-size: clamp(1.75rem, 3vw, 2.25rem);
+    font-weight: 800;
+    color: #111827;
+    margin: 0 0 12px 0;
+    line-height: 1.2;
+}
+.members-subtitle {
+    font-size: 1rem;
+    color: #64748b;
+    margin: 0;
+    max-width: 520px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.members-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 28px;
+}
+@media (max-width: 1024px) {
+    .members-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+}
+@media (max-width: 600px) {
+    .members-grid { grid-template-columns: 1fr; gap: 24px; }
+    .members-section { padding: 60px 0; }
+}
+.member-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.member-card:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12);
+}
+.member-card-image {
+    width: 100%;
+    aspect-ratio: 1;
+    min-height: 240px;
+    max-height: 280px;
+    overflow: hidden;
+    background: #1e293b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    font-size: 4rem;
+    font-weight: 700;
+    line-height: 1;
+}
+.member-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.member-card-body {
+    padding: 24px 20px;
+    text-align: center;
+}
+.member-card-name {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 6px 0;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+}
+.member-card-role {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin: 0 0 8px 0;
+    font-weight: 500;
+}
+.member-card-location {
+    font-size: 0.8125rem;
+    color: #94a3b8;
+    margin: 0;
+}
+.member-card-id {
+    font-size: 0.7rem;
+    color: #cbd5e1;
+    margin-top: 12px;
+    font-family: ui-monospace, monospace;
+    letter-spacing: 0.5px;
+}
+.section-title.center { text-align: center; }
+
+.section-divider {
+    width: 50px;
+    height: 4px;
+    background: #111827;
+    margin-bottom: 28px;
+}
+
+.section-divider.light { background: #ffffff; }
+.section-divider.center { margin-left: auto; margin-right: auto; }
+
+.section-content {
+    font-size: 1.05rem;
+    line-height: 1.85;
+    color: #4b5563;
+}
+
+.section-content.light { color: #d1d5db; }
+.section-content p { margin-bottom: 1.1em; }
+.section-content ul, .section-content ol { padding-left: 1.5em; margin-bottom: 1.1em; }
+.section-content li { margin-bottom: 0.6em; }
+.section-content strong { color: #111827; font-weight: 600; }
+.section-content.light strong { color: #ffffff; }
+
+.section-image-wrap {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+.section-img {
+    width: 100%;
+    height: 420px;
+    object-fit: cover;
+    display: block;
+}
+
+.section-img-placeholder {
+    width: 100%;
+    height: 420px;
+    background: #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+}
+
+.section-img-placeholder.dark {
+    background: #1f2937;
+    color: #4b5563;
+}
+
+/* =====================================================
+   WHAT WE STAND AGAINST - Full BG Image Section
+   ===================================================== */
+.stand-against-section {
+    position: relative;
+    min-height: 600px;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 100px 24px;
+    clear: both;
+}
+
+.stand-against-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 1;
+}
+
+.stand-against-container {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+    text-align: center;
+}
+
+.stand-against-label {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 20px;
+}
+
+.stand-against-title {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0 0 24px 0;
+    line-height: 1.1;
+}
+
+.stand-against-divider {
+    width: 60px;
+    height: 4px;
+    background: #ffffff;
+    margin: 0 auto 36px auto;
+}
+
+.stand-against-content {
+    font-size: 1.1rem;
+    line-height: 1.9;
+    color: rgba(255, 255, 255, 0.9);
+    text-align: left;
+}
+
+.stand-against-content p {
+    margin-bottom: 1.25em;
+    text-align: center;
+}
+
+.stand-against-content ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+
+.stand-against-content li {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 0;
+    transition: all 0.3s ease;
+}
+
+.stand-against-content li:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.stand-against-content strong {
+    color: #ffffff;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 4px;
+    font-size: 1.15rem;
+}
+
+/* =====================================================
+   CTA SECTION
+   ===================================================== */
+.cta-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.cta-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+}
+
+.cta-card {
+    position: relative;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 36px 32px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.cta-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.55);
+    z-index: 1;
+    transition: background 0.3s ease;
+}
+
+.cta-card:hover::before {
+    background: rgba(15, 23, 42, 0.45);
+}
+
+.cta-card > * {
+    position: relative;
+    z-index: 2;
+}
+
+.cta-card:hover {
+    border-color: #d1d5db;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+    transform: translateY(-4px);
+}
+
+/* Individual card backgrounds - matching content themes */
+.cta-card.cta-card-1 {
+    /* Understand the Movement - learning, knowledge, books, education */
+    background-image: url('https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
+}
+
+.cta-card.cta-card-2 {
+    /* Watch the Evidence - media, camera, documentation, investigation */
+    background-image: url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
+}
+
+.cta-card.cta-card-3 {
+    /* Become a Member - community, people together, unity, joining hands */
+    background-image: url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
+}
+
+.cta-card h4 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0 0 14px 0;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.cta-card p {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.95);
+    margin-bottom: 20px;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+
+.cta-card a,
+.cta-content a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #ffffff;
+    text-decoration: none;
+    transition: all 0.2s;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 10px 18px;
+    border-radius: 8px;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.cta-card a:hover,
+.cta-content a:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateX(2px);
+}
+
+.cta-card a::after,
+.cta-content a::after {
+    content: '→';
+    transition: transform 0.2s;
+}
+
+.cta-card a:hover::after,
+.cta-content a:hover::after {
+    transform: translateX(4px);
+}
+
+/* =====================================================
+   YOUTUBE / IG SECTION - No gradients, clean
+   ===================================================== */
+.youtube-ig-section {
+    padding: 100px 0;
+    background: #ffffff;
+    border-top: 1px solid #e5e7eb;
+}
+
+.youtube-ig-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.youtube-ig-header {
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.youtube-ig-badge {
+    display: inline-block;
+    padding: 6px 16px;
+    background: #0f172a;
+    border-radius: 50px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #ffffff;
+    margin-bottom: 16px;
+}
+
+.youtube-ig-title {
+    font-size: clamp(1.75rem, 3vw, 2.25rem);
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 12px 0;
+    line-height: 1.2;
+}
+
+.youtube-ig-subtitle {
+    font-size: 1rem;
+    color: #64748b;
+    max-width: 520px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.youtube-ig-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+@media (max-width: 1200px) {
+    .youtube-ig-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .youtube-ig-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.youtube-ig-card-link {
+    display: block;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    text-decoration: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.youtube-ig-card-link:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+    text-decoration: none;
+}
+
+.youtube-ig-card-thumb-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: #f1f5f9;
+    overflow: hidden;
+}
+
+.youtube-ig-card-thumb {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.youtube-ig-card-link:hover .youtube-ig-card-thumb {
+    transform: scale(1.05);
+}
+
+.youtube-ig-card-thumb-placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    font-size: 2.5rem;
+}
+
+.youtube-ig-play-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 64px;
+    height: 64px;
+    background: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.youtube-ig-play-btn i {
+    color: #111;
+    font-size: 1.5rem;
+    margin-left: 4px;
+}
+
+.youtube-ig-card-link:hover .youtube-ig-play-btn {
+    transform: translate(-50%, -50%) scale(1.1);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+}
+
+.youtube-ig-card-body {
+    padding: 1rem 1.25rem;
+}
+
+.youtube-ig-card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.youtube-ig-card-desc {
+    font-size: 0.8125rem;
+    color: #64748b;
+    margin: 0.5rem 0 0 0;
+    line-height: 1.5;
+}
+
+/* Old CTA content fallback */
+.cta-content {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+}
+
+.cta-content h4 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 14px 0;
+}
+
+.cta-content p {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: #6b7280;
+    margin-bottom: 20px;
+}
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+@media (max-width: 1024px) {
+    .manifesto-main {
+        max-width: 400px;
+        margin-right: 2rem;
+    }
+
+    .section-grid {
+        gap: 50px;
+    }
+}
+
+@media (max-width: 900px) {
+    .manifesto-hero {
+        flex-direction: column;
+        min-height: auto;
+        margin-top: 0;
+    }
+
+    .manifesto-content {
+        padding: 3rem 1.5rem;
+        order: 2;
+    }
+
+    .manifesto-main {
+        max-width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .manifesto-image {
+        flex: none;
+        height: 320px;
+        min-height: 320px;
+        clip-path: none;
+        order: 1;
+    }
+
+    .manifesto-title {
+        font-size: 1.75rem;
+    }
+
+    .hero-quote-container {
+        padding: 1rem 0.75rem;
+    }
+
+    .hero-quote {
+        font-size: 1rem;
+        line-height: 1.4;
+    }
+
+    .hero-attribution {
+        font-size: 0.8rem;
+    }
+
+    .banner_section {
+        height: auto !important;
+        min-height: auto !important;
+        padding: 0 !important;
+        background-size: cover !important;
+    }
+
+    .banner_section .layout_padding {
+        padding: 1.5rem 0 !important;
+    }
+
+    .landing-section { padding: 70px 0; }
+    .youtube-ig-section { padding: 70px 0; }
+    .youtube-ig-grid { grid-template-columns: 1fr; }
+    .section-grid { grid-template-columns: 1fr; gap: 40px; }
+    .section-grid.reverse { direction: ltr; }
+    .section-img, .section-img-placeholder { height: 320px; }
+    .cta-grid, .cta-content { grid-template-columns: 1fr; gap: 24px; }
+    .section-title { font-size: 1.85rem; }
+
+    .stand-against-section {
+        min-height: auto;
+        padding: 80px 20px;
+        background-attachment: scroll;
+    }
+
+    .stand-against-title {
+        font-size: 1.85rem;
+    }
+
+    .stand-against-content {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .manifesto-hero {
+        margin-top: 0;
+    }
+
+    .manifesto-content {
+        padding: 2rem 1rem;
+    }
+
+    .manifesto-title {
+        font-size: 1.5rem;
+    }
+
+    .manifesto-label {
+        font-size: 0.6rem;
+    }
+
+    .manifesto-image {
+        height: 260px;
+        min-height: 260px;
+    }
+
+    .hero-quote-container {
+        padding: 1rem 0.5rem;
+    }
+
+    .hero-quote {
+        font-size: 0.9rem;
+        line-height: 1.35;
+    }
+
+    .hero-attribution {
+        font-size: 0.7rem;
+    }
+
+    .manifesto-cta {
+        width: 100%;
+        justify-content: center;
+        font-size: 0.8rem;
+        padding: 14px 24px;
+    }
+
+    .landing-section { padding: 50px 0; }
+    .section-container { padding: 0 16px; }
+    .section-title { font-size: 1.5rem; }
+    .section-img, .section-img-placeholder { height: 260px; }
+    .cta-card { 
+        padding: 28px 24px; 
+        min-height: 240px;
+    }
+}
+
+/* =====================================================
+   BLOG PREVIEW CARDS - Landing Page
+   ===================================================== */
+.blog-preview-card:hover {
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    transform: translateY(-4px);
+    border-color: #cbd5e1;
+}
+.blog-preview-card:hover img {
+    transform: scale(1.05);
+}
+.blog-preview-card h3 a:hover {
+    color: #475569;
+}
+.blog-preview-link:hover {
+    color: #475569;
+    gap: 0.75rem;
+}
+
+/* =====================================================
+   DONATE SECTION - Flat, no gradients
+   ===================================================== */
+.donate-section {
+    padding: 80px 0;
+    background: #ffffff;
+    border-top: 1px solid #e5e7eb;
+    border-bottom: 1px solid #e5e7eb;
+}
+.donate-container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 24px;
+    text-align: center;
+}
+.donate-badge {
+    display: inline-block;
+    padding: 8px 18px;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 50px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #475569;
+    margin-bottom: 16px;
+}
+.donate-title {
+    font-size: clamp(1.75rem, 3.5vw, 2.25rem);
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 12px 0;
+    line-height: 1.2;
+}
+.donate-subtitle {
+    font-size: 1.05rem;
+    color: #64748b;
+    line-height: 1.6;
+    margin: 0 0 28px 0;
+}
+.donate-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 14px 28px;
+    background: #0f172a;
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.donate-btn:hover {
+    background: #1e293b;
+    color: #ffffff;
+}
+
+/* =====================================================
+   MEDIA VAULT SHOWCASE SECTION - Clean White Design
+   ===================================================== */
+.media-vault-section {
+    padding: 100px 0;
+    background: #f8fafc;
+    position: relative;
+}
+
+.media-vault-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.media-vault-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.media-vault-badge {
+    display: inline-block;
+    padding: 8px 20px;
+    background: #111827;
+    border-radius: 50px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #ffffff;
+    margin-bottom: 20px;
+}
+
+.media-vault-title {
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    font-weight: 800;
+    color: #111827;
+    margin: 0 0 16px 0;
+    line-height: 1.1;
+}
+
+.media-vault-subtitle {
+    font-size: 1.05rem;
+    color: #6b7280;
+    max-width: 550px;
+    margin: 0 auto;
+    line-height: 1.7;
+}
+
+/* Tabs */
+.media-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+}
+
+.media-tab {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 24px;
+    background: #ffffff;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    color: #6b7280;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.media-tab:hover {
+    border-color: #d1d5db;
+    color: #374151;
+}
+
+.media-tab.active {
+    background: #111827;
+    border-color: #111827;
+    color: #ffffff;
+}
+
+.media-tab .tab-icon {
+    font-size: 1rem;
+}
+
+.media-tab .tab-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 7px;
+    background: #f3f4f6;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #6b7280;
+}
+
+.media-tab.active .tab-count {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+}
+
+/* Grid */
+.media-grid-wrapper {
+    position: relative;
+}
+
+.media-grid {
+    display: none;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    animation: fadeInUp 0.35s ease;
+}
+
+.media-grid.active {
+    display: grid;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Media Cards */
+.media-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.media-card:hover {
+    transform: translateY(-6px);
+    border-color: #d1d5db;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+}
+
+.media-card-thumb {
+    position: relative;
+    height: 160px;
+    background: #f3f4f6;
+    overflow: hidden;
+}
+
+.media-card-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.media-card:hover .media-card-thumb img {
+    transform: scale(1.05);
+}
+
+.media-card-thumb-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #f3f4f6;
+    color: #9ca3af;
+}
+
+.media-card-thumb-placeholder .placeholder-icon {
+    font-size: 2.2rem;
+    margin-bottom: 8px;
+}
+
+.media-card-thumb-placeholder span {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+.media-card-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s ease;
+}
+
+.media-card:hover .media-card-overlay {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.media-play-btn {
+    width: 60px;
+    height: 60px;
+    background: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #111827;
+    font-size: 1.25rem;
+    opacity: 0.9;
+    transform: scale(0.9);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.media-card:hover .media-play-btn {
+    transform: scale(1);
+    opacity: 1;
+}
+
+/* Video Player Modal */
+.video-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.video-modal.active {
+    display: flex;
+}
+
+.video-modal-content {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.video-modal-close {
+    position: absolute;
+    top: -50px;
+    right: 0;
+    width: 40px;
+    height: 40px;
+    background: #fff;
+    border: none;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    color: #111;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+}
+
+.video-modal-close:hover {
+    transform: scale(1.1);
+}
+
+.video-modal video,
+.video-modal iframe {
+    width: 100%;
+    aspect-ratio: 16/9;
+    display: block;
+    border: none;
+}
+
+.video-modal-title {
+    padding: 16px 20px;
+    background: #111;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.media-card-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 5px 10px;
+    background: #111827;
+    border-radius: 6px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.media-card-body {
+    padding: 18px;
+}
+
+.media-card-category {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #9ca3af;
+    margin-bottom: 6px;
+}
+
+.media-card-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 8px 0;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.media-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.75rem;
+    color: #9ca3af;
+}
+
+.media-card-meta span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Empty State */
+.media-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    background: #ffffff;
+    border: 2px dashed #e5e7eb;
+    border-radius: 14px;
+}
+
+.media-empty-icon {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+    color: #d1d5db;
+}
+
+.media-empty p {
+    font-size: 0.95rem;
+    color: #9ca3af;
+    margin: 0;
+}
+
+/* View All Link */
+.media-view-all {
+    text-align: center;
+    margin-top: 45px;
+}
+
+.media-view-all-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 32px;
+    background: #111827;
+    border: 2px solid #111827;
+    border-radius: 10px;
+    color: #ffffff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.25s ease;
+}
+
+.media-view-all-btn:hover {
+    background: #1f2937;
+    border-color: #1f2937;
+    color: #ffffff;
+    transform: translateY(-2px);
+}
+
+.media-view-all-btn .btn-icon {
+    font-size: 1rem;
+}
+
+.media-view-all-btn .btn-arrow {
+    transition: transform 0.25s ease;
+}
+
+.media-view-all-btn:hover .btn-arrow {
+    transform: translateX(4px);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .media-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .media-vault-section {
+        padding: 70px 0;
+    }
+
+    .media-tabs {
+        gap: 8px;
+    }
+
+    .media-tab {
+        padding: 12px 16px;
+        font-size: 0.8rem;
+    }
+
+    .media-tab .tab-icon {
+        display: none;
+    }
+
+    .media-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+
+    .media-card-thumb {
+        height: 130px;
+    }
+
+    .media-card-body {
+        padding: 14px;
+    }
+
+    .media-card-title {
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .media-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .media-card-thumb {
+        height: 160px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Quote -->
+<div class="container-fluid">
+   <div class="banner_section layout_padding">
+      <div class="hero-quote-container">
+         <p class="hero-quote">"{{ sections.hero_quote.content|default:"When the people fear the government, there is tyranny. When the government fears the people, there is liberty." }}"</p>
+         <span class="hero-attribution">— {{ sections.hero_quote.subtitle|default:"Thomas Jefferson" }}</span>
+      </div>
+      {% if hero_video_url %}
+      <div class="image_main">
+         <div class="container">
+            <video src="{{ hero_video_url }}" class="image_1" autoplay muted loop playsinline></video>
+         </div>
+      </div>
+      {% else %}
+      <div id="my_slider" class="carousel slide" data-ride="carousel">
+         <div class="carousel-inner">
+            <div class="carousel-item active">
+               <div class="image_main">
+                  <div class="container">
+                     <img src="{% if sections.hero_slide_1.image_url %}{{ sections.hero_slide_1.image_url }}{% else %}{% static 'images/img-1.png' %}{% endif %}" class="image_1" alt="Slide 1">
+                  </div>
+               </div>
+            </div>
+            <div class="carousel-item">
+               <div class="image_main">
+                  <div class="container">
+                     <img src="{% if sections.hero_slide_2.image_url %}{{ sections.hero_slide_2.image_url }}{% else %}{% static 'images/img-1.png' %}{% endif %}" class="image_1" alt="Slide 2">
+                  </div>
+               </div>
+            </div>
+            <div class="carousel-item">
+               <div class="image_main">
+                  <div class="container">
+                     <img src="{% if sections.hero_slide_3.image_url %}{{ sections.hero_slide_3.image_url }}{% else %}{% static 'images/img-1.png' %}{% endif %}" class="image_1" alt="Slide 3">
+                  </div>
+               </div>
+            </div>
+         </div>
+         <a class="carousel-control-prev" href="#my_slider" role="button" data-slide="prev">
+         <i class="fa fa-angle-left"></i>
+         </a>
+         <a class="carousel-control-next" href="#my_slider" role="button" data-slide="next">
+         <i class="fa fa-angle-right"></i>
+         </a>
+      </div>
+      {% endif %}
+   </div>
+</div>
+
+<!-- Donate Section -->
+<section class="donate-section" id="donate">
+    <div class="donate-container">
+        <span class="donate-badge">Support the movement</span>
+        <h2 class="donate-title">Donate</h2>
+        <p class="donate-subtitle">Your contribution helps us document evidence, support accountability, and advance the cause. Every amount counts.</p>
+        <button type="button" class="donate-btn" onclick="typeof openDonateModal === 'function' && openDonateModal();">
+            <i class="fa fa-heart"></i>
+            Donate now
+        </button>
+    </div>
+</section>
+
+<!-- Media Vault Showcase Section -->
+<section class="media-vault-section" id="media-vault-showcase">
+    <div class="media-vault-container">
+        <div class="media-vault-header">
+            <span class="media-vault-badge">Evidence Archive</span>
+            <h2 class="media-vault-title">Media Vault</h2>
+            <p class="media-vault-subtitle">Access documented evidence, testimonies, and investigations. The truth preserved for history.</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="media-tabs">
+            <button class="media-tab active" data-tab="videos">
+                <span class="tab-icon"><i class="fa fa-play-circle"></i></span>
+                <span>Videos</span>
+                <span class="tab-count">{{ media_videos|length }}</span>
+            </button>
+            <button class="media-tab" data-tab="audio">
+                <span class="tab-icon"><i class="fa fa-headphones"></i></span>
+                <span>Audio</span>
+                <span class="tab-count">{{ media_audio|length }}</span>
+            </button>
+            <button class="media-tab" data-tab="images">
+                <span class="tab-icon"><i class="fa fa-image"></i></span>
+                <span>Images</span>
+                <span class="tab-count">{{ media_images|length }}</span>
+            </button>
+            <button class="media-tab" data-tab="documents">
+                <span class="tab-icon"><i class="fa fa-file-text"></i></span>
+                <span>Documents</span>
+                <span class="tab-count">{{ media_documents|length }}</span>
+            </button>
+        </div>
+
+        <!-- Media Grids -->
+        <div class="media-grid-wrapper">
+            <!-- Videos Grid -->
+            <div class="media-grid active" id="grid-videos">
+                {% for video in media_videos %}
+                <div class="media-card" onclick="openVideoModal('{{ video.file_url|escapejs }}', '{{ video.title|escapejs }}')" style="cursor:pointer;">
+                    <div class="media-card-thumb">
+                        {% if video.thumbnail_url %}
+                        <img src="{{ video.thumbnail_url }}" alt="{{ video.title }}">
+                        {% else %}
+                        <div class="media-card-thumb-placeholder">
+                            <span class="placeholder-icon"><i class="fa fa-play-circle"></i></span>
+                            <span>Video</span>
+                        </div>
+                        {% endif %}
+                        <div class="media-card-overlay">
+                            <div class="media-play-btn"><i class="fa fa-play"></i></div>
+                        </div>
+                        {% if video.category %}<span class="media-card-badge">{{ video.category }}</span>{% endif %}
+                    </div>
+                    <div class="media-card-body">
+                        <span class="media-card-category">Video</span>
+                        <h3 class="media-card-title">{{ video.title }}</h3>
+                        <div class="media-card-meta">
+                            {% if video.source %}<span><i class="fa fa-user"></i> {{ video.source }}</span>{% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="media-empty">
+                    <div class="media-empty-icon"><i class="fa fa-play-circle"></i></div>
+                    <p>No videos available yet</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Audio Grid -->
+            <div class="media-grid" id="grid-audio">
+                {% for audio in media_audio %}
+                <div class="media-card">
+                    <div class="media-card-thumb">
+                        {% if audio.thumbnail_url %}
+                        <img src="{{ audio.thumbnail_url }}" alt="{{ audio.title }}">
+                        {% else %}
+                        <div class="media-card-thumb-placeholder">
+                            <span class="placeholder-icon"><i class="fa fa-headphones"></i></span>
+                            <span>Audio</span>
+                        </div>
+                        {% endif %}
+                        <div class="media-card-overlay">
+                            <div class="media-play-btn"><i class="fa fa-headphones"></i></div>
+                        </div>
+                        {% if audio.category %}<span class="media-card-badge">{{ audio.category }}</span>{% endif %}
+                    </div>
+                    <div class="media-card-body">
+                        <span class="media-card-category">Audio</span>
+                        <h3 class="media-card-title">{{ audio.title }}</h3>
+                        <div class="media-card-meta">
+                            {% if audio.source %}<span><i class="fa fa-user"></i> {{ audio.source }}</span>{% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="media-empty">
+                    <div class="media-empty-icon"><i class="fa fa-headphones"></i></div>
+                    <p>No audio files available yet</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Images Grid -->
+            <div class="media-grid" id="grid-images">
+                {% for image in media_images %}
+                <div class="media-card">
+                    <div class="media-card-thumb">
+                        {% if image.file_url %}
+                        <img src="{{ image.file_url }}" alt="{{ image.title }}">
+                        {% else %}
+                        <div class="media-card-thumb-placeholder">
+                            <span class="placeholder-icon"><i class="fa fa-image"></i></span>
+                            <span>Image</span>
+                        </div>
+                        {% endif %}
+                        <div class="media-card-overlay">
+                            <div class="media-play-btn"><i class="fa fa-expand"></i></div>
+                        </div>
+                        {% if image.category %}<span class="media-card-badge">{{ image.category }}</span>{% endif %}
+                    </div>
+                    <div class="media-card-body">
+                        <span class="media-card-category">Image</span>
+                        <h3 class="media-card-title">{{ image.title }}</h3>
+                        <div class="media-card-meta">
+                            {% if image.location %}<span><i class="fa fa-map-marker"></i> {{ image.location }}</span>{% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="media-empty">
+                    <div class="media-empty-icon"><i class="fa fa-image"></i></div>
+                    <p>No images available yet</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Documents Grid -->
+            <div class="media-grid" id="grid-documents">
+                {% for doc in media_documents %}
+                <div class="media-card">
+                    <div class="media-card-thumb">
+                        <div class="media-card-thumb-placeholder">
+                            <span class="placeholder-icon"><i class="fa fa-file-text"></i></span>
+                            <span>{{ doc.file_type|default:"Document" }}</span>
+                        </div>
+                        <div class="media-card-overlay">
+                            <div class="media-play-btn"><i class="fa fa-download"></i></div>
+                        </div>
+                        {% if doc.category %}<span class="media-card-badge">{{ doc.category }}</span>{% endif %}
+                    </div>
+                    <div class="media-card-body">
+                        <span class="media-card-category">Document</span>
+                        <h3 class="media-card-title">{{ doc.title }}</h3>
+                        <div class="media-card-meta">
+                            {% if doc.file_size %}<span><i class="fa fa-file-o"></i> {{ doc.file_size }}</span>{% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="media-empty">
+                    <div class="media-empty-icon"><i class="fa fa-file-text"></i></div>
+                    <p>No documents available yet</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- View All Links - Dynamic based on tab -->
+        <div class="media-view-all">
+            <a href="{% url 'media_videos' %}" class="media-view-all-btn" id="viewall-videos">
+                <span class="btn-icon"><i class="fa fa-play-circle"></i></span>
+                <span>View All Videos</span>
+                <span class="btn-arrow">→</span>
+            </a>
+            <a href="{% url 'media_audios' %}" class="media-view-all-btn" id="viewall-audio" style="display: none;">
+                <span class="btn-icon"><i class="fa fa-headphones"></i></span>
+                <span>View All Audio</span>
+                <span class="btn-arrow">→</span>
+            </a>
+            <a href="{% url 'media_images' %}" class="media-view-all-btn" id="viewall-images" style="display: none;">
+                <span class="btn-icon"><i class="fa fa-image"></i></span>
+                <span>View All Images</span>
+                <span class="btn-arrow">→</span>
+            </a>
+            <a href="{% url 'media_documents' %}" class="media-view-all-btn" id="viewall-documents" style="display: none;">
+                <span class="btn-icon"><i class="fa fa-file-text"></i></span>
+                <span>View All Documents</span>
+                <span class="btn-arrow">→</span>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Manifesto Section (separate from hero) -->
+<section class="manifesto-hero" id="manifesto">
+    <div class="manifesto-content">
+        <main class="manifesto-main">
+            <span class="manifesto-label">{{ sections.manifesto.subtitle|default:"The Ratel Movement" }}</span>
+            <h1 class="manifesto-title">{{ sections.manifesto.title|default:"Our Manifesto" }}</h1>
+            <div class="manifesto-divider"></div>
+            <div class="manifesto-rich-content">
+                {% if sections.manifesto.content %}
+                    {{ sections.manifesto.content|safe }}
+                {% else %}
+                    <p>We stand for truth in an age of deception.</p>
+                    <p>We fight for justice where corruption thrives.</p>
+                    <p>We amplify voices silenced by power.</p>
+                    <p>We document what they want forgotten.</p>
+                    <p>We build bridges where walls divide.</p>
+                    <p><strong>We are the ratel — fearless, relentless, unstoppable.</strong></p>
+                {% endif %}
+            </div>
+            <a href="{% url 'membership' %}" class="manifesto-cta">JOIN THE MOVEMENT</a>
+        </main>
+    </div>
+    <div class="manifesto-image">
+        {% if sections.manifesto.image_url %}
+        <img src="{{ sections.manifesto.image_url }}" alt="The Ratel Movement - Our Manifesto">
+        {% else %}
+        <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?ixlib=rb-4.0.3&auto=format&fit=crop&w=2832&q=80" alt="The Ratel Movement">
+        {% endif %}
+    </div>
+</section>
+
+<!-- Why RATEL Exists Section -->
+<section class="landing-section section-light" id="why-ratel">
+    <div class="section-container">
+        <div class="section-grid">
+            <div class="section-image-wrap">
+                {% if sections.why_ratel_exists.image_url %}
+                <img src="{{ sections.why_ratel_exists.image_url }}" alt="Why RATEL Exists" class="section-img">
+                {% else %}
+                <img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="Why RATEL Exists" class="section-img">
+                {% endif %}
+            </div>
+            <div class="section-text">
+                <span class="section-label">{{ sections.why_ratel_exists.subtitle|default:"Our Purpose" }}</span>
+                <h2 class="section-title">{{ sections.why_ratel_exists.title|default:"Why RATEL Exists" }}</h2>
+                <div class="section-divider"></div>
+                <div class="section-content">
+                    {% if sections.why_ratel_exists.content %}
+                        {{ sections.why_ratel_exists.content|safe }}
+                    {% else %}
+                        <p>In a world where truth is twisted and voices are silenced, RATEL emerged as a beacon of resistance. We exist because:</p>
+                        <ul>
+                            <li><strong>Accountability Matters</strong> — Those in power must answer to the people they serve</li>
+                            <li><strong>Truth Requires Defenders</strong> — Facts don't speak for themselves; they need champions</li>
+                            <li><strong>Unity Creates Change</strong> — Together, we are stronger than any institution</li>
+                            <li><strong>History Must Be Preserved</strong> — What happens today shapes tomorrow</li>
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Members - 4 full members (rotates on refresh, no gradients) -->
+{% if featured_members %}
+<section class="members-section" id="featured-members">
+    <div class="members-container">
+        <div class="members-header">
+            <span class="members-badge">Our Movement</span>
+            <h2 class="members-title">Full Members</h2>
+            <p class="members-subtitle">Meet some of the people who have joined the Ratel Movement.</p>
+        </div>
+        <div class="members-grid">
+            {% for member in featured_members %}
+            <div class="member-card">
+                <div class="member-card-image">
+                    {% if member.profile_image_url %}
+                    <img src="{{ member.profile_image_url }}" alt="{{ member.full_name|default:'Member' }}">
+                    {% else %}
+                    {{ member.full_name|default:"M"|slice:":1"|upper }}
+                    {% endif %}
+                </div>
+                <div class="member-card-body">
+                    <h3 class="member-card-name">{{ member.full_name|default:"Member" }}</h3>
+                    {% if member.membership_type %}
+                    <p class="member-card-role">{{ member.membership_type }}</p>
+                    {% endif %}
+                    <p class="member-card-location">
+                        {% if member.based_in_nigeria and member.state %}{{ member.state }}, Nigeria{% elif member.country %}{{ member.country }}{% else %}—{% endif %}
+                    </p>
+                    {% if member.member_id %}
+                    <p class="member-card-id">{{ member.member_id }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- What We Stand Against Section - Nigeria flag background with dark overlay -->
+<section class="stand-against-section" id="stand-against" style="background-image: url('{% if sections.what_we_stand_against.image_url %}{{ sections.what_we_stand_against.image_url }}{% else %}https://static.vecteezy.com/system/resources/previews/008/255/329/non_2x/nigeria-national-flag-waving-realistic-illustration-vector.jpg{% endif %}');">
+    <div class="stand-against-overlay"></div>
+    <div class="stand-against-container">
+        <span class="stand-against-label">{{ sections.what_we_stand_against.subtitle|default:"Our Opposition" }}</span>
+        <h2 class="stand-against-title">{{ sections.what_we_stand_against.title|default:"What We Stand Against" }}</h2>
+        <div class="stand-against-divider"></div>
+        <div class="stand-against-content">
+            {% if sections.what_we_stand_against.content %}
+                {{ sections.what_we_stand_against.content|safe }}
+            {% else %}
+                <p>RATEL stands firmly against forces that undermine democracy and human dignity:</p>
+                <ul>
+                    <li><strong>Corruption</strong> — The abuse of power for personal gain at public expense</li>
+                    <li><strong>Censorship</strong> — The suppression of truth and free expression</li>
+                    <li><strong>Injustice</strong> — Systems that favor the powerful over the powerless</li>
+                    <li><strong>Apathy</strong> — The dangerous comfort of looking away</li>
+                    <li><strong>Disinformation</strong> — Deliberate lies designed to manipulate and divide</li>
+                </ul>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- YouTube Section -->
+{% if youtube_links %}
+<section class="youtube-ig-section" id="youtube-section">
+    <div class="youtube-ig-container">
+        <div class="youtube-ig-header">
+            <h2 class="youtube-ig-title">YouTube</h2>
+            <p class="youtube-ig-subtitle">Watch our latest videos and stay connected with our content.</p>
+        </div>
+        <div class="youtube-ig-grid">
+            {% for link in youtube_links|slice:":4" %}
+            <a href="{{ link.youtube_url }}" target="_blank" rel="noopener" class="youtube-ig-card-link">
+                <div class="youtube-ig-card-thumb-wrap">
+                    {% if link.thumbnail_url %}
+                    <img src="{{ link.thumbnail_url }}" alt="{{ link.title }}" class="youtube-ig-card-thumb">
+                    {% else %}
+                    <div class="youtube-ig-card-thumb-placeholder"><i class="fa fa-youtube-play"></i></div>
+                    {% endif %}
+                    <div class="youtube-ig-play-btn"><i class="fa fa-play"></i></div>
+                </div>
+                <div class="youtube-ig-card-body">
+                    <h3 class="youtube-ig-card-title">{{ link.title }}</h3>
+                    {% if link.subtitle %}<p class="youtube-ig-card-desc">{{ link.subtitle }}</p>{% endif %}
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Instagram Section -->
+{% if instagram_links %}
+<section class="youtube-ig-section" id="instagram-section" style="background: #f8fafc; border-top: 1px solid #e5e7eb;">
+    <div class="youtube-ig-container">
+        <div class="youtube-ig-header">
+            <h2 class="youtube-ig-title">Instagram</h2>
+            <p class="youtube-ig-subtitle">Watch our latest Instagram content and behind-the-scenes updates.</p>
+        </div>
+        <div class="youtube-ig-grid">
+            {% for link in instagram_links|slice:":4" %}
+            <a href="{{ link.ig_url }}" target="_blank" rel="noopener" class="youtube-ig-card-link">
+                <div class="youtube-ig-card-thumb-wrap">
+                    {% if link.thumbnail_url %}
+                    <img src="{{ link.thumbnail_url }}" alt="{{ link.title }}" class="youtube-ig-card-thumb">
+                    {% else %}
+                    <div class="youtube-ig-card-thumb-placeholder"><i class="fa fa-instagram"></i></div>
+                    {% endif %}
+                    <div class="youtube-ig-play-btn"><i class="fa fa-play"></i></div>
+                </div>
+                <div class="youtube-ig-card-body">
+                    <h3 class="youtube-ig-card-title">{{ link.title }}</h3>
+                    {% if link.subtitle %}<p class="youtube-ig-card-desc">{{ link.subtitle }}</p>{% endif %}
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Cases Section -->
+<section class="landing-section section-light" id="cases">
+    <div class="section-container">
+        <div class="section-grid">
+            <div class="section-text">
+                <span class="section-label">Legal Cases</span>
+                <h2 class="section-title">Cases & Investigations</h2>
+                <div class="section-divider"></div>
+                <div class="section-content">
+                    <p>We document and track legal cases, investigations, and matters of public interest. Our commitment to transparency means you can follow our pursuit of justice and accountability.</p>
+                    <p><strong>Every case matters.</strong> Every investigation counts. Every pursuit of truth strengthens our movement.</p>
+                </div>
+                <a href="{% url 'cases' %}" class="manifesto-cta" style="margin-top:1.5rem;">
+                    View All Cases
+                    <i class="fa fa-arrow-right" style="margin-left:8px;"></i>
+                </a>
+            </div>
+            <div class="section-image-wrap">
+                {% if featured_cases %}
+                    {% with case=featured_cases|first %}
+                    <div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;padding:2rem;transition:all 0.3s ease;box-shadow:0 4px 12px rgba(0,0,0,0.08);">
+                        <div style="display:flex;align-items:start;justify-content:space-between;margin-bottom:1.25rem;">
+                            <span style="font-family:monospace;font-size:0.8rem;font-weight:700;color:#0f172a;letter-spacing:0.5px;">{{ case.case_number }}</span>
+                            <span style="display:inline-flex;align-items:center;padding:6px 14px;border-radius:6px;font-size:0.75rem;font-weight:600;text-transform:capitalize;background:#dcfce7;color:#166534;">
+                                {{ case.status }}
+                            </span>
+                        </div>
+                        <h4 style="font-size:1.25rem;font-weight:700;color:#0f172a;margin:0 0 1rem 0;line-height:1.3;">{{ case.title }}</h4>
+                        <p style="font-size:0.95rem;color:#64748b;margin:0 0 1rem 0;line-height:1.7;">{{ case.short_description|default:case.description|truncatewords:25|default:"No description available" }}</p>
+                        {% if case.date_reported %}
+                        <div style="font-size:0.8rem;color:#94a3b8;display:flex;align-items:center;gap:8px;margin-top:1.25rem;padding-top:1rem;border-top:1px solid #f1f5f9;">
+                            <i class="fa fa-calendar" style="font-size:0.75rem;"></i>
+                            <span>Reported: {{ case.date_reported|date:"M d, Y" }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endwith %}
+                {% else %}
+                <div style="background:#f8fafc;border:2px dashed #e2e8f0;border-radius:12px;padding:3rem 2rem;text-align:center;">
+                    <div style="font-size:2.5rem;color:#cbd5e1;margin-bottom:1rem;">
+                        <i class="fa fa-folder-open"></i>
+                    </div>
+                    <h4 style="font-size:1.1rem;font-weight:600;color:#64748b;margin:0 0 0.5rem 0;">No cases yet</h4>
+                    <p style="font-size:0.9rem;color:#94a3b8;margin:0;">Cases and investigations will appear here once they are added.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Blog Section - News Portal Style -->
+{% if latest_blogs %}
+<section class="landing-section" id="blog" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); padding: 5rem 0;">
+    <style>
+        .blog-portal-section {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+        .blog-portal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+        .blog-portal-header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .blog-portal-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(220, 38, 38, 0.3);
+        }
+        .blog-portal-title-group h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin: 0;
+            line-height: 1.2;
+        }
+        .blog-portal-title-group p {
+            font-size: 0.95rem;
+            color: #64748b;
+            margin: 0.25rem 0 0 0;
+        }
+        .blog-portal-view-all {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 12px 24px;
+            background: #0f172a;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.2);
+        }
+        .blog-portal-view-all:hover {
+            background: #1e293b;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(15, 23, 42, 0.3);
+        }
+        .blog-portal-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        .blog-portal-featured {
+            grid-row: span 2;
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            min-height: 480px;
+            background: #1e293b;
+        }
+        .blog-portal-featured-img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        .blog-portal-featured:hover .blog-portal-featured-img {
+            transform: scale(1.05);
+        }
+        .blog-portal-featured-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.1) 100%);
+        }
+        .blog-portal-featured-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 2rem;
+            color: #fff;
+        }
+        .blog-portal-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 6px 14px;
+            background: #dc2626;
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+        .blog-portal-badge-icon {
+            width: 6px;
+            height: 6px;
+            background: #fff;
+            border-radius: 50%;
+            animation: pulse-dot 1.5s infinite;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .blog-portal-featured-title {
+            font-size: 1.75rem;
+            font-weight: 800;
+            line-height: 1.25;
+            margin: 0 0 1rem 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .blog-portal-featured-title a {
+            color: #fff;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .blog-portal-featured-title a:hover {
+            color: #fca5a5;
+        }
+        .blog-portal-featured-excerpt {
+            font-size: 1rem;
+            color: rgba(255,255,255,0.85);
+            line-height: 1.6;
+            margin: 0 0 1.25rem 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .blog-portal-featured-meta {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.7);
+        }
+        .blog-portal-featured-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .blog-portal-card {
+            background: #fff;
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            gap: 1.25rem;
+            padding: 1.25rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            border: 1px solid rgba(0,0,0,0.04);
+            transition: all 0.3s ease;
+        }
+        .blog-portal-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+        }
+        .blog-portal-card-img-wrap {
+            flex-shrink: 0;
+            width: 140px;
+            height: 140px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #f1f5f9;
+        }
+        .blog-portal-card-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+        .blog-portal-card:hover .blog-portal-card-img {
+            transform: scale(1.08);
+        }
+        .blog-portal-card-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 0;
+        }
+        .blog-portal-card-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: #fef2f2;
+            color: #dc2626;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-radius: 4px;
+            margin-bottom: 0.6rem;
+            width: fit-content;
+        }
+        .blog-portal-card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #0f172a;
+            line-height: 1.35;
+            margin: 0 0 0.6rem 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .blog-portal-card-title a {
+            color: inherit;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .blog-portal-card-title a:hover {
+            color: #dc2626;
+        }
+        .blog-portal-card-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+        .blog-portal-card-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        .blog-portal-no-img {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #cbd5e1;
+            background: #f8fafc;
+        }
+        @media (max-width: 900px) {
+            .blog-portal-grid {
+                grid-template-columns: 1fr;
+            }
+            .blog-portal-featured {
+                grid-row: span 1;
+                min-height: 400px;
+            }
+            .blog-portal-card {
+                flex-direction: column;
+            }
+            .blog-portal-card-img-wrap {
+                width: 100%;
+                height: 180px;
+            }
+        }
+        @media (max-width: 600px) {
+            .blog-portal-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .blog-portal-title-group h2 {
+                font-size: 1.5rem;
+            }
+            .blog-portal-featured {
+                min-height: 320px;
+            }
+            .blog-portal-featured-title {
+                font-size: 1.35rem;
+            }
+        }
+    </style>
+
+    <div class="blog-portal-section">
+        <!-- Header -->
+        <div class="blog-portal-header">
+            <div class="blog-portal-header-left">
+                <div class="blog-portal-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/>
+                        <path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/>
+                    </svg>
+                </div>
+                <div class="blog-portal-title-group">
+                    <h2>Latest From Our Blog</h2>
+                    <p>Insights, analysis & updates from Ratel Movement</p>
+                </div>
+            </div>
+            <a href="{% url 'blog' %}" class="blog-portal-view-all">
+                View All Articles
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+                </svg>
+            </a>
+        </div>
+
+        <!-- Grid Layout: Featured + 2 Cards -->
+        <div class="blog-portal-grid">
+            {% for blog in latest_blogs|slice:":3" %}
+                {% if forloop.first %}
+                <!-- Featured Article (First Blog) -->
+                <article class="blog-portal-featured">
+                    {% if blog.featured_image_url %}
+                    <img src="{{ blog.featured_image_url }}" alt="{{ blog.title }}" class="blog-portal-featured-img">
+                    {% else %}
+                    <div class="blog-portal-featured-img blog-portal-no-img" style="position: absolute; inset: 0;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                    </div>
+                    {% endif %}
+                    <div class="blog-portal-featured-overlay"></div>
+                    <div class="blog-portal-featured-content">
+                        <div class="blog-portal-badge">
+                            <span class="blog-portal-badge-icon"></span>
+                            {{ blog.category|default:"Latest" }}
+                        </div>
+                        <h3 class="blog-portal-featured-title">
+                            <a href="{% url 'blog_detail' blog.slug %}">{{ blog.title }}</a>
+                        </h3>
+                        {% if blog.excerpt %}
+                        <p class="blog-portal-featured-excerpt">{{ blog.excerpt|truncatewords:25 }}</p>
+                        {% endif %}
+                        <div class="blog-portal-featured-meta">
+                            {% if blog.published_at %}
+                            <span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                                {{ blog.published_at|date:"M d, Y" }}
+                            </span>
+                            {% endif %}
+                            <span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                {{ blog.reading_time|default:5 }} min read
+                            </span>
+                            {% if blog.author_name %}
+                            <span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                {{ blog.author_name }}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </article>
+                {% else %}
+                <!-- Side Cards (2nd and 3rd Blogs) -->
+                <article class="blog-portal-card">
+                    <div class="blog-portal-card-img-wrap">
+                        {% if blog.featured_image_url %}
+                        <img src="{{ blog.featured_image_url }}" alt="{{ blog.title }}" class="blog-portal-card-img">
+                        {% else %}
+                        <div class="blog-portal-card-img blog-portal-no-img" style="height: 100%;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="blog-portal-card-content">
+                        <span class="blog-portal-card-badge">{{ blog.category|default:"Article" }}</span>
+                        <h3 class="blog-portal-card-title">
+                            <a href="{% url 'blog_detail' blog.slug %}">{{ blog.title }}</a>
+                        </h3>
+                        <div class="blog-portal-card-meta">
+                            {% if blog.published_at %}
+                            <span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                                {{ blog.published_at|date:"M d" }}
+                            </span>
+                            {% endif %}
+                            <span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                {{ blog.reading_time|default:5 }} min
+                            </span>
+                        </div>
+                    </div>
+                </article>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Calls to Action Section -->
+<section class="landing-section section-alt" id="take-action">
+    <div class="section-container">
+        <div class="cta-header">
+            <span class="section-label center">{{ sections.calls_to_action.subtitle|default:"Join The Movement" }}</span>
+            <h2 class="section-title center">{{ sections.calls_to_action.title|default:"Take Action" }}</h2>
+            <div class="section-divider center"></div>
+        </div>
+        {% if sections.calls_to_action.content %}
+            <div class="cta-content">{{ sections.calls_to_action.content|safe }}</div>
+        {% else %}
+            <div class="cta-grid">
+                <div class="cta-card cta-card-1">
+                    <h4>Understand the Movement</h4>
+                    <p>Learn about our history, mission, and the principles that guide everything we do. Knowledge is the first step toward change.</p>
+                    <a href="{% url 'about_ratel' %}">Learn More</a>
+                </div>
+                <div class="cta-card cta-card-2">
+                    <h4>Watch the Evidence</h4>
+                    <p>Access our media vault containing documented evidence, testimonies, and investigations that expose the truth.</p>
+                    <a href="{% url 'media_vault' %}">View Media</a>
+                </div>
+                <div class="cta-card cta-card-3">
+                    <h4>Become a Member</h4>
+                    <p>Join thousands who refuse to stay silent. Your voice matters. Your action creates ripples of change.</p>
+                    <a href="{% url 'membership' %}">Join Now</a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Video Player Modal -->
+<div class="video-modal" id="videoModal">
+    <div class="video-modal-content">
+        <button class="video-modal-close" onclick="closeVideoModal()">&times;</button>
+        <video id="modalVideo" controls>
+            <source src="" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div class="video-modal-title" id="modalVideoTitle"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+$(document).ready(function() {
+    // Media Vault Tabs
+    $('.media-tab').on('click', function() {
+        var tab = $(this).data('tab');
+
+        // Update active tab
+        $('.media-tab').removeClass('active');
+        $(this).addClass('active');
+
+        // Update active grid
+        $('.media-grid').removeClass('active');
+        $('#grid-' + tab).addClass('active');
+
+        // Update view all button
+        $('.media-view-all-btn').hide();
+        $('#viewall-' + tab).show();
+    });
+});
+
+// Video Modal Functions
+function openVideoModal(videoUrl, title) {
+    var modal = document.getElementById('videoModal');
+    var video = document.getElementById('modalVideo');
+    var titleEl = document.getElementById('modalVideoTitle');
+
+    if (!videoUrl) return;
+
+    video.src = videoUrl;
+    titleEl.textContent = title || '';
+    modal.classList.add('active');
+    video.play();
+
+    // Prevent body scroll
+    document.body.style.overflow = 'hidden';
+}
+
+function closeVideoModal() {
+    var modal = document.getElementById('videoModal');
+    var video = document.getElementById('modalVideo');
+
+    video.pause();
+    video.src = '';
+    modal.classList.remove('active');
+
+    // Restore body scroll
+    document.body.style.overflow = '';
+}
+
+// Close modal on backdrop click
+document.getElementById('videoModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeVideoModal();
+    }
+});
+
+// Close modal on Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeVideoModal();
+    }
+});
+</script>
+{% endblock %}

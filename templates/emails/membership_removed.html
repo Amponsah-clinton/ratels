@@ -1,0 +1,15 @@
+{% extends "emails/base_email.html" %}
+{% block title %}Membership Update - RATEL Movement{% endblock %}
+{% block content %}
+<p style="margin:0 0 20px;font-size:16px;color:#374151;line-height:1.7;">
+Dear Member,
+</p>
+<p style="margin:0 0 20px;font-size:16px;color:#4b5563;line-height:1.7;">
+Your RATEL Movement membership record has been removed from our system. If you believe this is an error, please contact the movement administrators.
+</p>
+<p style="margin:0 0 8px;font-size:13px;color:#6b7280;">Member ID (last known)</p>
+<p style="margin:0 0 24px;font-size:16px;font-weight:600;color:#111827;font-family:'Courier New',monospace;">{{ member_id }}</p>
+<p style="margin:0;font-size:15px;color:#111827;font-weight:600;">
+    Neutrality is complicity.
+</p>
+{% endblock %}

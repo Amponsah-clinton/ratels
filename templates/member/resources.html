@@ -1,0 +1,251 @@
+{% extends "member/base_member.html" %}
+
+{% block title %}Exclusive Resources{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        margin-bottom: 1.5rem;
+    }
+    .page-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+    }
+    .page-subtitle {
+        color: #64748b;
+        font-size: 0.9rem;
+        margin: 0.25rem 0 0 0;
+    }
+
+    .filter-row {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.5rem;
+    }
+    .filter-btn {
+        padding: 0.5rem 1rem;
+        border: 1px solid #e2e8f0;
+        background: #fff;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #64748b;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .filter-btn:hover {
+        border-color: #cbd5e1;
+        color: #1e293b;
+    }
+    .filter-btn.active {
+        background: #1e293b;
+        border-color: #1e293b;
+        color: #fff;
+    }
+
+    .resources-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.25rem;
+    }
+
+    .resource-card {
+        background: #fff;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+        transition: all 0.2s;
+    }
+    .resource-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        transform: translateY(-2px);
+    }
+    .resource-thumbnail {
+        height: 140px;
+        background: #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+    .resource-thumbnail i {
+        width: 48px;
+        height: 48px;
+        color: #94a3b8;
+    }
+    .resource-category {
+        position: absolute;
+        top: 0.75rem;
+        left: 0.75rem;
+        padding: 0.25rem 0.6rem;
+        background: #1e293b;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: #fff;
+        text-transform: uppercase;
+    }
+    .resource-exclusive {
+        position: absolute;
+        top: 0.75rem;
+        right: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        background: #f59e0b;
+        border-radius: 4px;
+        font-size: 0.65rem;
+        font-weight: 600;
+        color: #fff;
+        text-transform: uppercase;
+    }
+    .resource-body {
+        padding: 1.25rem;
+    }
+    .resource-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0 0 0.5rem 0;
+        line-height: 1.4;
+    }
+    .resource-description {
+        font-size: 0.85rem;
+        color: #64748b;
+        line-height: 1.6;
+        margin: 0 0 1rem 0;
+    }
+    .resource-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 1rem;
+        border-top: 1px solid #f1f5f9;
+    }
+    .resource-info {
+        font-size: 0.75rem;
+        color: #94a3b8;
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+    .resource-info i {
+        width: 14px;
+        height: 14px;
+    }
+    .resource-download {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.4rem 0.75rem;
+        background: #1e293b;
+        color: #fff;
+        font-size: 0.8rem;
+        font-weight: 500;
+        border-radius: 6px;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+    .resource-download:hover {
+        background: #334155;
+    }
+    .resource-download i {
+        width: 14px;
+        height: 14px;
+    }
+
+    .empty-state {
+        background: #fff;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        padding: 4rem 2rem;
+        text-align: center;
+        grid-column: 1 / -1;
+    }
+    .empty-state i {
+        width: 64px;
+        height: 64px;
+        color: #cbd5e1;
+        margin-bottom: 1rem;
+    }
+    .empty-state h3 {
+        font-size: 1.1rem;
+        color: #475569;
+        margin: 0 0 0.5rem 0;
+    }
+    .empty-state p {
+        color: #94a3b8;
+        font-size: 0.9rem;
+        margin: 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Exclusive Resources</h1>
+    <p class="page-subtitle">Access exclusive materials, guides, and documents for members only</p>
+</div>
+
+<div class="filter-row">
+    <button class="filter-btn active" onclick="filterResources('all', this)">All Resources</button>
+    <button class="filter-btn" onclick="filterResources('toolkits', this)">Activist Toolkits</button>
+    <button class="filter-btn" onclick="filterResources('educational', this)">Educational</button>
+    <button class="filter-btn" onclick="filterResources('legal', this)">Legal Guides</button>
+    <button class="filter-btn" onclick="filterResources('research', this)">Research</button>
+</div>
+
+<div class="resources-grid" id="resourcesGrid">
+    {% if resources %}
+        {% for res in resources %}
+        <div class="resource-card" data-category="{{ res.category|lower }}">
+            <div class="resource-thumbnail">
+                <i data-lucide="file-text"></i>
+                <span class="resource-category">{{ res.category }}</span>
+                {% if res.is_exclusive %}
+                    <span class="resource-exclusive">Members Only</span>
+                {% endif %}
+            </div>
+            <div class="resource-body">
+                <h3 class="resource-title">{{ res.title }}</h3>
+                <p class="resource-description">{{ res.description|truncatechars:100 }}</p>
+                <div class="resource-meta">
+                    <span class="resource-info">
+                        <i data-lucide="calendar"></i>
+                        {{ res.created_at|slice:":10" }}
+                    </span>
+                    <a href="{{ res.file_url }}" class="resource-download" target="_blank">
+                        <i data-lucide="download"></i>
+                        Download
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <i data-lucide="book-open"></i>
+            <h3>No resources available yet</h3>
+            <p>Exclusive resources will be added soon. Check back later!</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function filterResources(category, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    document.querySelectorAll('.resource-card').forEach(card => {
+        if (category === 'all' || card.dataset.category === category) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+</script>
+{% endblock %}

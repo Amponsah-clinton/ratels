@@ -1,0 +1,198 @@
+{% extends "dashboard/base_dashboard.html" %}
+
+{% block title %}Payments{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+    .page-header-left h1 { font-size: 1.5rem; font-weight: 600; color: #1e293b; margin: 0 0 0.25rem 0; }
+    .page-header-left p { color: #64748b; font-size: 0.9rem; margin: 0; }
+    .btn-export { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.65rem 1.25rem; background: #0f172a; color: #fff; border: none; border-radius: 8px; font-size: 0.9rem; font-weight: 500; text-decoration: none; cursor: pointer; transition: background 0.2s; }
+    .btn-export:hover { background: #1e293b; color: #fff; }
+    .btn-export i { width: 18px; height: 18px; }
+
+    .stats-top { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+    @media (max-width: 768px) { .stats-top { grid-template-columns: 1fr; } }
+    .stat-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.25rem; }
+    .stat-card .stat-label { font-size: 0.8rem; color: #64748b; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.03em; }
+    .stat-card .stat-value { font-size: 1.5rem; font-weight: 700; color: #1e293b; }
+    .stat-card.total-card { border-color: #0f172a; background: #f8fafc; }
+    .stat-card.total-card .stat-value { color: #0f172a; }
+
+    .payments-tabs { display: flex; gap: 0; border-bottom: 1px solid #e2e8f0; margin-bottom: 0; }
+    .payments-tab { padding: 0.75rem 1.25rem; background: #f8fafc; border: 1px solid #e2e8f0; border-bottom: none; border-radius: 8px 8px 0 0; font-size: 0.9rem; font-weight: 500; color: #64748b; cursor: pointer; margin-right: 2px; }
+    .payments-tab:hover { background: #f1f5f9; color: #334155; }
+    .payments-tab.active { background: #fff; color: #0f172a; border-color: #e2e8f0; margin-bottom: -1px; padding-bottom: calc(0.75rem + 1px); }
+
+    .table-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; border-top-left-radius: 0; }
+    .table-header { padding: 1rem 1.25rem; border-bottom: 1px solid #e2e8f0; }
+    .table-header h3 { font-size: 1rem; font-weight: 600; color: #1e293b; margin: 0; }
+    .table-responsive { overflow-x: auto; }
+    .payments-table { width: 100%; border-collapse: collapse; }
+    .payments-table thead th { background: #f8fafc; padding: 0.85rem 1rem; text-align: left; font-size: 0.75rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.03em; white-space: nowrap; }
+    .payments-table tbody td { padding: 0.9rem 1rem; border-top: 1px solid #f1f5f9; font-size: 0.9rem; color: #1e293b; vertical-align: middle; }
+    .payments-table tbody tr:hover { background: #f8fafc; }
+    .payments-table .amount { font-weight: 600; color: #0f172a; }
+    .payments-table .ref { font-family: ui-monospace, monospace; font-size: 0.8rem; color: #64748b; }
+    .status-badge { display: inline-flex; padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; background: #e2e8f0; color: #475569; }
+    .status-badge.success { background: #dcfce7; color: #166534; }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+
+    .empty-state { text-align: center; padding: 3rem 2rem; color: #64748b; }
+    .empty-state i { width: 48px; height: 48px; color: #cbd5e1; margin-bottom: 1rem; }
+    .empty-state h3 { font-size: 1.1rem; color: #475569; margin: 0 0 0.5rem 0; }
+    .empty-state p { margin: 0; font-size: 0.9rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="page-header-left">
+        <h1>Payments</h1>
+        <p>Donations and membership renewals</p>
+    </div>
+    <div class="page-header-right">
+        <a href="{% url 'dashboard_payments' %}?format=csv" class="btn-export">
+            <i data-lucide="download"></i>
+            Export CSV
+        </a>
+    </div>
+</div>
+
+<div class="stats-top">
+    <div class="stat-card">
+        <div class="stat-label">Donations total</div>
+        <div class="stat-value">{{ donation_currency }} {{ donations_total|floatformat:2 }}</div>
+        <div style="font-size:0.8rem; color:#64748b; margin-top:0.25rem;">{{ donations_count }} donation(s)</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Membership renewal total</div>
+        <div class="stat-value">{{ currency }} {{ total_amount|floatformat:2 }}</div>
+        <div style="font-size:0.8rem; color:#64748b; margin-top:0.25rem;">{{ total_count }} payment(s)</div>
+    </div>
+    <div class="stat-card total-card">
+        <div class="stat-label">Total received (combined)</div>
+        <div class="stat-value">{{ donation_currency }} {{ donations_total|floatformat:2 }} + {{ currency }} {{ total_amount|floatformat:2 }}</div>
+    </div>
+</div>
+
+<div class="payments-tabs" role="tablist">
+    <button type="button" class="payments-tab active" role="tab" id="tab-donations" aria-selected="true" aria-controls="pane-donations">Donations</button>
+    <button type="button" class="payments-tab" role="tab" id="tab-membership" aria-selected="false" aria-controls="pane-membership">Membership renewal</button>
+</div>
+
+<div class="table-card">
+    <div id="pane-donations" class="tab-pane active" role="tabpanel">
+        <div class="table-header">
+            <h3>Donation records ({{ donations_count }})</h3>
+        </div>
+        <div class="table-responsive">
+            <table class="payments-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Donor</th>
+                        <th>Email</th>
+                        <th>Amount</th>
+                        <th>Reference</th>
+                        <th>Method</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in donations %}
+                    <tr>
+                        <td>{{ d.created_fmt }}</td>
+                        <td>{{ d.donor_name }}</td>
+                        <td>{{ d.donor_email }}</td>
+                        <td class="amount">{{ d.currency }} {{ d.amount|floatformat:2 }}</td>
+                        <td class="ref">{{ d.payment_reference }}</td>
+                        <td>{{ d.payment_method }}</td>
+                        <td><span class="status-badge success">{{ d.status }}</span></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7">
+                            <div class="empty-state">
+                                <i data-lucide="heart"></i>
+                                <h3>No donations yet</h3>
+                                <p>Donations from the landing page will appear here.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div id="pane-membership" class="tab-pane" role="tabpanel">
+        <div class="table-header">
+            <h3>Membership renewal records ({{ total_count }})</h3>
+        </div>
+        <div class="table-responsive">
+            <table class="payments-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Member</th>
+                        <th>Email</th>
+                        <th>Amount</th>
+                        <th>Months</th>
+                        <th>Reference</th>
+                        <th>Method</th>
+                        <th>Status</th>
+                        <th>Period</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in payments %}
+                    <tr>
+                        <td>{{ p.created_fmt }}</td>
+                        <td>{{ p.member_name }}</td>
+                        <td>{{ p.member_email }}</td>
+                        <td class="amount">{{ p.currency }} {{ p.amount_paid|floatformat:2 }}</td>
+                        <td>{{ p.months_subscribed }}</td>
+                        <td class="ref">{{ p.payment_reference }}</td>
+                        <td>{{ p.payment_method }}</td>
+                        <td><span class="status-badge {% if p.status == 'active' %}success{% endif %}">{{ p.status }}</span></td>
+                        <td>{{ p.start_date_fmt }} – {{ p.end_date_fmt }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9">
+                            <div class="empty-state">
+                                <i data-lucide="credit-card"></i>
+                                <h3>No membership payments yet</h3>
+                                <p>Payments will appear here when members renew their subscription.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    var tabDonations = document.getElementById('tab-donations');
+    var tabMembership = document.getElementById('tab-membership');
+    var paneDonations = document.getElementById('pane-donations');
+    var paneMembership = document.getElementById('pane-membership');
+    function showDonations() {
+        tabDonations.classList.add('active'); tabDonations.setAttribute('aria-selected', 'true');
+        tabMembership.classList.remove('active'); tabMembership.setAttribute('aria-selected', 'false');
+        paneDonations.classList.add('active'); paneMembership.classList.remove('active');
+    }
+    function showMembership() {
+        tabMembership.classList.add('active'); tabMembership.setAttribute('aria-selected', 'true');
+        tabDonations.classList.remove('active'); tabDonations.setAttribute('aria-selected', 'false');
+        paneMembership.classList.add('active'); paneDonations.classList.remove('active');
+    }
+    if (tabDonations) tabDonations.addEventListener('click', showDonations);
+    if (tabMembership) tabMembership.addEventListener('click', showMembership);
+})();
+</script>
+{% endblock %}

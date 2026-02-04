@@ -1,0 +1,1338 @@
+{% extends "dashboard/base_dashboard.html" %}
+
+{% block title %}Leadership Management{% endblock %}
+
+{% block content %}
+<div class="md-space-y-6">
+
+    <!-- Page Header -->
+    <div class="md-page-header-row">
+        <div>
+            <h1 class="md-page-title">Leadership Management</h1>
+            <p class="md-page-subtitle">Manage your organization's leadership content</p>
+        </div>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="leadership-tabs">
+        <button class="tab-btn active" data-tab="vision">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            Founding Vision
+        </button>
+        <button class="tab-btn" data-tab="council">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            Leadership Council
+        </button>
+        <button class="tab-btn" data-tab="committees">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="7" x="3" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="14" rx="1"></rect><rect width="7" height="7" x="3" y="14" rx="1"></rect></svg>
+            Committees
+        </button>
+        <button class="tab-btn" data-tab="advisors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            Advisory Voices
+        </button>
+        <button class="tab-btn" data-tab="conduct">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"></path><path d="m9 12 2 2 4-4"></path></svg>
+            Code of Conduct
+        </button>
+    </div>
+
+    <!-- ==================== FOUNDING VISION TAB ==================== -->
+    <div class="tab-content active" id="tab-vision">
+        <div class="section-header-row">
+            <h2 class="section-title">Founding Vision</h2>
+            <button class="md-btn md-btn-primary md-btn-sm" onclick="openModal('visionModal')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                Add Vision Item
+            </button>
+        </div>
+        <div class="items-list" id="visionList">
+            {% for item in founding_vision %}
+            <div class="item-card" data-id="{{ item.id }}">
+                <div class="item-card-content">
+                    <div class="item-order">#{{ item.display_order }}</div>
+                    <div class="item-info">
+                        <h4>{{ item.title }}</h4>
+                        <p>{{ item.content|truncatechars:150 }}</p>
+                    </div>
+                </div>
+                <div class="item-actions">
+                    <button class="action-btn edit-btn" onclick="editVision('{{ item.id }}', '{{ item.title|escapejs }}', '{{ item.content|escapejs }}', {{ item.display_order }})">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+                    </button>
+                    <button class="action-btn delete-btn" onclick="deleteItem('founding_vision', '{{ item.id }}')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                    </button>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                <p>No vision items yet. Click "Add Vision Item" to create one.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- ==================== LEADERSHIP COUNCIL TAB ==================== -->
+    <div class="tab-content" id="tab-council">
+        <div class="section-header-row">
+            <h2 class="section-title">Leadership Council</h2>
+            <button class="md-btn md-btn-primary md-btn-sm" onclick="openModal('councilModal')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                Add Leader
+            </button>
+        </div>
+        <div class="council-grid" id="councilList">
+            {% for leader in leadership_council %}
+            <div class="leader-card" data-id="{{ leader.id }}">
+                <div class="leader-avatar">
+                    {% if leader.profile_image_url %}
+                    <img src="{{ leader.profile_image_url }}" alt="{{ leader.full_name }}">
+                    {% else %}
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    {% endif %}
+                </div>
+                <h4>{{ leader.full_name }}</h4>
+                <p class="leader-position">{{ leader.position }}</p>
+                {% if leader.bio %}
+                <p class="leader-bio">{{ leader.bio|truncatechars:80 }}</p>
+                {% endif %}
+                <div class="leader-actions">
+                    <button class="action-btn edit-btn" onclick="editCouncil('{{ leader.id }}')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+                        Edit
+                    </button>
+                    <button class="action-btn delete-btn" onclick="deleteItem('leadership_council', '{{ leader.id }}')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/></svg>
+                        Delete
+                    </button>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state full-width">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                <p>No leaders added yet. Click "Add Leader" to create one.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- ==================== COMMITTEES TAB ==================== -->
+    <div class="tab-content" id="tab-committees">
+        <div class="section-header-row">
+            <h2 class="section-title">Strategic Committees</h2>
+            <button class="md-btn md-btn-primary md-btn-sm" onclick="openModal('committeeModal')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                Add Committee
+            </button>
+        </div>
+        <div class="items-list" id="committeesList">
+            {% for committee in strategic_committees %}
+            <div class="item-card committee-item" data-id="{{ committee.id }}">
+                <div class="item-card-content">
+                    <div class="committee-avatar-sm">
+                        {% if committee.profile_image_url %}
+                        <img src="{{ committee.profile_image_url }}" alt="{{ committee.committee_name }}">
+                        {% else %}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect width="7" height="7" x="3" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="14" rx="1"></rect><rect width="7" height="7" x="3" y="14" rx="1"></rect></svg>
+                        {% endif %}
+                    </div>
+                    <div class="item-order">#{{ committee.display_order }}</div>
+                    <div class="item-info">
+                        <h4>{{ committee.committee_name }}</h4>
+                        <p class="chair-info">Chaired by: {{ committee.chairperson|default:"Not assigned" }}</p>
+                        {% if committee.description %}
+                        <p>{{ committee.description|truncatechars:120 }}</p>
+                        {% endif %}
+                        {% if committee.responsibilities %}
+                        <div class="tags-preview">
+                            {% for resp in committee.responsibilities|slice:":3" %}
+                            <span class="tag">{{ resp }}</span>
+                            {% endfor %}
+                            {% if committee.responsibilities|length > 3 %}
+                            <span class="tag-more">+{{ committee.responsibilities|length|add:"-3" }} more</span>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="item-actions">
+                    <button class="action-btn edit-btn" onclick="editCommittee('{{ committee.id }}')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+                    </button>
+                    <button class="action-btn delete-btn" onclick="deleteItem('strategic_committees', '{{ committee.id }}')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/></svg>
+                    </button>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect width="7" height="7" x="3" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="14" rx="1"></rect><rect width="7" height="7" x="3" y="14" rx="1"></rect></svg>
+                <p>No committees yet. Click "Add Committee" to create one.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- ==================== ADVISORY VOICES TAB ==================== -->
+    <div class="tab-content" id="tab-advisors">
+        <div class="section-header-row">
+            <h2 class="section-title">Advisory Voices</h2>
+            <button class="md-btn md-btn-primary md-btn-sm" onclick="openModal('advisorModal')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                Add Advisor
+            </button>
+        </div>
+        <div class="items-list" id="advisorsList">
+            {% for advisor in advisory_voices %}
+            <div class="item-card advisor-item" data-id="{{ advisor.id }}">
+                <div class="item-card-content">
+                    <div class="advisor-avatar-sm">
+                        {% if advisor.profile_image_url %}
+                        <img src="{{ advisor.profile_image_url }}" alt="{{ advisor.full_name }}">
+                        {% else %}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        {% endif %}
+                    </div>
+                    <div class="item-info">
+                        <h4>{{ advisor.full_name }}</h4>
+                        <p class="advisor-meta">{{ advisor.title }}{% if advisor.organization %} at {{ advisor.organization }}{% endif %}</p>
+                        {% if advisor.quote %}
+                        <p class="advisor-quote">"{{ advisor.quote|truncatechars:100 }}"</p>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="item-actions">
+                    <button class="action-btn edit-btn" onclick="editAdvisor('{{ advisor.id }}')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+                    </button>
+                    <button class="action-btn delete-btn" onclick="deleteItem('advisory_voices', '{{ advisor.id }}')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/></svg>
+                    </button>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                <p>No advisors yet. Click "Add Advisor" to create one.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- ==================== CODE OF CONDUCT TAB ==================== -->
+    <div class="tab-content" id="tab-conduct">
+        <div class="section-header-row">
+            <h2 class="section-title">Code of Conduct</h2>
+            <button class="md-btn md-btn-primary md-btn-sm" onclick="openModal('conductModal')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                Add Section
+            </button>
+        </div>
+        <div class="items-list" id="conductList">
+            {% for item in code_of_conduct %}
+            <div class="item-card" data-id="{{ item.id }}">
+                <div class="item-card-content">
+                    <div class="item-order">#{{ item.display_order }}</div>
+                    <div class="item-info">
+                        <h4>{{ item.section_title }}</h4>
+                        <p>{{ item.content|truncatechars:150 }}</p>
+                    </div>
+                </div>
+                <div class="item-actions">
+                    <button class="action-btn edit-btn" onclick="editConduct('{{ item.id }}', '{{ item.section_title|escapejs }}', '{{ item.content|escapejs }}', {{ item.display_order }})">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+                    </button>
+                    <button class="action-btn delete-btn" onclick="deleteItem('code_of_conduct', '{{ item.id }}')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/></svg>
+                    </button>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"></path><path d="m9 12 2 2 4-4"></path></svg>
+                <p>No conduct sections yet. Click "Add Section" to create one.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+
+<!-- ==================== MODALS ==================== -->
+
+<!-- Vision Modal -->
+<div class="modal-backdrop" id="visionModal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3 id="visionModalTitle">Add Vision Item</h3>
+            <button class="modal-close" onclick="closeModal('visionModal')">&times;</button>
+        </div>
+        <form id="visionForm" method="POST" action="{% url 'dashboard_leadership_save' %}">
+            {% csrf_token %}
+            <input type="hidden" name="table" value="founding_vision">
+            <input type="hidden" name="id" id="visionId" value="">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Title <span class="required">*</span></label>
+                    <input type="text" name="title" id="visionTitle" required placeholder="e.g., Our Beginning">
+                </div>
+                <div class="form-group">
+                    <label>Content <span class="required">*</span></label>
+                    <textarea name="content" id="visionContent" rows="5" required placeholder="Describe this aspect of your founding vision..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Display Order</label>
+                    <input type="number" name="display_order" id="visionOrder" value="0" min="0">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="md-btn md-btn-secondary" onclick="closeModal('visionModal')">Cancel</button>
+                <button type="submit" class="md-btn md-btn-primary">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Council Modal -->
+<div class="modal-backdrop" id="councilModal">
+    <div class="modal-container modal-lg">
+        <div class="modal-header">
+            <h3 id="councilModalTitle">Add Leader</h3>
+            <button class="modal-close" onclick="closeModal('councilModal')">&times;</button>
+        </div>
+        <form id="councilForm" method="POST" action="{% url 'dashboard_leadership_save' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="table" value="leadership_council">
+            <input type="hidden" name="id" id="councilId" value="">
+            <input type="hidden" name="profile_image_url" id="councilImageUrl" value="">
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Full Name <span class="required">*</span></label>
+                        <input type="text" name="full_name" id="councilName" required placeholder="e.g., Dr. John Doe">
+                    </div>
+                    <div class="form-group">
+                        <label>Position <span class="required">*</span></label>
+                        <input type="text" name="position" id="councilPosition" required placeholder="e.g., National Coordinator">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Bio</label>
+                    <textarea name="bio" id="councilBio" rows="3" placeholder="Brief biography..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Profile Image</label>
+                    <div class="image-upload-container">
+                        <input type="file" name="profile_image" id="councilImage" accept="image/*" onchange="previewImage(this, 'councilImagePreview', 'councilImageUrl')">
+                        <div class="image-preview" id="councilImagePreview" style="display: none;">
+                            <img id="councilImagePreviewImg" src="" alt="Preview">
+                            <button type="button" class="remove-image-btn" onclick="removeImage('councilImage', 'councilImagePreview', 'councilImageUrl')">Remove</button>
+                        </div>
+                        <p class="form-help">Upload a profile image (JPG, PNG, etc.)</p>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" name="email" id="councilEmail" placeholder="email@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input type="text" name="phone" id="councilPhone" placeholder="+234...">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>LinkedIn URL</label>
+                        <input type="url" name="linkedin_url" id="councilLinkedin" placeholder="https://linkedin.com/in/...">
+                    </div>
+                    <div class="form-group">
+                        <label>Twitter URL</label>
+                        <input type="url" name="twitter_url" id="councilTwitter" placeholder="https://twitter.com/...">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Display Order</label>
+                    <input type="number" name="display_order" id="councilOrder" value="0" min="0">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="md-btn md-btn-secondary" onclick="closeModal('councilModal')">Cancel</button>
+                <button type="submit" class="md-btn md-btn-primary">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Committee Modal -->
+<div class="modal-backdrop" id="committeeModal">
+    <div class="modal-container modal-lg">
+        <div class="modal-header">
+            <h3 id="committeeModalTitle">Add Committee</h3>
+            <button class="modal-close" onclick="closeModal('committeeModal')">&times;</button>
+        </div>
+        <form id="committeeForm" method="POST" action="{% url 'dashboard_leadership_save' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="table" value="strategic_committees">
+            <input type="hidden" name="id" id="committeeId" value="">
+            <input type="hidden" name="profile_image_url" id="committeeImageUrl" value="">
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Committee Name <span class="required">*</span></label>
+                        <input type="text" name="committee_name" id="committeeName" required placeholder="e.g., Legal Affairs Committee">
+                    </div>
+                    <div class="form-group">
+                        <label>Chairperson</label>
+                        <input type="text" name="chairperson" id="committeeChair" placeholder="e.g., Barrister John Doe">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="description" id="committeeDesc" rows="3" placeholder="Describe the committee's purpose..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Profile Image</label>
+                    <div class="image-upload-container">
+                        <input type="file" name="profile_image" id="committeeImage" accept="image/*" onchange="previewImage(this, 'committeeImagePreview', 'committeeImageUrl')">
+                        <div class="image-preview" id="committeeImagePreview" style="display: none;">
+                            <img id="committeeImagePreviewImg" src="" alt="Preview">
+                            <button type="button" class="remove-image-btn" onclick="removeImage('committeeImage', 'committeeImagePreview', 'committeeImageUrl')">Remove</button>
+                        </div>
+                        <p class="form-help">Upload a profile image (JPG, PNG, etc.)</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Responsibilities (comma-separated)</label>
+                    <input type="text" name="responsibilities" id="committeeResp" placeholder="e.g., Legal research, Policy advocacy, Member support">
+                </div>
+                <div class="form-group">
+                    <label>Display Order</label>
+                    <input type="number" name="display_order" id="committeeOrder" value="0" min="0">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="md-btn md-btn-secondary" onclick="closeModal('committeeModal')">Cancel</button>
+                <button type="submit" class="md-btn md-btn-primary">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Advisor Modal -->
+<div class="modal-backdrop" id="advisorModal">
+    <div class="modal-container modal-lg">
+        <div class="modal-header">
+            <h3 id="advisorModalTitle">Add Advisor</h3>
+            <button class="modal-close" onclick="closeModal('advisorModal')">&times;</button>
+        </div>
+        <form id="advisorForm" method="POST" action="{% url 'dashboard_leadership_save' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="table" value="advisory_voices">
+            <input type="hidden" name="id" id="advisorId" value="">
+            <input type="hidden" name="profile_image_url" id="advisorImageUrl" value="">
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Full Name <span class="required">*</span></label>
+                        <input type="text" name="full_name" id="advisorName" required placeholder="e.g., Prof. Jane Smith">
+                    </div>
+                    <div class="form-group">
+                        <label>Title</label>
+                        <input type="text" name="title" id="advisorTitle" placeholder="e.g., Distinguished Advisor">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Organization</label>
+                        <input type="text" name="organization" id="advisorOrg" placeholder="e.g., University of Lagos">
+                    </div>
+                    <div class="form-group">
+                        <label>Area of Expertise</label>
+                        <input type="text" name="expertise" id="advisorExpertise" placeholder="e.g., Constitutional Law">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Bio</label>
+                    <textarea name="bio" id="advisorBio" rows="3" placeholder="Brief biography..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Profile Image</label>
+                    <div class="image-upload-container">
+                        <input type="file" name="profile_image" id="advisorImage" accept="image/*" onchange="previewImage(this, 'advisorImagePreview', 'advisorImageUrl')">
+                        <div class="image-preview" id="advisorImagePreview" style="display: none;">
+                            <img id="advisorImagePreviewImg" src="" alt="Preview">
+                            <button type="button" class="remove-image-btn" onclick="removeImage('advisorImage', 'advisorImagePreview', 'advisorImageUrl')">Remove</button>
+                        </div>
+                        <p class="form-help">Upload a profile image (JPG, PNG, etc.)</p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Notable Quote</label>
+                    <textarea name="quote" id="advisorQuote" rows="2" placeholder="A memorable quote from this advisor..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Display Order</label>
+                    <input type="number" name="display_order" id="advisorOrder" value="0" min="0">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="md-btn md-btn-secondary" onclick="closeModal('advisorModal')">Cancel</button>
+                <button type="submit" class="md-btn md-btn-primary">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Conduct Modal -->
+<div class="modal-backdrop" id="conductModal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3 id="conductModalTitle">Add Code of Conduct Section</h3>
+            <button class="modal-close" onclick="closeModal('conductModal')">&times;</button>
+        </div>
+        <form id="conductForm" method="POST" action="{% url 'dashboard_leadership_save' %}">
+            {% csrf_token %}
+            <input type="hidden" name="table" value="code_of_conduct">
+            <input type="hidden" name="id" id="conductId" value="">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Section Title <span class="required">*</span></label>
+                    <input type="text" name="section_title" id="conductTitle" required placeholder="e.g., Integrity">
+                </div>
+                <div class="form-group">
+                    <label>Content <span class="required">*</span></label>
+                    <textarea name="content" id="conductContent" rows="5" required placeholder="Describe this code of conduct section..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Display Order</label>
+                    <input type="number" name="display_order" id="conductOrder" value="0" min="0">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="md-btn md-btn-secondary" onclick="closeModal('conductModal')">Cancel</button>
+                <button type="submit" class="md-btn md-btn-primary">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+/* Tab Navigation */
+.leadership-tabs {
+    display: flex;
+    gap: 8px;
+    background: #ffffff;
+    padding: 8px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    overflow-x: auto;
+}
+
+.tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border: none;
+    background: transparent;
+    color: #64748b;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.tab-btn:hover {
+    background: #f8fafc;
+    color: #0f172a;
+}
+
+.tab-btn.active {
+    background: #0f172a;
+    color: #ffffff;
+}
+
+.tab-btn svg {
+    flex-shrink: 0;
+}
+
+/* Tab Content */
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Section Header */
+.section-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin: 0;
+}
+
+/* Items List */
+.items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.item-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    transition: all 0.2s;
+}
+
+.item-card:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.item-card-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    flex: 1;
+    min-width: 0;
+}
+
+.item-order {
+    width: 36px;
+    height: 36px;
+    background: #f1f5f9;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #64748b;
+    flex-shrink: 0;
+}
+
+.item-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.item-info h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin: 0 0 4px 0;
+}
+
+.item-info p {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.item-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.action-btn {
+    width: 36px;
+    height: 36px;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #64748b;
+}
+
+.action-btn:hover {
+    background: #f8fafc;
+}
+
+.action-btn.edit-btn:hover {
+    border-color: #3b82f6;
+    color: #3b82f6;
+}
+
+.action-btn.delete-btn:hover {
+    border-color: #ef4444;
+    color: #ef4444;
+}
+
+/* Council Grid */
+.council-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.leader-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.leader-card:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+}
+
+.leader-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: #f1f5f9;
+    margin: 0 auto 16px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    color: #94a3b8;
+}
+
+.leader-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.leader-card h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin: 0 0 4px 0;
+}
+
+.leader-position {
+    font-size: 0.85rem;
+    color: #dc2626;
+    font-weight: 500;
+    margin: 0 0 8px 0;
+}
+
+.leader-bio {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin: 0 0 16px 0;
+    line-height: 1.5;
+}
+
+.leader-actions {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.leader-actions .action-btn {
+    width: auto;
+    padding: 8px 16px;
+    font-size: 0.8rem;
+    gap: 6px;
+}
+
+/* Tags */
+.tags-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.tag {
+    padding: 4px 10px;
+    background: #f1f5f9;
+    border-radius: 100px;
+    font-size: 0.75rem;
+    color: #475569;
+}
+
+.tag-more {
+    padding: 4px 10px;
+    background: #e2e8f0;
+    border-radius: 100px;
+    font-size: 0.75rem;
+    color: #64748b;
+}
+
+/* Advisor and Committee specific */
+.advisor-avatar-sm,
+.committee-avatar-sm {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+    color: #94a3b8;
+}
+
+.advisor-avatar-sm img,
+.committee-avatar-sm img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.advisor-meta {
+    font-size: 0.8rem;
+    color: #dc2626;
+    margin: 2px 0 0 0 !important;
+}
+
+.advisor-quote {
+    font-style: italic;
+    color: #475569 !important;
+    margin-top: 8px !important;
+}
+
+.chair-info {
+    font-size: 0.8rem;
+    color: #3b82f6 !important;
+    margin: 2px 0 8px 0 !important;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 60px 24px;
+    background: #ffffff;
+    border: 1px dashed #e2e8f0;
+    border-radius: 12px;
+    color: #94a3b8;
+}
+
+.empty-state.full-width {
+    grid-column: 1 / -1;
+}
+
+.empty-state svg {
+    margin-bottom: 12px;
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+/* Modal */
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 24px;
+}
+
+.modal-backdrop.active {
+    display: flex;
+}
+
+.modal-container {
+    background: #ffffff;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-container.modal-lg {
+    max-width: 700px;
+}
+
+/* Critical: Make form participate in flex layout for proper scrolling */
+.modal-container form {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;  /* Required for nested flex scroll */
+    overflow: hidden;
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e2e8f0;
+    flex-shrink: 0;
+}
+
+.modal-header h3 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin: 0;
+}
+
+.modal-close {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: #f1f5f9;
+    border-radius: 8px;
+    font-size: 1.25rem;
+    color: #64748b;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-close:hover {
+    background: #e2e8f0;
+}
+
+.modal-body {
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1 1 auto;
+    min-height: 0;  /* Required for flex scroll to work */
+    scroll-behavior: smooth;
+}
+
+/* Custom scrollbar for modal body */
+.modal-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 3px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 24px;
+    border-top: 1px solid #e2e8f0;
+    flex-shrink: 0;  /* Prevent footer from being compressed */
+    background: #ffffff;  /* Ensure footer has solid background */
+}
+
+/* Form */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 6px;
+}
+
+.form-group .required {
+    color: #ef4444;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #0f172a;
+    box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.1);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* Image Upload Styles */
+.image-upload-container {
+    margin-top: 8px;
+}
+
+.image-upload-container input[type="file"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+.image-preview {
+    margin-top: 12px;
+    position: relative;
+    display: inline-block;
+    max-width: 180px;
+    max-height: 140px;  /* Limit preview height to prevent overflow */
+}
+
+.image-preview img {
+    max-width: 100%;
+    max-height: 120px;  /* Constrain image height */
+    width: auto;
+    height: auto;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    object-fit: contain;
+}
+
+.remove-image-btn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: rgba(239, 68, 68, 0.9);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.remove-image-btn:hover {
+    background: rgba(239, 68, 68, 1);
+}
+
+.form-help {
+    margin-top: 6px;
+    font-size: 0.75rem;
+    color: #64748b;
+    margin-bottom: 0;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+@media (max-width: 600px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Buttons */
+.md-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+}
+
+.md-btn-sm {
+    padding: 8px 16px;
+    font-size: 0.8rem;
+}
+
+.md-btn-primary {
+    background: #0f172a;
+    color: #ffffff;
+}
+
+.md-btn-primary:hover {
+    background: #1e293b;
+}
+
+.md-btn-secondary {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.md-btn-secondary:hover {
+    background: #e2e8f0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .leadership-tabs {
+        flex-wrap: nowrap;
+        padding: 6px;
+    }
+
+    .tab-btn {
+        padding: 10px 14px;
+        font-size: 0.8rem;
+    }
+
+    .tab-btn span {
+        display: none;
+    }
+
+    .item-card {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .item-actions {
+        justify-content: flex-end;
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid #f1f5f9;
+    }
+
+    .council-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script>
+// Tab functionality
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+        this.classList.add('active');
+        document.getElementById('tab-' + this.dataset.tab).classList.add('active');
+    });
+});
+
+// Modal functions
+function openModal(modalId) {
+    document.getElementById(modalId).classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).classList.remove('active');
+    document.body.style.overflow = '';
+    // Reset form
+    const form = document.querySelector('#' + modalId + ' form');
+    if (form) {
+        form.reset();
+        // Reset image previews
+        const previews = form.querySelectorAll('.image-preview');
+        previews.forEach(preview => {
+            preview.style.display = 'none';
+        });
+        const urlInputs = form.querySelectorAll('input[type="hidden"][name="profile_image_url"]');
+        urlInputs.forEach(input => {
+            input.value = '';
+        });
+    }
+}
+
+// Close modal on backdrop click
+document.querySelectorAll('.modal-backdrop').forEach(modal => {
+    modal.addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    });
+});
+
+// Edit functions
+function editVision(id, title, content, order) {
+    document.getElementById('visionModalTitle').textContent = 'Edit Vision Item';
+    document.getElementById('visionId').value = id;
+    document.getElementById('visionTitle').value = title;
+    document.getElementById('visionContent').value = content;
+    document.getElementById('visionOrder').value = order;
+    openModal('visionModal');
+}
+
+function editConduct(id, title, content, order) {
+    document.getElementById('conductModalTitle').textContent = 'Edit Code of Conduct Section';
+    document.getElementById('conductId').value = id;
+    document.getElementById('conductTitle').value = title;
+    document.getElementById('conductContent').value = content;
+    document.getElementById('conductOrder').value = order;
+    openModal('conductModal');
+}
+
+function editCouncil(id) {
+    // Fetch data via AJAX and populate form
+    fetch('{% url "dashboard_leadership_get" %}?table=leadership_council&id=' + id)
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                const item = data.item;
+                document.getElementById('councilModalTitle').textContent = 'Edit Leader';
+                document.getElementById('councilId').value = id;
+                document.getElementById('councilName').value = item.full_name || '';
+                document.getElementById('councilPosition').value = item.position || '';
+                document.getElementById('councilBio').value = item.bio || '';
+                document.getElementById('councilImageUrl').value = item.profile_image_url || '';
+                if (item.profile_image_url) {
+                    document.getElementById('councilImagePreviewImg').src = item.profile_image_url;
+                    document.getElementById('councilImagePreview').style.display = 'block';
+                }
+                document.getElementById('councilEmail').value = item.email || '';
+                document.getElementById('councilPhone').value = item.phone || '';
+                document.getElementById('councilLinkedin').value = item.linkedin_url || '';
+                document.getElementById('councilTwitter').value = item.twitter_url || '';
+                document.getElementById('councilOrder').value = item.display_order || 0;
+                openModal('councilModal');
+            }
+        });
+}
+
+function editCommittee(id) {
+    fetch('{% url "dashboard_leadership_get" %}?table=strategic_committees&id=' + id)
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                const item = data.item;
+                document.getElementById('committeeModalTitle').textContent = 'Edit Committee';
+                document.getElementById('committeeId').value = id;
+                document.getElementById('committeeName').value = item.committee_name || '';
+                document.getElementById('committeeChair').value = item.chairperson || '';
+                document.getElementById('committeeDesc').value = item.description || '';
+                document.getElementById('committeeResp').value = (item.responsibilities || []).join(', ');
+                document.getElementById('committeeImageUrl').value = item.profile_image_url || '';
+                if (item.profile_image_url) {
+                    document.getElementById('committeeImagePreviewImg').src = item.profile_image_url;
+                    document.getElementById('committeeImagePreview').style.display = 'block';
+                }
+                document.getElementById('committeeOrder').value = item.display_order || 0;
+                openModal('committeeModal');
+            }
+        });
+}
+
+function editAdvisor(id) {
+    fetch('{% url "dashboard_leadership_get" %}?table=advisory_voices&id=' + id)
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                const item = data.item;
+                document.getElementById('advisorModalTitle').textContent = 'Edit Advisor';
+                document.getElementById('advisorId').value = id;
+                document.getElementById('advisorName').value = item.full_name || '';
+                document.getElementById('advisorTitle').value = item.title || '';
+                document.getElementById('advisorOrg').value = item.organization || '';
+                document.getElementById('advisorExpertise').value = item.expertise || '';
+                document.getElementById('advisorBio').value = item.bio || '';
+                document.getElementById('advisorImageUrl').value = item.profile_image_url || '';
+                if (item.profile_image_url) {
+                    document.getElementById('advisorImagePreviewImg').src = item.profile_image_url;
+                    document.getElementById('advisorImagePreview').style.display = 'block';
+                }
+                document.getElementById('advisorQuote').value = item.quote || '';
+                document.getElementById('advisorOrder').value = item.display_order || 0;
+                openModal('advisorModal');
+            }
+        });
+}
+
+// Image preview and upload functions
+function previewImage(input, previewId, urlInputId) {
+    const preview = document.getElementById(previewId);
+    const previewImg = document.getElementById(previewId + 'Img');
+    const urlInput = document.getElementById(urlInputId);
+
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImg.src = e.target.result;
+            preview.style.display = 'block';
+            // Clear the URL input when a new file is selected
+            urlInput.value = '';
+
+            // Smooth scroll to show the preview within the modal body
+            setTimeout(() => {
+                const modalBody = preview.closest('.modal-body');
+                if (modalBody) {
+                    // Scroll to show the image preview
+                    preview.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }, 100);
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function removeImage(inputId, previewId, urlInputId) {
+    document.getElementById(inputId).value = '';
+    document.getElementById(previewId).style.display = 'none';
+    document.getElementById(urlInputId).value = '';
+}
+
+// Delete function
+function deleteItem(table, id) {
+    if (confirm('Are you sure you want to delete this item?')) {
+        fetch('{% url "dashboard_leadership_delete" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: 'table=' + table + '&id=' + id
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error deleting item: ' + (data.error || 'Unknown error'));
+            }
+        });
+    }
+}
+</script>
+{% endblock %}

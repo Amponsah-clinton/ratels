@@ -1,0 +1,395 @@
+{% extends "dashboard/base_dashboard.html" %}
+
+{% block title %}Videos - Media Vault{% endblock %}
+
+{% block content %}
+<div class="md-space-y-6">
+
+    <!-- Page Header -->
+    <div class="md-vault-header">
+        <div class="md-vault-header-content">
+            <h1 class="md-page-title">Videos</h1>
+            <p class="md-page-subtitle">Short clips, documentaries, and public addresses</p>
+        </div>
+        <div class="md-vault-header-actions">
+            <div class="md-view-toggle">
+                <button class="md-view-btn active" id="gridViewBtn" onclick="setView('grid')">
+                    <i data-lucide="grid-3x3" style="width:18px;height:18px;"></i>
+                </button>
+                <button class="md-view-btn" id="listViewBtn" onclick="setView('list')">
+                    <i data-lucide="list" style="width:18px;height:18px;"></i>
+                </button>
+            </div>
+            <button class="md-btn md-btn-primary md-btn-sm" onclick="openUploadModal()">
+                <i data-lucide="plus" style="width:16px;height:16px;"></i>
+                Add Video
+            </button>
+        </div>
+    </div>
+
+    <!-- Category Tabs -->
+    <div class="md-vault-tabs">
+        <button class="md-vault-tab {% if not current_category or current_category == 'all' %}active{% endif %}" onclick="filterCategory('all')">
+            All Videos
+        </button>
+        <button class="md-vault-tab {% if current_category == 'short_clips' %}active{% endif %}" onclick="filterCategory('short_clips')">
+            Short Clips
+        </button>
+        <button class="md-vault-tab {% if current_category == 'documentaries' %}active{% endif %}" onclick="filterCategory('documentaries')">
+            Documentaries
+        </button>
+        <button class="md-vault-tab {% if current_category == 'public_addresses' %}active{% endif %}" onclick="filterCategory('public_addresses')">
+            Public Addresses
+        </button>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="md-filter-bar">
+        <div class="md-filter-search">
+            <span class="md-filter-search-icon">
+                <i data-lucide="search"></i>
+            </span>
+            <input type="text" class="md-filter-search-input" placeholder="Search videos..." id="searchInput" onkeyup="searchMedia()">
+        </div>
+        <select class="md-filter-select" id="sortSelect" onchange="sortMedia()">
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="title">Title A-Z</option>
+        </select>
+    </div>
+
+    <!-- Video Grid -->
+    <div class="md-media-grid" id="mediaGrid">
+        {% if videos %}
+            {% for video in videos %}
+            <div class="md-media-card" data-title="{{ video.title|lower }}" data-category="{{ video.category }}" data-date="{{ video.created_at|date:'Y-m-d' }}">
+                <div class="md-media-thumb">
+                    {% if video.thumbnail_url %}
+                    <img src="{{ video.thumbnail_url }}" alt="{{ video.title }}">
+                    {% else %}
+                    <div class="md-media-thumb-placeholder">
+                        <i data-lucide="video"></i>
+                    </div>
+                    {% endif %}
+                    <span class="md-media-badge {{ video.category }}">{{ video.category|cut:"_" }}</span>
+                    {% if video.duration_seconds %}
+                    <span class="md-media-duration">{{ video.duration_seconds|floatformat:0 }}s</span>
+                    {% endif %}
+                    <a href="{{ video.file_url }}" target="_blank" class="md-media-play">
+                        <i data-lucide="play"></i>
+                    </a>
+                </div>
+                <div class="md-media-body">
+                    <h3 class="md-media-title">{{ video.title }}</h3>
+                    <p class="md-media-desc">{{ video.description|default:"No description" }}</p>
+                    <div class="md-media-meta">
+                        <span class="md-media-meta-item">
+                            <i data-lucide="calendar"></i>
+                            {{ video.created_at|date:"M d, Y" }}
+                        </span>
+                        {% if video.source %}
+                        <span class="md-media-meta-item">
+                            <i data-lucide="link"></i>
+                            {{ video.source }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="md-media-actions">
+                    <a href="{{ video.file_url }}" target="_blank" class="md-media-action-btn primary">
+                        <i data-lucide="play"></i>
+                        Play
+                    </a>
+                    <button class="md-media-action-btn secondary" onclick="editMedia('{{ video.id }}')">
+                        <i data-lucide="edit-2"></i>
+                    </button>
+                    <button class="md-media-action-btn danger" onclick="deleteMedia('{{ video.id }}', 'video')">
+                        <i data-lucide="trash-2"></i>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="md-empty-state" style="grid-column: 1 / -1;">
+                <i data-lucide="video-off" class="md-empty-icon"></i>
+                <h3 class="md-empty-title">No videos yet</h3>
+                <p class="md-empty-desc">Upload your first video to start building your evidence vault. Supported formats: MP4, WebM, MOV</p>
+                <button class="md-btn md-btn-primary" onclick="openUploadModal()">
+                    <i data-lucide="upload" style="width:18px;height:18px;"></i>
+                    Upload Video
+                </button>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- List View (hidden by default) -->
+    <div class="md-media-list" id="mediaList" style="display:none;">
+        {% if videos %}
+            {% for video in videos %}
+            <div class="md-media-list-item" data-title="{{ video.title|lower }}" data-category="{{ video.category }}" data-date="{{ video.created_at|date:'Y-m-d' }}">
+                <div class="md-media-list-thumb">
+                    {% if video.thumbnail_url %}
+                    <img src="{{ video.thumbnail_url }}" alt="{{ video.title }}">
+                    {% else %}
+                    <div class="md-media-thumb-placeholder" style="display:flex;align-items:center;justify-content:center;height:100%;">
+                        <i data-lucide="video" style="width:24px;height:24px;"></i>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="md-media-list-content">
+                    <div class="md-media-list-title">{{ video.title }}</div>
+                    <div class="md-media-list-meta">
+                        <span class="md-media-badge {{ video.category }}" style="position:static;">{{ video.category|cut:"_" }}</span>
+                        <span>{{ video.created_at|date:"M d, Y" }}</span>
+                        {% if video.duration_seconds %}<span>{{ video.duration_seconds }}s</span>{% endif %}
+                    </div>
+                </div>
+                <div class="md-flex md-gap-2">
+                    <a href="{{ video.file_url }}" target="_blank" class="md-media-action-btn primary">
+                        <i data-lucide="play"></i>
+                    </a>
+                    <button class="md-media-action-btn danger" onclick="deleteMedia('{{ video.id }}', 'video')">
+                        <i data-lucide="trash-2"></i>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- Upload Modal -->
+<div class="md-modal-overlay" id="uploadModal">
+    <div class="md-modal">
+        <div class="md-modal-header">
+            <h2 class="md-modal-title">Add New Video</h2>
+            <button class="md-modal-close" onclick="closeUploadModal()">
+                <i data-lucide="x" style="width:20px;height:20px;"></i>
+            </button>
+        </div>
+        <form method="POST" action="{% url 'dashboard_media_videos_save' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="md-modal-body">
+                <div class="md-space-y-4">
+                    <div class="md-form-group full-width">
+                        <label class="md-form-label">Title *</label>
+                        <input type="text" name="title" class="md-form-input" placeholder="Enter video title" required>
+                    </div>
+                    <div class="md-form-row">
+                        <div class="md-form-group">
+                            <label class="md-form-label">Category *</label>
+                            <select name="category" class="md-form-select" required>
+                                <option value="">Select category</option>
+                                <option value="short_clips">Short Clips</option>
+                                <option value="documentaries">Documentaries</option>
+                                <option value="public_addresses">Public Addresses</option>
+                            </select>
+                        </div>
+                        <div class="md-form-group">
+                            <label class="md-form-label">Source</label>
+                            <input type="text" name="source" class="md-form-input" placeholder="e.g., Official Recording">
+                        </div>
+                    </div>
+                    <div class="md-form-group full-width">
+                        <label class="md-form-label">Description</label>
+                        <textarea name="description" class="md-form-textarea" placeholder="Describe the video content..."></textarea>
+                    </div>
+                    <div class="md-form-group full-width">
+                        <label class="md-form-label">Video File *</label>
+                        <div class="md-upload-zone" id="videoDropZone" onclick="document.getElementById('videoFile').click()">
+                            <i data-lucide="upload-cloud" class="md-upload-icon"></i>
+                            <p class="md-upload-text">Click to upload or drag and drop</p>
+                            <p class="md-upload-hint">MP4, WebM, MOV up to 500MB</p>
+                        </div>
+                        <input type="file" name="video_file" id="videoFile" accept="video/*" style="display:none;" onchange="handleFileSelect(this, 'videoDropZone')">
+                    </div>
+                    <div class="md-form-group full-width">
+                        <label class="md-form-label">Thumbnail (Optional)</label>
+                        <input type="file" name="thumbnail" class="md-form-input" accept="image/*" style="padding:8px;">
+                    </div>
+                    <div class="md-form-row">
+                        <div class="md-form-group">
+                            <label class="md-form-label">Recorded Date</label>
+                            <input type="date" name="recorded_date" class="md-form-input">
+                        </div>
+                        <div class="md-form-group">
+                            <label class="md-form-label">Location</label>
+                            <input type="text" name="location" class="md-form-input" placeholder="e.g., Lagos, Nigeria">
+                        </div>
+                    </div>
+                    <div class="md-form-group full-width">
+                        <label class="md-form-label">Tags (comma separated)</label>
+                        <input type="text" name="tags" class="md-form-input" placeholder="e.g., rally, speech, 2024">
+                    </div>
+                </div>
+            </div>
+            <div class="md-modal-footer">
+                <button type="button" class="md-btn md-btn-outline" onclick="closeUploadModal()">Cancel</button>
+                <button type="submit" class="md-btn md-btn-primary">
+                    <i data-lucide="upload" style="width:16px;height:16px;"></i>
+                    Upload Video
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // View toggle
+    function setView(view) {
+        const grid = document.getElementById('mediaGrid');
+        const list = document.getElementById('mediaList');
+        const gridBtn = document.getElementById('gridViewBtn');
+        const listBtn = document.getElementById('listViewBtn');
+
+        if (view === 'grid') {
+            grid.style.display = 'grid';
+            list.style.display = 'none';
+            gridBtn.classList.add('active');
+            listBtn.classList.remove('active');
+        } else {
+            grid.style.display = 'none';
+            list.style.display = 'flex';
+            gridBtn.classList.remove('active');
+            listBtn.classList.add('active');
+        }
+        localStorage.setItem('mediaViewMode', view);
+    }
+
+    // Restore view mode
+    const savedView = localStorage.getItem('mediaViewMode');
+    if (savedView) setView(savedView);
+
+    // Category filter
+    function filterCategory(category) {
+        const url = new URL(window.location.href);
+        if (category === 'all') {
+            url.searchParams.delete('category');
+        } else {
+            url.searchParams.set('category', category);
+        }
+        window.location.href = url.toString();
+    }
+
+    // Search functionality
+    function searchMedia() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        const cards = document.querySelectorAll('.md-media-card, .md-media-list-item');
+
+        cards.forEach(card => {
+            const title = card.getAttribute('data-title');
+            card.style.display = title.includes(query) ? '' : 'none';
+        });
+    }
+
+    // Sort functionality
+    function sortMedia() {
+        const sort = document.getElementById('sortSelect').value;
+        const grid = document.getElementById('mediaGrid');
+        const cards = Array.from(grid.querySelectorAll('.md-media-card'));
+
+        cards.sort((a, b) => {
+            if (sort === 'newest') {
+                return new Date(b.getAttribute('data-date')) - new Date(a.getAttribute('data-date'));
+            } else if (sort === 'oldest') {
+                return new Date(a.getAttribute('data-date')) - new Date(b.getAttribute('data-date'));
+            } else {
+                return a.getAttribute('data-title').localeCompare(b.getAttribute('data-title'));
+            }
+        });
+
+        cards.forEach(card => grid.appendChild(card));
+    }
+
+    // Modal functions
+    function openUploadModal() {
+        document.getElementById('uploadModal').classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeUploadModal() {
+        document.getElementById('uploadModal').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    // Close modal on overlay click
+    document.getElementById('uploadModal').addEventListener('click', function(e) {
+        if (e.target === this) closeUploadModal();
+    });
+
+    // File upload handling
+    function handleFileSelect(input, zoneId) {
+        const zone = document.getElementById(zoneId);
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            zone.innerHTML = `
+                <i data-lucide="check-circle" class="md-upload-icon" style="color:var(--md-green);"></i>
+                <p class="md-upload-text">${file.name}</p>
+                <p class="md-upload-hint">${(file.size / 1024 / 1024).toFixed(2)} MB</p>
+            `;
+            lucide.createIcons();
+        }
+    }
+
+    // Drag and drop
+    const dropZone = document.getElementById('videoDropZone');
+    if (dropZone) {
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
+        });
+
+        dropZone.addEventListener('drop', function(e) {
+            const files = e.dataTransfer.files;
+            document.getElementById('videoFile').files = files;
+            handleFileSelect(document.getElementById('videoFile'), 'videoDropZone');
+        }, false);
+    }
+
+    // Delete media
+    function deleteMedia(id, type) {
+        if (confirm('Are you sure you want to delete this ' + type + '? This action cannot be undone.')) {
+            fetch('{% url "dashboard_media_videos_delete" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ id: id })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    alert('Failed to delete: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(err => {
+                alert('Error: ' + err.message);
+            });
+        }
+    }
+
+    // Re-init icons after dynamic content
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+</script>
+{% endblock %}

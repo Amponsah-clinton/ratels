@@ -1,0 +1,513 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Mission & Vision - Ratel Movement{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* =====================================================
+       MISSION & VISION PAGE - Elegant, Purposeful Design
+       ===================================================== */
+
+    /* Page Container */
+    .mv-page {
+        clear: both;
+    }
+
+    /* Hero Section */
+    .mv-hero {
+        background: #fff;
+        padding: 80px 0 60px;
+        border-bottom: 1px solid #e5e7eb;
+        text-align: center;
+    }
+    .mv-hero-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+    .mv-hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: #f1f5f9;
+        border-radius: 50px;
+        color: #475569;
+        font-size: 0.8125rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    .mv-hero-badge svg {
+        width: 16px;
+        height: 16px;
+    }
+    .mv-hero h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 0 0 1rem 0;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+    }
+    .mv-hero-subtitle {
+        font-size: 1.25rem;
+        color: #64748b;
+        margin: 0;
+        line-height: 1.7;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* Main Content */
+    .mv-main {
+        background: #f8fafc;
+        padding: 80px 0;
+    }
+    .mv-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    /* Mission & Vision Cards */
+    .mv-statements {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 4rem;
+    }
+    .mv-statement-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid #e5e7eb;
+        padding: 2.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+    .mv-statement-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: #0f172a;
+    }
+    .mv-statement-card.vision::before {
+        background: #475569;
+    }
+    .mv-statement-icon {
+        width: 56px;
+        height: 56px;
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+    }
+    .mv-statement-icon svg {
+        width: 26px;
+        height: 26px;
+        color: #475569;
+    }
+    .mv-statement-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 0.5rem;
+    }
+    .mv-statement-card h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0 0 1rem 0;
+        line-height: 1.3;
+    }
+    .mv-statement-text {
+        font-size: 1.0625rem;
+        color: #475569;
+        line-height: 1.8;
+    }
+    .mv-statement-text p {
+        margin: 0;
+    }
+
+    /* Values Section */
+    .mv-values-section {
+        margin-bottom: 4rem;
+    }
+    .mv-section-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    .mv-section-header h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0 0 0.75rem 0;
+    }
+    .mv-section-header p {
+        font-size: 1.0625rem;
+        color: #64748b;
+        margin: 0;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* Values Grid */
+    .mv-values-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+    }
+    .mv-value-card {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid #e5e7eb;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.2s;
+    }
+    .mv-value-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.06);
+        border-color: #d1d5db;
+    }
+    .mv-value-icon {
+        width: 64px;
+        height: 64px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.25rem;
+    }
+    .mv-value-icon svg {
+        width: 28px;
+        height: 28px;
+        color: #475569;
+    }
+    .mv-value-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        background: #f1f5f9;
+        color: #475569;
+        font-size: 0.6875rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-radius: 50px;
+        margin-bottom: 0.75rem;
+    }
+    .mv-value-card h3 {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0 0 0.75rem 0;
+    }
+    .mv-value-card p {
+        font-size: 0.9375rem;
+        color: #64748b;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    /* Pledge Section */
+    .mv-pledge {
+        background: #fff;
+        border-radius: 16px;
+        border: 1px solid #e5e7eb;
+        padding: 3rem;
+        text-align: center;
+    }
+    .mv-pledge-icon {
+        width: 72px;
+        height: 72px;
+        background: #0f172a;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+    }
+    .mv-pledge-icon svg {
+        width: 32px;
+        height: 32px;
+        color: #fff;
+    }
+    .mv-pledge h2 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0 0 1rem 0;
+    }
+    .mv-pledge-text {
+        font-size: 1.125rem;
+        color: #475569;
+        line-height: 1.8;
+        max-width: 700px;
+        margin: 0 auto 2rem;
+    }
+    .mv-pledge-text p {
+        margin: 0;
+    }
+    .mv-pledge-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem 2rem;
+        background: #0f172a;
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 600;
+        text-decoration: none;
+        border-radius: 10px;
+        transition: all 0.2s;
+    }
+    .mv-pledge-cta:hover {
+        background: #1e293b;
+        color: #fff;
+        transform: translateY(-2px);
+    }
+    .mv-pledge-cta svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    /* Quote Block */
+    .mv-quote {
+        background: #fff;
+        border-top: 1px solid #e5e7eb;
+        padding: 80px 0;
+        text-align: center;
+    }
+    .mv-quote-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+    .mv-quote-icon {
+        width: 48px;
+        height: 48px;
+        margin: 0 auto 1.5rem;
+        color: #cbd5e1;
+    }
+    .mv-quote-text {
+        font-size: 1.5rem;
+        font-weight: 500;
+        color: #374151;
+        line-height: 1.6;
+        margin: 0 0 1.5rem 0;
+        font-style: italic;
+    }
+    .mv-quote-author {
+        font-size: 0.9375rem;
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .mv-statements {
+            grid-template-columns: 1fr;
+        }
+        .mv-values-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    @media (max-width: 768px) {
+        .mv-hero {
+            padding: 60px 0 40px;
+        }
+        .mv-hero h1 {
+            font-size: 2.25rem;
+        }
+        .mv-hero-subtitle {
+            font-size: 1.0625rem;
+        }
+        .mv-main {
+            padding: 60px 0;
+        }
+        .mv-statements {
+            margin-bottom: 3rem;
+        }
+        .mv-statement-card {
+            padding: 2rem;
+        }
+        .mv-values-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        .mv-value-card {
+            padding: 1.5rem;
+        }
+        .mv-section-header h2 {
+            font-size: 1.5rem;
+        }
+        .mv-pledge {
+            padding: 2rem;
+        }
+        .mv-pledge h2 {
+            font-size: 1.5rem;
+        }
+        .mv-quote {
+            padding: 60px 0;
+        }
+        .mv-quote-text {
+            font-size: 1.25rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mv-page">
+    <!-- Hero Section -->
+    <section class="mv-hero">
+        <div class="mv-hero-container">
+            <div class="mv-hero-badge">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="21.17" x2="12" y1="8" y2="8"/><line x1="3.95" x2="8.54" y1="6.06" y2="14"/><line x1="10.88" x2="15.46" y1="21.94" y2="14"/></svg>
+                Our Purpose
+            </div>
+            <h1>Mission & Vision</h1>
+            <p class="mv-hero-subtitle">The driving force behind everything we do and the future we're working to build.</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <section class="mv-main">
+        <div class="mv-container">
+            <!-- Mission & Vision Statements -->
+            <div class="mv-statements">
+                <div class="mv-statement-card mission">
+                    <div class="mv-statement-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+                    </div>
+                    <div class="mv-statement-label">{{ mission.subtitle|default:"What Drives Us Every Day" }}</div>
+                    <h2>{{ mission.title|default:"Our Mission" }}</h2>
+                    <div class="mv-statement-text">
+                        {{ mission.content|safe|default:"<p>To empower citizens with truth, document injustice with precision, and build a movement that holds power accountable through collective action and unwavering resolve.</p>" }}
+                    </div>
+                </div>
+
+                <div class="mv-statement-card vision">
+                    <div class="mv-statement-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </div>
+                    <div class="mv-statement-label">{{ vision.subtitle|default:"The Future We're Building" }}</div>
+                    <h2>{{ vision.title|default:"Our Vision" }}</h2>
+                    <div class="mv-statement-text">
+                        {{ vision.content|safe|default:"<p>A society where transparency is the norm, where every voice matters, where power serves the people, and where truth cannot be suppressed or distorted.</p>" }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Core Values -->
+            <div class="mv-values-section">
+                <div class="mv-section-header">
+                    <h2>{{ values_header.title|default:"Core Values" }}</h2>
+                    <p>{{ values_header.content|default:"Our values are not just words—they are commitments that guide every action we take."|safe|striptags }}</p>
+                </div>
+
+                <div class="mv-values-grid">
+                    {% if values %}
+                        {% for value in values %}
+                        <div class="mv-value-card">
+                            <div class="mv-value-icon">
+                                {% if value.icon == 'check-circle' %}
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                {% elif value.icon == 'shield' %}
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>
+                                {% elif value.icon == 'users' %}
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                {% elif value.icon == 'award' %}
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+                                {% elif value.icon == 'heart' %}
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                                {% else %}
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                {% endif %}
+                            </div>
+                            {% if value.highlight_text %}
+                            <span class="mv-value-badge">{{ value.highlight_text }}</span>
+                            {% endif %}
+                            <h3>{{ value.title }}</h3>
+                            <p>{{ value.content|safe|striptags|truncatewords:20 }}</p>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                    <!-- Default Values -->
+                    <div class="mv-value-card">
+                        <div class="mv-value-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                        </div>
+                        <span class="mv-value-badge">Non-Negotiable</span>
+                        <h3>Truth</h3>
+                        <p>We pursue truth relentlessly, documenting evidence and exposing falsehoods.</p>
+                    </div>
+                    <div class="mv-value-card">
+                        <div class="mv-value-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>
+                        </div>
+                        <span class="mv-value-badge">Fearless</span>
+                        <h3>Courage</h3>
+                        <p>We speak truth to power, even when it's dangerous. Fear will not silence us.</p>
+                    </div>
+                    <div class="mv-value-card">
+                        <div class="mv-value-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        </div>
+                        <span class="mv-value-badge">Together</span>
+                        <h3>Unity</h3>
+                        <p>We are stronger together. Our diversity is our strength, and our unity is our power.</p>
+                    </div>
+                    <div class="mv-value-card">
+                        <div class="mv-value-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+                        </div>
+                        <span class="mv-value-badge">Authentic</span>
+                        <h3>Integrity</h3>
+                        <p>We hold ourselves to the same standards we demand of others.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Pledge Section -->
+            <div class="mv-pledge">
+                <div class="mv-pledge-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/></svg>
+                </div>
+                <h2>{{ pledge.title|default:"Our Pledge" }}</h2>
+                <div class="mv-pledge-text">
+                    {{ pledge.content|safe|default:"<p>We pledge to remain vigilant, to never compromise on truth, to amplify marginalized voices, and to persist until justice prevails.</p>" }}
+                </div>
+                <a href="{% url 'membership' %}" class="mv-pledge-cta">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
+                    Join the Movement
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Closing Quote -->
+    <section class="mv-quote">
+        <div class="mv-quote-container">
+            <svg class="mv-quote-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
+            <p class="mv-quote-text">"Neutrality in the face of injustice is complicity. We choose to act."</p>
+            <span class="mv-quote-author">— The Ratel Movement</span>
+        </div>
+    </section>
+</div>
+{% endblock %}

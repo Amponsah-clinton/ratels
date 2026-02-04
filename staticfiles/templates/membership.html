@@ -1,0 +1,1125 @@
+{% extends "base.html" %}
+
+{% block title %}Membership - Ratel Movement{% endblock %}
+
+{% block extra_css %}
+<style>
+  .membership-section {
+    padding: 100px 0 80px;
+    background: #f8fafc;
+    min-height: 80vh;
+  }
+  .membership-section .container {
+    max-width: 1280px;
+  }
+  @media (min-width: 1400px) {
+    .membership-section .container {
+      max-width: 1400px;
+    }
+  }
+
+  /* Header with title and search */
+  .membership-header {
+    margin-bottom: 2rem;
+  }
+  .membership-title {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  .membership-title h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 0.5rem 0;
+  }
+  .membership-title p {
+    font-size: 1rem;
+    color: #64748b;
+    margin: 0;
+  }
+
+  /* Search and filter bar */
+  .search-filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .search-input-wrapper {
+    flex: 1;
+    position: relative;
+  }
+  .search-input {
+    width: 100%;
+    padding: 12px 16px 12px 44px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    background: #ffffff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .search-input:focus {
+    outline: none;
+    border-color: #0f172a;
+    box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.1);
+  }
+  .search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    pointer-events: none;
+  }
+  .filter-toggle-btn {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #ffffff;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .filter-toggle-btn:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+  }
+  .filter-toggle-btn svg {
+    width: 20px;
+    height: 20px;
+    color: #475569;
+  }
+
+  /* Main layout */
+  .membership-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  /* Sidebar filter */
+  .filter-sidebar {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+    position: sticky;
+    top: 100px;
+  }
+  .filter-section {
+    margin-bottom: 1.5rem;
+  }
+  .filter-section:last-child {
+    margin-bottom: 0;
+  }
+  .filter-section-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    margin-bottom: 0.75rem;
+  }
+  .filter-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .filter-option:hover {
+    color: #0f172a;
+  }
+  .filter-option input[type="checkbox"],
+  .filter-option input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #0f172a;
+    cursor: pointer;
+  }
+  .filter-option-label {
+    font-size: 0.9rem;
+    color: #374151;
+  }
+  .filter-option-count {
+    margin-left: auto;
+    font-size: 0.75rem;
+    color: #94a3b8;
+    background: #f1f5f9;
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+  .filter-clear-btn {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: transparent;
+    color: #64748b;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    margin-top: 1rem;
+  }
+  .filter-clear-btn:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+  }
+
+  /* Results info */
+  .results-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding: 0 0.25rem;
+  }
+  .results-count {
+    font-size: 0.9rem;
+    color: #64748b;
+  }
+  .results-count strong {
+    color: #0f172a;
+  }
+
+  /* Member grid */
+  .membership-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
+  }
+  .profile-card {
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .profile-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
+  }
+  .profile-image-container {
+    position: relative;
+    overflow: hidden;
+    padding-top: 100%;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  }
+  .profile-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease-out;
+  }
+  .profile-card:hover .profile-image {
+    transform: scale(1.05);
+  }
+  .profile-image-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(15, 23, 42, 0.4) 0%, transparent 50%);
+  }
+  .profile-footer {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .profile-footer-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .profile-footer-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #0f172a;
+  }
+  .profile-footer-role {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border-radius: 999px;
+    width: fit-content;
+  }
+  .profile-footer-location {
+    font-size: 0.8rem;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .profile-footer-location svg {
+    width: 14px;
+    height: 14px;
+  }
+  .member-view-btn {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    background-color: #0f172a;
+    color: #ffffff;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.15s ease;
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .member-view-btn:hover {
+    background-color: #1e293b;
+  }
+  .member-view-btn:active,
+  .member-view-btn:focus {
+    background-color: #1e293b;
+    outline: none;
+    transform: scale(0.98);
+  }
+
+  /* Empty state */
+  .membership-empty {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #64748b;
+  }
+  .membership-empty svg {
+    width: 64px;
+    height: 64px;
+    color: #cbd5e1;
+    margin-bottom: 1rem;
+  }
+  .membership-empty p {
+    font-size: 1rem;
+    margin: 0;
+  }
+
+  /* Mobile filter modal */
+  .filter-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.5);
+    z-index: 11000;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .filter-modal-backdrop.active {
+    display: block;
+    opacity: 1;
+  }
+  .filter-modal {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 320px;
+    max-width: 85vw;
+    height: 100%;
+    background: #ffffff;
+    z-index: 11001;
+    display: flex;
+    flex-direction: column;
+    transition: right 0.3s ease;
+    box-shadow: -4px 0 30px rgba(15, 23, 42, 0.2);
+  }
+  .filter-modal.active {
+    right: 0;
+  }
+  .filter-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  .filter-modal-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin: 0;
+  }
+  .filter-modal-close {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: #f1f5f9;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+  .filter-modal-close:hover {
+    background: #e2e8f0;
+  }
+  .filter-modal-close svg {
+    width: 20px;
+    height: 20px;
+    color: #475569;
+  }
+  .filter-modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+  }
+  .filter-modal-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    gap: 12px;
+  }
+  .filter-modal-footer button {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .filter-reset-btn {
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    color: #475569;
+  }
+  .filter-reset-btn:hover {
+    background: #f8fafc;
+  }
+  .filter-apply-btn {
+    border: none;
+    background: #0f172a;
+    color: #ffffff;
+  }
+  .filter-apply-btn:hover {
+    background: #1e293b;
+  }
+
+  /* Member detail modal */
+  .member-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 12000;
+    padding: 1rem;
+  }
+  .member-modal {
+    background: #ffffff;
+    border-radius: 20px;
+    max-width: 720px;
+    width: 100%;
+    max-height: 90vh;
+    overflow: hidden;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.4);
+    display: flex;
+    flex-direction: column;
+  }
+  .member-modal-header {
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .member-modal-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin: 0;
+  }
+  .member-modal-role {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin-top: 0.25rem;
+  }
+  .member-modal-close {
+    border: none;
+    background: #f1f5f9;
+    border-radius: 10px;
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.25rem;
+    color: #475569;
+    transition: background 0.2s;
+  }
+  .member-modal-close:hover {
+    background: #e2e8f0;
+  }
+  .member-modal-body {
+    padding: 1.5rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    gap: 1.5rem;
+    overflow-y: auto;
+  }
+  .member-modal-image {
+    border-radius: 16px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    aspect-ratio: 1;
+  }
+  .member-modal-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .member-modal-details {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .member-modal-detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .member-modal-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #94a3b8;
+    font-weight: 500;
+  }
+  .member-modal-value {
+    font-size: 0.95rem;
+    color: #0f172a;
+    font-weight: 500;
+  }
+  .member-modal-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .member-modal-tag {
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: #f1f5f9;
+    font-size: 0.8rem;
+    color: #475569;
+  }
+
+  /* Responsive */
+  @media (max-width: 992px) {
+    .membership-layout {
+      grid-template-columns: 1fr;
+    }
+    .filter-sidebar {
+      display: none;
+    }
+    .filter-toggle-btn {
+      display: flex;
+    }
+  }
+  @media (max-width: 768px) {
+    .membership-section {
+      padding: 110px 0 60px;
+    }
+    .membership-title h1 {
+      font-size: 1.5rem;
+      margin-top: 12px;
+    }
+    .membership-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+    .member-modal-body {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 480px) {
+    .membership-grid {
+      grid-template-columns: 1fr;
+    }
+    .search-filter-bar {
+      padding: 0 0.5rem;
+    }
+    .profile-footer {
+      padding: 0.875rem;
+      gap: 0.625rem;
+    }
+    .profile-footer-name {
+      font-size: 0.95rem;
+    }
+    .profile-footer-role {
+      font-size: 0.7rem;
+      padding: 3px 8px;
+    }
+    .profile-footer-location {
+      font-size: 0.75rem;
+    }
+    .member-view-btn {
+      padding: 10px 8px;
+      font-size: 0.8rem;
+    }
+  }
+  @media (max-width: 360px) {
+    .profile-card {
+      border-radius: 12px;
+    }
+    .profile-footer {
+      padding: 0.75rem;
+      gap: 0.5rem;
+    }
+    .profile-footer-name {
+      font-size: 0.9rem;
+    }
+    .profile-footer-location {
+      font-size: 0.7rem;
+    }
+    .profile-footer-location svg {
+      width: 12px;
+      height: 12px;
+    }
+    .member-view-btn {
+      padding: 9px 6px;
+      font-size: 0.75rem;
+      border-radius: 8px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="membership-section">
+  <div class="container">
+    <!-- Header -->
+    <div class="membership-header">
+      <div class="membership-title">
+        <h1 style="font-size: 28px !important; margin-top: 60px;">Our Members</h1>
+        <p>Members of the RATEL Movement with assigned roles</p>
+      </div>
+
+      <!-- Search and filter toggle -->
+      <div class="search-filter-bar">
+        <div class="search-input-wrapper">
+          <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.3-4.3"></path>
+          </svg>
+          <input type="text" id="memberSearch" class="search-input" placeholder="Search by name, location...">
+        </div>
+        <button type="button" class="filter-toggle-btn" id="filterToggleBtn" aria-label="Open filters">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Main layout -->
+    <div class="membership-layout">
+      <!-- Sidebar filter (desktop) -->
+      <aside class="filter-sidebar">
+        <div class="filter-section">
+          <h3 class="filter-section-title">Membership Type</h3>
+          {% for role in roles %}
+          <label class="filter-option">
+            <input type="checkbox" name="role" value="{{ role }}" class="filter-checkbox" data-filter="role">
+            <span class="filter-option-label">{{ role }}</span>
+          </label>
+          {% empty %}
+          <label class="filter-option">
+            <input type="checkbox" name="role" value="Full member" class="filter-checkbox" data-filter="role">
+            <span class="filter-option-label">Full member</span>
+          </label>
+          <label class="filter-option">
+            <input type="checkbox" name="role" value="Associate member" class="filter-checkbox" data-filter="role">
+            <span class="filter-option-label">Associate member</span>
+          </label>
+          <label class="filter-option">
+            <input type="checkbox" name="role" value="Honorary member" class="filter-checkbox" data-filter="role">
+            <span class="filter-option-label">Honorary member</span>
+          </label>
+          <label class="filter-option">
+            <input type="checkbox" name="role" value="Patron" class="filter-checkbox" data-filter="role">
+            <span class="filter-option-label">Patron</span>
+          </label>
+          {% endfor %}
+        </div>
+
+        <div class="filter-section">
+          <h3 class="filter-section-title">Location</h3>
+          <label class="filter-option">
+            <input type="checkbox" name="location" value="nigeria" class="filter-checkbox" data-filter="location">
+            <span class="filter-option-label">Nigeria</span>
+          </label>
+          <label class="filter-option">
+            <input type="checkbox" name="location" value="international" class="filter-checkbox" data-filter="location">
+            <span class="filter-option-label">International</span>
+          </label>
+        </div>
+
+        <button type="button" class="filter-clear-btn" id="clearFiltersBtn">Clear all filters</button>
+      </aside>
+
+      <!-- Main content -->
+      <main class="membership-main">
+        <div class="results-info">
+          <span class="results-count">Showing <strong id="resultsCount">{{ members|length }}</strong> member(s)</span>
+        </div>
+
+        {% if members %}
+        <div class="membership-grid" id="membersGrid">
+          {% for m in members %}
+          <article class="profile-card"
+                   data-name="{{ m.full_name|lower }}"
+                   data-role="{{ m.membership_type|lower }}"
+                   data-location="{% if m.based_in_nigeria %}nigeria{% else %}international{% endif %}"
+                   data-state="{{ m.state|lower }}"
+                   data-country="{{ m.country|lower }}">
+            <div class="profile-image-container">
+              <img
+                src="{{ m.profile_image_url|default:'https://via.placeholder.com/400x400?text=Member' }}"
+                alt="{{ m.full_name }}"
+                class="profile-image"
+                loading="lazy"
+              />
+              <div class="profile-image-overlay"></div>
+            </div>
+            <div class="profile-footer">
+              <div class="profile-footer-info">
+                <div class="profile-footer-name">{{ m.full_name }}</div>
+                {% if m.membership_type %}
+                <div class="profile-footer-role">{{ m.membership_type }}</div>
+                {% endif %}
+                <div class="profile-footer-location">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                  </svg>
+                  {% if m.based_in_nigeria %}
+                    {{ m.state|default:"Nigeria" }}{% if m.lga %}, {{ m.lga }}{% endif %}
+                  {% else %}
+                    {{ m.city|default:"" }}{% if m.city and m.country %}, {% endif %}{{ m.country|default:"International" }}
+                  {% endif %}
+                </div>
+              </div>
+              <button
+                type="button"
+                class="member-view-btn js-member-view"
+                data-name="{{ m.full_name }}"
+                data-role="{{ m.membership_type|default:'Member' }}"
+                data-member-id="{{ m.member_id }}"
+                data-email="{{ m.email }}"
+                data-phone="{{ m.phone_number }}"
+                data-location="{% if m.based_in_nigeria %}{{ m.state|default:'Nigeria' }}{% if m.lga %}, {{ m.lga }}{% endif %}{% else %}{{ m.city|default:'' }}{% if m.city and m.country %}, {% endif %}{{ m.country|default:'International' }}{% endif %}"
+                data-engagement="{{ m.engagement_preferences|join:', ' }}"
+                data-joined="{% if m.created_at %}{{ m.created_at|slice:10 }}{% endif %}"
+                data-image-url="{{ m.profile_image_url|default_if_none:'' }}"
+              >
+                View Profile
+              </button>
+            </div>
+          </article>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="membership-empty">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+          <p>No members with assigned roles are visible yet.</p>
+        </div>
+        {% endif %}
+
+        <!-- No results message -->
+        <div class="membership-empty" id="noResultsMsg" style="display: none;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.3-4.3"></path>
+          </svg>
+          <p>No members match your search or filters.</p>
+        </div>
+      </main>
+    </div>
+  </div>
+</div>
+
+<!-- Mobile filter modal -->
+<div class="filter-modal-backdrop" id="filterModalBackdrop"></div>
+<div class="filter-modal" id="filterModal">
+  <div class="filter-modal-header">
+    <h3 class="filter-modal-title">Filters</h3>
+    <button type="button" class="filter-modal-close" id="filterModalClose">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 6 6 18"></path>
+        <path d="m6 6 12 12"></path>
+      </svg>
+    </button>
+  </div>
+  <div class="filter-modal-body">
+    <div class="filter-section">
+      <h3 class="filter-section-title">Membership Type</h3>
+      {% for role in roles %}
+      <label class="filter-option">
+        <input type="checkbox" name="role_mobile" value="{{ role }}" class="filter-checkbox-mobile" data-filter="role">
+        <span class="filter-option-label">{{ role }}</span>
+      </label>
+      {% empty %}
+      <label class="filter-option">
+        <input type="checkbox" name="role_mobile" value="Full member" class="filter-checkbox-mobile" data-filter="role">
+        <span class="filter-option-label">Full member</span>
+      </label>
+      <label class="filter-option">
+        <input type="checkbox" name="role_mobile" value="Associate member" class="filter-checkbox-mobile" data-filter="role">
+        <span class="filter-option-label">Associate member</span>
+      </label>
+      <label class="filter-option">
+        <input type="checkbox" name="role_mobile" value="Honorary member" class="filter-checkbox-mobile" data-filter="role">
+        <span class="filter-option-label">Honorary member</span>
+      </label>
+      <label class="filter-option">
+        <input type="checkbox" name="role_mobile" value="Patron" class="filter-checkbox-mobile" data-filter="role">
+        <span class="filter-option-label">Patron</span>
+      </label>
+      {% endfor %}
+    </div>
+
+    <div class="filter-section">
+      <h3 class="filter-section-title">Location</h3>
+      <label class="filter-option">
+        <input type="checkbox" name="location_mobile" value="nigeria" class="filter-checkbox-mobile" data-filter="location">
+        <span class="filter-option-label">Nigeria</span>
+      </label>
+      <label class="filter-option">
+        <input type="checkbox" name="location_mobile" value="international" class="filter-checkbox-mobile" data-filter="location">
+        <span class="filter-option-label">International</span>
+      </label>
+    </div>
+  </div>
+  <div class="filter-modal-footer">
+    <button type="button" class="filter-reset-btn" id="mobileResetBtn">Reset</button>
+    <button type="button" class="filter-apply-btn" id="mobileApplyBtn">Apply Filters</button>
+  </div>
+</div>
+
+<!-- Member detail modal -->
+<div id="memberModalBackdrop" class="member-modal-backdrop">
+  <div class="member-modal">
+    <div class="member-modal-header">
+      <div>
+        <h3 class="member-modal-title" id="memberModalName">Member name</h3>
+        <div class="member-modal-role" id="memberModalRole"></div>
+      </div>
+      <button type="button" class="member-modal-close" id="memberModalClose" aria-label="Close">&times;</button>
+    </div>
+    <div class="member-modal-body">
+      <div class="member-modal-image">
+        <img id="memberModalImage" src="" alt="Member profile picture" />
+      </div>
+      <div class="member-modal-details">
+        <div class="member-modal-detail-item">
+          <div class="member-modal-label">Member ID</div>
+          <div class="member-modal-value" id="memberModalId">-</div>
+        </div>
+        <div class="member-modal-detail-item">
+          <div class="member-modal-label">Email</div>
+          <div class="member-modal-value" id="memberModalEmail">-</div>
+        </div>
+        <div class="member-modal-detail-item">
+          <div class="member-modal-label">Phone</div>
+          <div class="member-modal-value" id="memberModalPhone">-</div>
+        </div>
+        <div class="member-modal-detail-item">
+          <div class="member-modal-label">Location</div>
+          <div class="member-modal-value" id="memberModalLocation">-</div>
+        </div>
+        <div class="member-modal-detail-item">
+          <div class="member-modal-label">Joined</div>
+          <div class="member-modal-value" id="memberModalJoined">-</div>
+        </div>
+        <div class="member-modal-detail-item">
+          <div class="member-modal-label">Areas of Engagement</div>
+          <div class="member-modal-tags" id="memberModalTags"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function() {
+  // Elements
+  const searchInput = document.getElementById('memberSearch');
+  const membersGrid = document.getElementById('membersGrid');
+  const resultsCount = document.getElementById('resultsCount');
+  const noResultsMsg = document.getElementById('noResultsMsg');
+  const clearFiltersBtn = document.getElementById('clearFiltersBtn');
+
+  // Filter modal elements
+  const filterToggleBtn = document.getElementById('filterToggleBtn');
+  const filterModalBackdrop = document.getElementById('filterModalBackdrop');
+  const filterModal = document.getElementById('filterModal');
+  const filterModalClose = document.getElementById('filterModalClose');
+  const mobileResetBtn = document.getElementById('mobileResetBtn');
+  const mobileApplyBtn = document.getElementById('mobileApplyBtn');
+
+  // Get all cards
+  const cards = membersGrid ? Array.from(membersGrid.querySelectorAll('.profile-card')) : [];
+
+  // Desktop filter checkboxes
+  const desktopFilters = document.querySelectorAll('.filter-checkbox');
+  // Mobile filter checkboxes
+  const mobileFilters = document.querySelectorAll('.filter-checkbox-mobile');
+
+  // Filter state
+  let activeFilters = {
+    role: [],
+    location: []
+  };
+
+  // Apply filters and search
+  function applyFilters() {
+    const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
+    let visibleCount = 0;
+
+    cards.forEach(card => {
+      const name = card.dataset.name || '';
+      const role = card.dataset.role || '';
+      const location = card.dataset.location || '';
+      const state = card.dataset.state || '';
+      const country = card.dataset.country || '';
+
+      // Check search match
+      const searchMatch = !searchTerm ||
+        name.includes(searchTerm) ||
+        state.includes(searchTerm) ||
+        country.includes(searchTerm);
+
+      // Check role filter
+      const roleMatch = activeFilters.role.length === 0 ||
+        activeFilters.role.some(r => role.includes(r.toLowerCase()));
+
+      // Check location filter
+      const locationMatch = activeFilters.location.length === 0 ||
+        activeFilters.location.includes(location);
+
+      if (searchMatch && roleMatch && locationMatch) {
+        card.style.display = '';
+        visibleCount++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    // Update count
+    if (resultsCount) {
+      resultsCount.textContent = visibleCount;
+    }
+
+    // Show/hide no results message
+    if (noResultsMsg && membersGrid) {
+      if (visibleCount === 0 && cards.length > 0) {
+        noResultsMsg.style.display = 'block';
+        membersGrid.style.display = 'none';
+      } else {
+        noResultsMsg.style.display = 'none';
+        membersGrid.style.display = 'grid';
+      }
+    }
+  }
+
+  // Update filters from checkboxes
+  function updateFiltersFromCheckboxes(checkboxes) {
+    activeFilters = { role: [], location: [] };
+    checkboxes.forEach(cb => {
+      if (cb.checked) {
+        const filterType = cb.dataset.filter;
+        if (filterType === 'role') {
+          activeFilters.role.push(cb.value);
+        } else if (filterType === 'location') {
+          activeFilters.location.push(cb.value);
+        }
+      }
+    });
+  }
+
+  // Sync desktop and mobile filters
+  function syncFilters(source, target) {
+    target.forEach(targetCb => {
+      const sourceCb = Array.from(source).find(s =>
+        s.dataset.filter === targetCb.dataset.filter && s.value === targetCb.value
+      );
+      if (sourceCb) {
+        targetCb.checked = sourceCb.checked;
+      }
+    });
+  }
+
+  // Clear all filters
+  function clearAllFilters() {
+    desktopFilters.forEach(cb => cb.checked = false);
+    mobileFilters.forEach(cb => cb.checked = false);
+    activeFilters = { role: [], location: [] };
+    if (searchInput) searchInput.value = '';
+    applyFilters();
+  }
+
+  // Event listeners for desktop filters
+  desktopFilters.forEach(cb => {
+    cb.addEventListener('change', () => {
+      updateFiltersFromCheckboxes(desktopFilters);
+      syncFilters(desktopFilters, mobileFilters);
+      applyFilters();
+    });
+  });
+
+  // Search input
+  if (searchInput) {
+    searchInput.addEventListener('input', applyFilters);
+  }
+
+  // Clear filters button
+  if (clearFiltersBtn) {
+    clearFiltersBtn.addEventListener('click', clearAllFilters);
+  }
+
+  // Mobile filter modal
+  function openFilterModal() {
+    filterModalBackdrop.classList.add('active');
+    filterModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeFilterModal() {
+    filterModalBackdrop.classList.remove('active');
+    filterModal.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  if (filterToggleBtn) {
+    filterToggleBtn.addEventListener('click', openFilterModal);
+  }
+
+  if (filterModalClose) {
+    filterModalClose.addEventListener('click', closeFilterModal);
+  }
+
+  if (filterModalBackdrop) {
+    filterModalBackdrop.addEventListener('click', closeFilterModal);
+  }
+
+  if (mobileResetBtn) {
+    mobileResetBtn.addEventListener('click', () => {
+      mobileFilters.forEach(cb => cb.checked = false);
+    });
+  }
+
+  if (mobileApplyBtn) {
+    mobileApplyBtn.addEventListener('click', () => {
+      updateFiltersFromCheckboxes(mobileFilters);
+      syncFilters(mobileFilters, desktopFilters);
+      applyFilters();
+      closeFilterModal();
+    });
+  }
+
+  // Member detail modal
+  const triggers = document.querySelectorAll('.js-member-view');
+  const backdrop = document.getElementById('memberModalBackdrop');
+  const modalName = document.getElementById('memberModalName');
+  const modalRole = document.getElementById('memberModalRole');
+  const modalId = document.getElementById('memberModalId');
+  const modalEmail = document.getElementById('memberModalEmail');
+  const modalPhone = document.getElementById('memberModalPhone');
+  const modalLocation = document.getElementById('memberModalLocation');
+  const modalJoined = document.getElementById('memberModalJoined');
+  const modalTags = document.getElementById('memberModalTags');
+  const modalImage = document.getElementById('memberModalImage');
+  const closeBtn = document.getElementById('memberModalClose');
+
+  function openMemberModal(data) {
+    modalName.textContent = data.name || 'Member';
+    modalRole.textContent = data.role || '';
+    modalId.textContent = data.memberId || '-';
+    modalEmail.textContent = data.email || '-';
+    modalPhone.textContent = data.phone || '-';
+    modalLocation.textContent = data.location || '-';
+    modalJoined.textContent = data.joined || '-';
+
+    modalTags.innerHTML = '';
+    if (data.engagement) {
+      data.engagement.split(',').map(t => t.trim()).forEach(tag => {
+        if (!tag) return;
+        const span = document.createElement('span');
+        span.className = 'member-modal-tag';
+        span.textContent = tag;
+        modalTags.appendChild(span);
+      });
+    }
+
+    modalImage.src = data.imageUrl || 'https://via.placeholder.com/400x400?text=Member';
+    backdrop.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeMemberModal() {
+    backdrop.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  triggers.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const d = btn.dataset;
+      openMemberModal({
+        name: d.name,
+        role: d.role,
+        memberId: d.memberId,
+        email: d.email,
+        phone: d.phone,
+        location: d.location,
+        engagement: d.engagement,
+        joined: d.joined,
+        imageUrl: d.imageUrl
+      });
+    });
+  });
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', closeMemberModal);
+  }
+
+  if (backdrop) {
+    backdrop.addEventListener('click', e => {
+      if (e.target === backdrop) closeMemberModal();
+    });
+  }
+
+  // Close modals on Escape key
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      closeMemberModal();
+      closeFilterModal();
+    }
+  });
+})();
+</script>
+{% endblock %}

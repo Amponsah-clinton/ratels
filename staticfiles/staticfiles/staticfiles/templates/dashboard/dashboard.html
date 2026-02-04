@@ -1,0 +1,152 @@
+{% extends "dashboard/base_dashboard.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="md-space-y-6">
+
+    <!-- Page Header -->
+    <div class="md-page-header">
+        <h1 class="md-page-title">Dashboard</h1>
+        <p class="md-page-subtitle">Welcome to your new CRM dashboard</p>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="md-grid md-grid-4">
+        <div class="md-card">
+            <div class="md-card-header">
+                <div class="md-card-header-row">
+                    <h3 class="md-card-title">Total Contacts</h3>
+                    <span class="md-card-icon"><i data-lucide="users" style="width:16px;height:16px;"></i></span>
+                </div>
+            </div>
+            <div class="md-card-content-flush">
+                <div class="md-stat-value">1,234</div>
+                <p class="md-stat-change positive">+12% from last month</p>
+            </div>
+        </div>
+
+        <div class="md-card">
+            <div class="md-card-header">
+                <div class="md-card-header-row">
+                    <h3 class="md-card-title">Companies</h3>
+                    <span class="md-card-icon"><i data-lucide="building-2" style="width:16px;height:16px;"></i></span>
+                </div>
+            </div>
+            <div class="md-card-content-flush">
+                <div class="md-stat-value">456</div>
+                <p class="md-stat-change positive">+8% from last month</p>
+            </div>
+        </div>
+
+        <div class="md-card">
+            <div class="md-card-header">
+                <div class="md-card-header-row">
+                    <h3 class="md-card-title">Active Deals</h3>
+                    <span class="md-card-icon"><i data-lucide="trending-up" style="width:16px;height:16px;"></i></span>
+                </div>
+            </div>
+            <div class="md-card-content-flush">
+                <div class="md-stat-value">89</div>
+                <p class="md-stat-change positive">+23% from last month</p>
+            </div>
+        </div>
+
+        <div class="md-card">
+            <div class="md-card-header">
+                <div class="md-card-header-row">
+                    <h3 class="md-card-title">Revenue</h3>
+                    <span class="md-card-icon"><i data-lucide="dollar-sign" style="width:16px;height:16px;"></i></span>
+                </div>
+            </div>
+            <div class="md-card-content-flush">
+                <div class="md-stat-value">$234,567</div>
+                <p class="md-stat-change positive">+18% from last month</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Revenue Chart -->
+    <div class="md-card">
+        <div class="md-card-header">
+            <h3 class="md-card-title-lg">Revenue Trend</h3>
+        </div>
+        <div class="md-card-content">
+            <div class="md-chart-container">
+                <canvas id="mdDashboardRevenueChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity & Upcoming Tasks -->
+    <div class="md-grid md-grid-2">
+        <!-- Recent Activity -->
+        <div class="md-card">
+            <div class="md-card-header">
+                <h3 class="md-card-title-lg">Recent Activity</h3>
+            </div>
+            <div class="md-card-content">
+                <div class="md-activity-list">
+                    <div class="md-activity-item">
+                        <div class="md-activity-dot"></div>
+                        <div class="md-activity-content">
+                            <p class="md-activity-title">New contact added</p>
+                            <p class="md-activity-desc">John Doe from Acme Corp</p>
+                            <p class="md-activity-time">2 hours ago</p>
+                        </div>
+                    </div>
+                    <div class="md-activity-item">
+                        <div class="md-activity-dot"></div>
+                        <div class="md-activity-content">
+                            <p class="md-activity-title">Deal closed</p>
+                            <p class="md-activity-desc">$45,000 deal with Tech Solutions</p>
+                            <p class="md-activity-time">5 hours ago</p>
+                        </div>
+                    </div>
+                    <div class="md-activity-item">
+                        <div class="md-activity-dot"></div>
+                        <div class="md-activity-content">
+                            <p class="md-activity-title">Task completed</p>
+                            <p class="md-activity-desc">Follow-up call with Jane Smith</p>
+                            <p class="md-activity-time">1 day ago</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Tasks -->
+        <div class="md-card">
+            <div class="md-card-header">
+                <h3 class="md-card-title-lg">Upcoming Tasks</h3>
+            </div>
+            <div class="md-card-content">
+                <div class="md-task-list">
+                    <div class="md-task-item">
+                        <input type="checkbox" class="md-task-checkbox">
+                        <div class="md-task-content">
+                            <p class="md-task-title">Call with prospect</p>
+                            <p class="md-task-time">Today at 2:00 PM</p>
+                        </div>
+                    </div>
+                    <div class="md-task-item">
+                        <input type="checkbox" class="md-task-checkbox">
+                        <div class="md-task-content">
+                            <p class="md-task-title">Send proposal</p>
+                            <p class="md-task-time">Tomorrow at 10:00 AM</p>
+                        </div>
+                    </div>
+                    <div class="md-task-item">
+                        <input type="checkbox" class="md-task-checkbox">
+                        <div class="md-task-content">
+                            <p class="md-task-title">Review contracts</p>
+                            <p class="md-task-time">Friday at 3:00 PM</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

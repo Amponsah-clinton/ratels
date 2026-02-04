@@ -1,0 +1,1233 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Share the Message - Ratel Movement{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ============================================
+       GLOBAL LAYOUT FIXES
+       ============================================ */
+    html, body {
+        overflow-x: hidden;
+        width: 100%;
+    }
+
+    .header_section {
+        margin-bottom: 0 !important;
+        float: none !important;
+        width: 100% !important;
+        display: block !important;
+        overflow: visible !important;
+    }
+
+    .header_main {
+        float: none !important;
+        overflow: visible !important;
+    }
+
+    /* ============================================
+       PAGE HEADER - Clean, Light Design
+       ============================================ */
+    .page-header {
+        background: #fff;
+        border-bottom: 1px solid #e5e7eb;
+        padding: 2.5rem 0;
+        margin: 0 !important;
+        clear: both !important;
+        float: none !important;
+        display: block !important;
+        width: 100% !important;
+    }
+
+    .page-header .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    .page-header-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+    }
+
+    .page-header-left h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #111827;
+        margin: 0 0 0.375rem 0;
+        padding: 0;
+        letter-spacing: -0.01em;
+    }
+
+    .page-header-left p {
+        font-size: 0.9375rem;
+        color: #6b7280;
+        margin: 0;
+        padding: 0;
+    }
+
+    .page-header-stats {
+        display: flex;
+        gap: 2rem;
+    }
+
+    .header-stat {
+        text-align: center;
+    }
+
+    .header-stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #111827;
+        line-height: 1;
+    }
+
+    .header-stat-label {
+        font-size: 0.75rem;
+        color: #9ca3af;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-top: 0.25rem;
+    }
+
+    /* ============================================
+       MAIN LAYOUT - Centered Container
+       ============================================ */
+    .messages-main {
+        background: #f8fafc;
+        min-height: calc(100vh - 200px);
+        padding: 0;
+        overflow: visible;
+    }
+
+    .messages-wrapper {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+        overflow: visible;
+    }
+
+    .messages-layout {
+        display: flex;
+        gap: 2rem;
+        min-height: 60vh;
+        overflow: visible;
+    }
+
+    /* ============================================
+       SIDEBAR - Pushed from edge on large screens
+       ============================================ */
+    .messages-sidebar {
+        width: 260px;
+        flex-shrink: 0;
+        background: #fff;
+        border-radius: 12px;
+        padding: 1.25rem;
+        height: fit-content;
+        position: sticky;
+        top: 1rem;
+        border: 1px solid #e5e7eb;
+    }
+
+    .sidebar-title {
+        font-size: 0.6875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #9ca3af;
+        margin-bottom: 0.75rem;
+        padding: 0 0.5rem;
+    }
+
+    .sidebar-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .sidebar-link {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.625rem 0.75rem;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 0.875rem;
+        color: #4b5563;
+        text-decoration: none;
+        transition: all 0.15s ease;
+    }
+
+    .sidebar-link:hover {
+        background: #f3f4f6;
+        color: #111827;
+        text-decoration: none;
+    }
+
+    .sidebar-link.active {
+        background: #f3f4f6;
+        color: #111827;
+    }
+
+    .sidebar-link-left {
+        display: flex;
+        align-items: center;
+        gap: 0.625rem;
+    }
+
+    .sidebar-link svg {
+        width: 18px;
+        height: 18px;
+        opacity: 0.6;
+    }
+
+    .sidebar-link.active svg {
+        opacity: 1;
+    }
+
+    .sidebar-link .count {
+        background: #f3f4f6;
+        color: #6b7280;
+        padding: 0.125rem 0.5rem;
+        border-radius: 100px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        min-width: 24px;
+        text-align: center;
+    }
+
+    .sidebar-link.active .count {
+        background: #e5e7eb;
+        color: #374151;
+    }
+
+    /* ============================================
+       CONTENT AREA
+       ============================================ */
+    .messages-content {
+        flex: 1;
+        min-width: 0;
+        overflow: visible;
+    }
+
+    .content-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+    }
+
+    .content-header h2 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #111827;
+        margin: 0;
+        padding: 0;
+    }
+
+    .content-header .results-count {
+        color: #9ca3af;
+        font-size: 0.875rem;
+    }
+
+    /* ============================================
+       CARDS GRID - Clean List Layout
+       ============================================ */
+    .messages-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        overflow: visible;
+    }
+
+    /* ============================================
+       MESSAGE CARD - Premium Modern Design
+       ============================================ */
+    .message-card {
+        background: #ffffff;
+        border-radius: 16px;
+        border: 1px solid #e5e7eb;
+        display: flex;
+        align-items: stretch;
+        overflow: hidden;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        position: relative;
+    }
+
+    .message-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: transparent;
+        transition: background 0.3s ease;
+    }
+
+    .message-card:hover {
+        border-color: #cbd5e1;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        transform: translateY(-2px);
+    }
+
+    .message-card.featured {
+        border-color: #fbbf24;
+        box-shadow: 0 4px 16px rgba(251, 191, 36, 0.15);
+    }
+
+    .message-card.featured::before {
+        background: #fbbf24;
+    }
+
+    .message-card.featured:hover {
+        box-shadow: 0 12px 32px rgba(251, 191, 36, 0.2);
+    }
+
+    /* Card Thumbnail - Enhanced */
+    .card-thumb {
+        width: 160px;
+        min-height: 140px;
+        background: #f8fafc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        overflow: hidden;
+        position: relative;
+        border-radius: 16px 0 0 16px;
+    }
+
+    .card-thumb::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.02) 100%);
+        pointer-events: none;
+    }
+
+    .card-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.4s ease;
+    }
+
+    .message-card:hover .card-thumb img {
+        transform: scale(1.05);
+    }
+
+    .card-thumb video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.4s ease;
+    }
+
+    .message-card:hover .card-thumb video {
+        transform: scale(1.05);
+    }
+
+    .card-thumb-icon {
+        color: #cbd5e1;
+        width: 40px;
+        height: 40px;
+    }
+
+    .card-thumb-text {
+        padding: 1rem;
+        font-size: 0.8125rem;
+        color: #475569;
+        line-height: 1.5;
+        display: -webkit-box;
+        -webkit-line-clamp: 5;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        font-weight: 400;
+    }
+
+    /* Card Body - Enhanced Typography */
+    .card-body-main {
+        flex: 1;
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-width: 0;
+        gap: 0.75rem;
+    }
+
+    .card-meta {
+        display: flex;
+        align-items: center;
+        gap: 0.625rem;
+        margin-bottom: 0;
+        flex-wrap: wrap;
+    }
+
+    .card-type {
+        font-size: 0.6875rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #475569;
+        background: #f1f5f9;
+        padding: 0.375rem 0.75rem;
+        border-radius: 6px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .card-featured-tag {
+        font-size: 0.6875rem;
+        font-weight: 700;
+        color: #92400e;
+        background: #fef3c7;
+        padding: 0.375rem 0.75rem;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        border: 1px solid #fde68a;
+    }
+
+    .card-featured-tag svg {
+        width: 12px;
+        height: 12px;
+        fill: currentColor;
+    }
+
+    .card-title {
+        font-size: 1.0625rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0;
+        padding: 0;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        letter-spacing: -0.01em;
+    }
+
+    .card-desc {
+        font-size: 0.875rem;
+        color: #64748b;
+        margin: 0;
+        padding: 0;
+        line-height: 1.6;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .card-tags {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 0.25rem;
+        flex-wrap: wrap;
+    }
+
+    .card-tag {
+        font-size: 0.75rem;
+        color: #1e40af;
+        background: #eff6ff;
+        padding: 0.25rem 0.625rem;
+        border-radius: 6px;
+        font-weight: 500;
+        border: 1px solid #dbeafe;
+    }
+
+    /* Card Actions - Premium Buttons */
+    .card-actions-section {
+        display: flex;
+        align-items: center;
+        gap: 0.625rem;
+        padding: 1.5rem;
+        border-left: 1px solid #f1f5f9;
+        flex-shrink: 0;
+        overflow: visible;
+        position: relative;
+        background: #fafbfc;
+    }
+
+    .action-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        border: 1.5px solid #e2e8f0;
+        background: #ffffff;
+        color: #64748b;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+    }
+
+    .action-btn:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+        color: #334155;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .action-btn:active {
+        transform: translateY(0);
+    }
+
+    .action-btn svg {
+        width: 18px;
+        height: 18px;
+        stroke-width: 2;
+    }
+
+    .action-btn.copy-btn:hover {
+        background: #f0fdf4;
+        border-color: #86efac;
+        color: #16a34a;
+    }
+
+    .action-btn.download-btn:hover {
+        background: #eff6ff;
+        border-color: #93c5fd;
+        color: #2563eb;
+    }
+
+    .action-btn.copied {
+        background: #22c55e;
+        border-color: #22c55e;
+        color: #ffffff;
+    }
+
+    /* Share Dropdown - ensure it appears above other content */
+    .share-dropdown {
+        position: relative;
+        z-index: 50;
+    }
+
+    .share-dropdown.open {
+        z-index: 9999;
+    }
+
+    .share-menu {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+        padding: 0.5rem;
+        min-width: 160px;
+        display: none;
+        z-index: 9999;
+        overflow: visible;
+    }
+
+    .share-dropdown.open .share-menu {
+        display: block;
+        animation: slideDown 0.2s ease-out;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-8px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .share-menu-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.625rem 0.875rem;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #334155;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: none;
+        background: transparent;
+        width: 100%;
+        text-align: left;
+    }
+
+    .share-menu-item:hover {
+        background: #f8fafc;
+        color: #0f172a;
+        transform: translateX(2px);
+    }
+
+    .share-menu-item svg {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+    }
+
+    .share-menu-item.whatsapp svg { color: #25D366; }
+    .share-menu-item.twitter svg { color: #0f172a; }
+    .share-menu-item.telegram svg { color: #0088cc; }
+
+    /* ============================================
+       CTA SECTION
+       ============================================ */
+    .cta-section {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-top: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .cta-content h3 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #111827;
+        margin: 0 0 0.25rem 0;
+        padding: 0;
+    }
+
+    .cta-content p {
+        color: #6b7280;
+        font-size: 0.875rem;
+        margin: 0;
+        padding: 0;
+    }
+
+    .cta-buttons {
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    .cta-btn {
+        padding: 0.625rem 1.25rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        text-decoration: none;
+        border: none;
+    }
+
+    .cta-btn-primary {
+        background: #111827;
+        color: #fff;
+    }
+
+    .cta-btn-primary:hover {
+        background: #1f2937;
+        color: #fff;
+        text-decoration: none;
+    }
+
+    .cta-btn-secondary {
+        background: #fff;
+        color: #374151;
+        border: 1px solid #e5e7eb;
+    }
+
+    .cta-btn-secondary:hover {
+        background: #f9fafb;
+        color: #111827;
+        text-decoration: none;
+    }
+
+    /* ============================================
+       EMPTY STATE
+       ============================================ */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: #fff;
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+    }
+
+    .empty-state-icon {
+        width: 64px;
+        height: 64px;
+        background: #f3f4f6;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        color: #9ca3af;
+    }
+
+    .empty-state h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #374151;
+        margin: 0 0 0.25rem 0;
+        padding: 0;
+    }
+
+    .empty-state p {
+        color: #6b7280;
+        font-size: 0.875rem;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* ============================================
+       TOAST NOTIFICATION
+       ============================================ */
+    .toast-notification {
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%) translateY(100px);
+        background: #111827;
+        color: #fff;
+        padding: 0.75rem 1.25rem;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        gap: 0.625rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        opacity: 0;
+        transition: all 0.25s ease;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .toast-notification.show {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+
+    .toast-notification svg {
+        width: 18px;
+        height: 18px;
+        color: #22c55e;
+    }
+
+    /* ============================================
+       MOBILE TOGGLE
+       ============================================ */
+    .mobile-filter-toggle {
+        display: none;
+        width: 100%;
+        padding: 0.875rem 1rem;
+        background: #fff;
+        border: none;
+        border-bottom: 1px solid #e5e7eb;
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: #374151;
+        cursor: pointer;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .mobile-filter-toggle svg {
+        width: 18px;
+        height: 18px;
+        color: #9ca3af;
+    }
+
+    /* ============================================
+       RESPONSIVE DESIGN
+       ============================================ */
+    @media (max-width: 1024px) {
+        .messages-wrapper {
+            padding: 1.5rem;
+        }
+
+        .messages-layout {
+            gap: 1.5rem;
+        }
+
+        .messages-sidebar {
+            width: 220px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .page-header .container {
+            padding: 0 1rem;
+        }
+
+        .page-header-content {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .page-header-stats {
+            gap: 1.5rem;
+        }
+
+        .messages-wrapper {
+            padding: 0;
+        }
+
+        .messages-layout {
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .messages-sidebar {
+            width: 100%;
+            border-radius: 0;
+            border-left: none;
+            border-right: none;
+            border-top: none;
+            position: static;
+            display: none;
+        }
+
+        .messages-sidebar.show {
+            display: block;
+        }
+
+        .mobile-filter-toggle {
+            display: flex;
+        }
+
+        .messages-content {
+            padding: 1rem;
+        }
+
+        .message-card {
+            flex-direction: column;
+            border-radius: 12px;
+        }
+
+        .card-thumb {
+            width: 100%;
+            height: 180px;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .card-body-main {
+            padding: 1.25rem;
+        }
+
+        .card-actions-section {
+            border-left: none;
+            border-top: 1px solid #f1f5f9;
+            background: #fafbfc;
+            padding: 1rem 1.25rem;
+        }
+
+        .card-actions-section {
+            border-left: none;
+            border-top: 1px solid #f3f4f6;
+            justify-content: flex-end;
+            padding: 0.75rem 1rem;
+        }
+
+        .cta-section {
+            flex-direction: column;
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        .cta-buttons {
+            width: 100%;
+            flex-direction: column;
+        }
+
+        .cta-btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Page Header - Clean, Light -->
+<section class="page-header">
+    <div class="container">
+        <div class="page-header-content">
+            <div class="page-header-left">
+                <h1>Share the Message</h1>
+                <p>Ready-to-share content to help spread awareness across your networks.</p>
+            </div>
+            <div class="page-header-stats">
+                <div class="header-stat">
+                    <div class="header-stat-value">{{ total_messages|default:0 }}</div>
+                    <div class="header-stat-label">Resources</div>
+                </div>
+                <div class="header-stat">
+                    <div class="header-stat-value">{{ total_shares|default:0 }}</div>
+                    <div class="header-stat-label">Shares</div>
+                </div>
+                <div class="header-stat">
+                    <div class="header-stat-value">{{ total_downloads|default:0 }}</div>
+                    <div class="header-stat-label">Downloads</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main Content -->
+<section class="messages-main">
+    <!-- Mobile Filter Toggle -->
+    <button class="mobile-filter-toggle" onclick="toggleSidebar()">
+        <span>Filter by Category</span>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+
+    <div class="messages-wrapper">
+        <div class="messages-layout">
+            <!-- Sidebar -->
+            <aside class="messages-sidebar" id="messagesSidebar">
+                <div class="sidebar-title">Categories</div>
+                <nav class="sidebar-nav">
+                    <a href="#all" class="sidebar-link active" data-category="all">
+                        <span class="sidebar-link-left">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                            All Content
+                        </span>
+                        <span class="count">{{ total_messages|default:0 }}</span>
+                    </a>
+                    <a href="#pre_written" class="sidebar-link" data-category="pre_written">
+                        <span class="sidebar-link-left">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            Pre-Written
+                        </span>
+                        <span class="count">{{ category_counts.pre_written|default:0 }}</span>
+                    </a>
+                    <a href="#quotes" class="sidebar-link" data-category="quotes">
+                        <span class="sidebar-link-left">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V21c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg>
+                            Quote Cards
+                        </span>
+                        <span class="count">{{ category_counts.quotes|default:0 }}</span>
+                    </a>
+                    <a href="#posters" class="sidebar-link" data-category="posters">
+                        <span class="sidebar-link-left">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                            Posters & Banners
+                        </span>
+                        <span class="count">{{ category_counts.posters|default:0 }}</span>
+                    </a>
+                    <a href="#videos" class="sidebar-link" data-category="videos">
+                        <span class="sidebar-link-left">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+                            Video Clips
+                        </span>
+                        <span class="count">{{ category_counts.videos|default:0 }}</span>
+                    </a>
+                    <a href="#toolkits" class="sidebar-link" data-category="toolkits">
+                        <span class="sidebar-link-left">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                            Toolkits
+                        </span>
+                        <span class="count">{{ category_counts.toolkits|default:0 }}</span>
+                    </a>
+                    <a href="#hashtags" class="sidebar-link" data-category="hashtags">
+                        <span class="sidebar-link-left">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg>
+                            Hashtags
+                        </span>
+                        <span class="count">{{ category_counts.hashtags|default:0 }}</span>
+                    </a>
+                </nav>
+            </aside>
+
+            <!-- Content Area -->
+            <div class="messages-content">
+                <div class="content-header">
+                    <h2 id="categoryTitle">All Content</h2>
+                    <span class="results-count"><span id="resultsCount">{{ total_messages|default:0 }}</span> items</span>
+                </div>
+
+                {% if messages_list %}
+                <!-- Messages List -->
+                <div class="messages-grid" id="messagesGrid">
+                    {% for message in messages_list %}
+                    <div class="message-card {% if message.is_featured %}featured{% endif %}" data-category="{{ message.category }}" data-id="{{ message.id }}">
+                        <!-- Thumbnail -->
+                        <div class="card-thumb">
+                            {% if message.media_url %}
+                                {% if message.content_type == 'video' %}
+                                <video src="{{ message.media_url }}" muted preload="metadata"></video>
+                                {% else %}
+                                <img src="{{ message.media_url }}" alt="{{ message.title }}">
+                                {% endif %}
+                            {% elif message.text_content %}
+                            <div class="card-thumb-text">{{ message.text_content|truncatechars:100 }}</div>
+                            {% else %}
+                            <svg class="card-thumb-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                            {% endif %}
+                        </div>
+
+                        <!-- Body -->
+                        <div class="card-body-main">
+                            <div class="card-meta">
+                                <span class="card-type">{{ message.content_type|default:"Text"|title }}</span>
+                                {% if message.is_featured %}
+                                <span class="card-featured-tag">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                    Featured
+                                </span>
+                                {% endif %}
+                            </div>
+                            <h3 class="card-title">{{ message.title }}</h3>
+                            {% if message.description %}
+                            <p class="card-desc">{{ message.description }}</p>
+                            {% endif %}
+                            {% if message.hashtags %}
+                            <div class="card-tags">
+                                {% for tag in message.hashtags|slice:":3" %}
+                                <span class="card-tag">{{ tag }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="card-actions-section">
+                            {% if message.text_content %}
+                            <button class="action-btn copy-btn" data-text="{{ message.text_content }}" data-hashtags="{% if message.hashtags %}{{ message.hashtags|join:' ' }}{% endif %}" data-id="{{ message.id }}" title="Copy text">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                            </button>
+                            {% endif %}
+                            {% if message.media_url %}
+                            <button class="action-btn download-btn" data-url="{{ message.media_url }}" data-filename="{{ message.media_filename|default:message.title }}" data-id="{{ message.id }}" title="Download">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            </button>
+                            {% endif %}
+                            <div class="share-dropdown">
+                                <button class="action-btn share-toggle" title="Share">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                                </button>
+                                <div class="share-menu">
+                                    <button class="share-menu-item whatsapp" data-id="{{ message.id }}" data-text="{{ message.whatsapp_text|default:message.text_content }}" data-media="{{ message.media_url }}">
+                                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                                        WhatsApp
+                                    </button>
+                                    <button class="share-menu-item twitter" data-id="{{ message.id }}" data-text="{{ message.twitter_text|default:message.text_content|truncatechars:200 }}">
+                                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                                        X (Twitter)
+                                    </button>
+                                    <button class="share-menu-item telegram" data-id="{{ message.id }}" data-text="{{ message.telegram_text|default:message.text_content }}">
+                                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                                        Telegram
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- CTA Section -->
+                <div class="cta-section">
+                    <div class="cta-content">
+                        <h3>Become a Ratel Movement Member</h3>
+                        <p>Join thousands spreading awareness and making a difference.</p>
+                    </div>
+                    <div class="cta-buttons">
+                        <a href="{% url 'auth' %}" class="cta-btn cta-btn-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+                            Join Now
+                        </a>
+                        <a href="{% url 'about' %}" class="cta-btn cta-btn-secondary">Learn More</a>
+                    </div>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    </div>
+                    <h3>No content available yet</h3>
+                    <p>Check back soon for shareable messages and resources.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Toast Notification -->
+<div class="toast-notification" id="toast">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    <span id="toastMessage">Copied to clipboard!</span>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    const categoryTitles = {
+        'all': 'All Content',
+        'pre_written': 'Pre-Written Messages',
+        'quotes': 'Quote Cards',
+        'posters': 'Posters & Banners',
+        'videos': 'Video Clips',
+        'toolkits': 'Social Media Toolkits',
+        'hashtags': 'Hashtags & Slogans'
+    };
+
+    function toggleSidebar() {
+        document.getElementById('messagesSidebar').classList.toggle('show');
+    }
+
+    // Sidebar filtering
+    document.querySelectorAll('.sidebar-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+            this.classList.add('active');
+
+            const category = this.dataset.category;
+            const cards = document.querySelectorAll('.message-card');
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                if (category === 'all' || card.dataset.category === category) {
+                    card.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            document.getElementById('categoryTitle').textContent = categoryTitles[category] || 'All Content';
+            document.getElementById('resultsCount').textContent = visibleCount;
+
+            if (window.innerWidth <= 768) {
+                document.getElementById('messagesSidebar').classList.remove('show');
+            }
+        });
+    });
+
+    function showToast(message) {
+        const toast = document.getElementById('toast');
+        document.getElementById('toastMessage').textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // Messages page URL (uses current host so it works when hosted)
+    const messagesPageUrl = window.location.origin + '{% url "messages" %}';
+
+    // Copy buttons – include text, hashtags, and link to messages page
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            let text = this.dataset.text || '';
+            const hashtags = (this.dataset.hashtags || '').trim();
+            if (hashtags) text += '\n\n' + hashtags;
+            text += '\n\n' + messagesPageUrl;
+
+            const id = this.dataset.id;
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Copied to clipboard!');
+                trackAction(id, 'copy');
+                this.classList.add('copied');
+                setTimeout(() => this.classList.remove('copied'), 1500);
+            });
+        });
+    });
+
+    // Download buttons
+    document.querySelectorAll('.download-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const url = this.dataset.url;
+            const filename = this.dataset.filename;
+            const id = this.dataset.id;
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            link.target = '_blank';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast('Download started!');
+            trackAction(id, 'download');
+        });
+    });
+
+    // Share dropdown toggle
+    document.querySelectorAll('.share-toggle').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const dropdown = this.closest('.share-dropdown');
+            document.querySelectorAll('.share-dropdown.open').forEach(d => {
+                if (d !== dropdown) d.classList.remove('open');
+            });
+            dropdown.classList.toggle('open');
+        });
+    });
+
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.share-dropdown.open').forEach(d => d.classList.remove('open'));
+    });
+
+    // Share buttons
+    document.querySelectorAll('.share-menu-item.whatsapp').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = this.dataset.id;
+            let text = this.dataset.text || '';
+            const mediaUrl = this.dataset.media;
+            if (mediaUrl) text += '\n\n' + mediaUrl;
+            window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+            trackAction(id, 'share_whatsapp');
+        });
+    });
+
+    document.querySelectorAll('.share-menu-item.twitter').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = this.dataset.id;
+            const text = this.dataset.text || '';
+            window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(text), '_blank');
+            trackAction(id, 'share_twitter');
+        });
+    });
+
+    document.querySelectorAll('.share-menu-item.telegram').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = this.dataset.id;
+            const text = this.dataset.text || '';
+            window.open('https://t.me/share/url?url=' + encodeURIComponent(window.location.href) + '&text=' + encodeURIComponent(text), '_blank');
+            trackAction(id, 'share_telegram');
+        });
+    });
+
+    function trackAction(messageId, action) {
+        fetch('{% url "messages_track" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ message_id: messageId, action: action })
+        }).catch(() => {});
+    }
+
+    // Video hover play
+    document.querySelectorAll('.card-thumb video').forEach(video => {
+        video.parentElement.addEventListener('mouseenter', () => video.play());
+        video.parentElement.addEventListener('mouseleave', () => { video.pause(); video.currentTime = 0; });
+    });
+</script>
+{% endblock %}

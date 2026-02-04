@@ -1,0 +1,1089 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if search_query %}Search: {{ search_query }} - {% endif %}{% if category_filter %}{{ category_filter|title }} - {% endif %}News & Insights - Ratel Movement{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* =====================================================
+   BLOG PAGE - BBC/Al Jazeera Inspired News Portal
+   ===================================================== */
+:root {
+    --news-primary: #bb1919;
+    --news-dark: #0f172a;
+    --news-gray: #64748b;
+    --news-light: #f8fafc;
+    --news-border: #e2e8f0;
+    --news-accent: #1e40af;
+}
+
+.news-portal {
+    clear: both;
+    background: #fff;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* ===== BREAKING NEWS TICKER ===== */
+.news-ticker {
+    background: var(--news-primary);
+    color: #fff;
+    padding: 10px 0;
+    overflow: hidden;
+    position: relative;
+}
+.ticker-label {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background: #000;
+    color: #fff;
+    padding: 10px 20px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    display: flex;
+    align-items: center;
+    z-index: 2;
+}
+.ticker-label::after {
+    content: '';
+    position: absolute;
+    right: -20px;
+    top: 0;
+    border-style: solid;
+    border-width: 19px 0 19px 20px;
+    border-color: transparent transparent transparent #000;
+}
+.ticker-content {
+    margin-left: 140px;
+    display: flex;
+    animation: ticker 30s linear infinite;
+}
+.ticker-item {
+    white-space: nowrap;
+    padding: 0 50px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+.ticker-item a {
+    color: #fff;
+    text-decoration: none;
+}
+.ticker-item a:hover {
+    text-decoration: underline;
+}
+@keyframes ticker {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+/* ===== HERO HEADER ===== */
+.news-header {
+    background: linear-gradient(135deg, var(--news-dark) 0%, #1e293b 100%);
+    padding: 60px 0;
+    position: relative;
+    overflow: hidden;
+}
+.news-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.5;
+}
+.news-header-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    position: relative;
+    z-index: 1;
+}
+.news-header-content {
+    max-width: 700px;
+}
+.news-header h1 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: #fff;
+    margin: 0 0 1rem 0;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+}
+.news-header p {
+    font-size: 1.25rem;
+    color: rgba(255,255,255,0.8);
+    margin: 0 0 2rem 0;
+    line-height: 1.6;
+}
+
+/* Search Bar */
+.news-search {
+    display: flex;
+    gap: 0;
+    max-width: 500px;
+}
+.news-search input {
+    flex: 1;
+    padding: 16px 20px;
+    border: none;
+    border-radius: 8px 0 0 8px;
+    font-size: 1rem;
+    background: rgba(255,255,255,0.95);
+    color: var(--news-dark);
+}
+.news-search input::placeholder {
+    color: var(--news-gray);
+}
+.news-search input:focus {
+    outline: none;
+    background: #fff;
+}
+.news-search button {
+    padding: 16px 28px;
+    background: var(--news-primary);
+    color: #fff;
+    border: none;
+    border-radius: 0 8px 8px 0;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.news-search button:hover {
+    background: #a01515;
+}
+
+/* Active Filters */
+.active-filters {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+}
+.filter-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 50px;
+    font-size: 0.875rem;
+    color: #fff;
+}
+.filter-badge a {
+    color: #fff;
+    display: flex;
+    align-items: center;
+}
+.clear-filters {
+    color: rgba(255,255,255,0.7);
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: color 0.2s;
+}
+.clear-filters:hover {
+    color: #fff;
+}
+
+/* ===== MAIN LAYOUT ===== */
+.news-main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 40px 2rem 80px;
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 50px;
+}
+
+/* ===== FEATURED ARTICLE ===== */
+.featured-article {
+    margin-bottom: 50px;
+}
+.featured-card {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 30px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+}
+.featured-card:hover {
+    box-shadow: 0 12px 50px rgba(0,0,0,0.15);
+    transform: translateY(-4px);
+}
+.featured-image-wrap {
+    position: relative;
+    overflow: hidden;
+}
+.featured-image {
+    width: 100%;
+    height: 100%;
+    min-height: 420px;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+.featured-card:hover .featured-image {
+    transform: scale(1.05);
+}
+.featured-image-placeholder {
+    width: 100%;
+    height: 100%;
+    min-height: 420px;
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+}
+.featured-badge {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: var(--news-primary);
+    color: #fff;
+    padding: 8px 16px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-radius: 4px;
+}
+.featured-content {
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.featured-category {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 14px;
+    background: #fef2f2;
+    color: var(--news-primary);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border-radius: 4px;
+    margin-bottom: 16px;
+    width: fit-content;
+}
+.featured-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--news-dark);
+    margin: 0 0 16px 0;
+    line-height: 1.25;
+}
+.featured-title a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.featured-title a:hover {
+    color: var(--news-primary);
+}
+.featured-excerpt {
+    font-size: 1.05rem;
+    color: var(--news-gray);
+    line-height: 1.7;
+    margin: 0 0 24px 0;
+}
+.featured-meta {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-size: 0.85rem;
+    color: var(--news-gray);
+    margin-bottom: 24px;
+}
+.featured-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.featured-meta svg {
+    opacity: 0.6;
+}
+.featured-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 28px;
+    background: var(--news-dark);
+    color: #fff;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    width: fit-content;
+}
+.featured-link:hover {
+    background: #1e293b;
+    gap: 14px;
+}
+
+/* ===== ARTICLES GRID ===== */
+.articles-section {
+    margin-bottom: 40px;
+}
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 3px solid var(--news-dark);
+}
+.section-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--news-dark);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.section-title::before {
+    content: '';
+    width: 4px;
+    height: 24px;
+    background: var(--news-primary);
+    border-radius: 2px;
+}
+.articles-count {
+    font-size: 0.875rem;
+    color: var(--news-gray);
+}
+
+.articles-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px;
+}
+
+/* Article Card */
+.article-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--news-border);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+.article-card:hover {
+    box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+    transform: translateY(-4px);
+    border-color: transparent;
+}
+.article-image-wrap {
+    position: relative;
+    overflow: hidden;
+}
+.article-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+.article-card:hover .article-image {
+    transform: scale(1.08);
+}
+.article-image-placeholder {
+    width: 100%;
+    height: 200px;
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+}
+.article-category {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    padding: 5px 12px;
+    background: var(--news-dark);
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border-radius: 4px;
+}
+.article-body {
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+.article-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--news-dark);
+    margin: 0 0 10px 0;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.article-title a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.article-title a:hover {
+    color: var(--news-primary);
+}
+.article-excerpt {
+    font-size: 0.9rem;
+    color: var(--news-gray);
+    line-height: 1.6;
+    margin: 0 0 16px 0;
+    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.article-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 16px;
+    border-top: 1px solid #f1f5f9;
+    margin-top: auto;
+}
+.article-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.8rem;
+    color: var(--news-gray);
+}
+.article-link {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--news-primary);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.8rem;
+    transition: gap 0.2s;
+}
+.article-link:hover {
+    gap: 8px;
+}
+
+/* ===== SIDEBAR ===== */
+.news-sidebar {
+    position: sticky;
+    top: 20px;
+    height: fit-content;
+}
+
+/* Sidebar Widget */
+.sidebar-widget {
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid var(--news-border);
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+.widget-header {
+    background: var(--news-dark);
+    color: #fff;
+    padding: 16px 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.widget-body {
+    padding: 20px;
+}
+
+/* Categories Widget */
+.category-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.category-item {
+    border-bottom: 1px solid #f1f5f9;
+}
+.category-item:last-child {
+    border-bottom: none;
+}
+.category-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 0;
+    color: var(--news-dark);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+}
+.category-link:hover {
+    color: var(--news-primary);
+    padding-left: 8px;
+}
+.category-link.active {
+    color: var(--news-primary);
+    font-weight: 600;
+}
+.category-count {
+    background: #f1f5f9;
+    color: var(--news-gray);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+.category-link:hover .category-count,
+.category-link.active .category-count {
+    background: #fef2f2;
+    color: var(--news-primary);
+}
+
+/* Trending Widget */
+.trending-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.trending-item {
+    display: flex;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+.trending-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.trending-item:first-child {
+    padding-top: 0;
+}
+.trending-number {
+    width: 32px;
+    height: 32px;
+    background: var(--news-primary);
+    color: #fff;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+.trending-content {
+    flex: 1;
+    min-width: 0;
+}
+.trending-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--news-dark);
+    margin: 0 0 4px 0;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.trending-title a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.trending-title a:hover {
+    color: var(--news-primary);
+}
+.trending-meta {
+    font-size: 0.75rem;
+    color: var(--news-gray);
+}
+
+/* Tags Widget */
+.tags-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.tag-link {
+    display: inline-block;
+    padding: 6px 14px;
+    background: #f8fafc;
+    color: var(--news-gray);
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 500;
+    border-radius: 20px;
+    border: 1px solid var(--news-border);
+    transition: all 0.2s;
+}
+.tag-link:hover {
+    background: var(--news-dark);
+    color: #fff;
+    border-color: var(--news-dark);
+}
+
+/* Newsletter Widget */
+.newsletter-widget {
+    background: linear-gradient(135deg, var(--news-dark) 0%, #1e293b 100%);
+    border: none;
+}
+.newsletter-widget .widget-header {
+    background: transparent;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.newsletter-content {
+    padding: 20px;
+}
+.newsletter-content p {
+    color: rgba(255,255,255,0.8);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin: 0 0 16px 0;
+}
+.newsletter-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.newsletter-form input {
+    padding: 14px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+}
+.newsletter-form input::placeholder {
+    color: rgba(255,255,255,0.5);
+}
+.newsletter-form button {
+    padding: 14px;
+    background: var(--news-primary);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.newsletter-form button:hover {
+    background: #a01515;
+}
+
+/* ===== EMPTY STATE ===== */
+.empty-state {
+    text-align: center;
+    padding: 80px 40px;
+    background: #f8fafc;
+    border-radius: 16px;
+    border: 2px dashed var(--news-border);
+}
+.empty-state svg {
+    width: 80px;
+    height: 80px;
+    color: #cbd5e1;
+    margin-bottom: 24px;
+}
+.empty-state h2 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--news-dark);
+    margin: 0 0 12px 0;
+}
+.empty-state p {
+    font-size: 1rem;
+    color: var(--news-gray);
+    margin: 0 0 24px 0;
+}
+.empty-state a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: var(--news-dark);
+    color: #fff;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+.empty-state a:hover {
+    background: #1e293b;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1200px) {
+    .news-main {
+        grid-template-columns: 1fr 300px;
+        gap: 30px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .news-main {
+        grid-template-columns: 1fr;
+    }
+    .news-sidebar {
+        position: static;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+    .newsletter-widget {
+        grid-column: span 2;
+    }
+    .featured-card {
+        grid-template-columns: 1fr;
+    }
+    .featured-image, .featured-image-placeholder {
+        min-height: 300px;
+    }
+}
+
+@media (max-width: 768px) {
+    .news-ticker {
+        display: none;
+    }
+    .news-header {
+        padding: 40px 0;
+    }
+    .news-header h1 {
+        font-size: 2.5rem;
+    }
+    .news-header p {
+        font-size: 1rem;
+    }
+    .news-search {
+        flex-direction: column;
+    }
+    .news-search input,
+    .news-search button {
+        border-radius: 8px;
+    }
+    .news-main {
+        padding: 24px 1rem 60px;
+    }
+    .articles-grid {
+        grid-template-columns: 1fr;
+    }
+    .news-sidebar {
+        grid-template-columns: 1fr;
+    }
+    .newsletter-widget {
+        grid-column: span 1;
+    }
+    .featured-content {
+        padding: 24px;
+    }
+    .featured-title {
+        font-size: 1.5rem;
+    }
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="news-portal">
+    <!-- Breaking News Ticker -->
+    {% if trending_blogs %}
+    <div class="news-ticker">
+        <div class="ticker-label">Trending</div>
+        <div class="ticker-content">
+            {% for item in trending_blogs %}
+            <span class="ticker-item">
+                <a href="{% url 'blog_detail' item.slug %}">{{ item.title }}</a>
+            </span>
+            {% endfor %}
+            {% for item in trending_blogs %}
+            <span class="ticker-item">
+                <a href="{% url 'blog_detail' item.slug %}">{{ item.title }}</a>
+            </span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Hero Header -->
+    <section class="news-header">
+        <div class="news-header-container">
+            <div class="news-header-content">
+                <h1>News & Insights</h1>
+                <p>Stay informed with the latest analysis, updates, and perspectives from the Ratel Movement</p>
+
+                <!-- Search Form -->
+                <form class="news-search" action="{% url 'blog' %}" method="get">
+                    {% if category_filter %}
+                    <input type="hidden" name="category" value="{{ category_filter }}">
+                    {% endif %}
+                    <input type="text" name="q" placeholder="Search articles..." value="{{ search_query }}">
+                    <button type="submit">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        Search
+                    </button>
+                </form>
+
+                <!-- Active Filters -->
+                {% if category_filter or search_query %}
+                <div class="active-filters">
+                    {% if category_filter %}
+                    <span class="filter-badge">
+                        Category: {{ category_filter|title }}
+                        <a href="{% url 'blog' %}{% if search_query %}?q={{ search_query }}{% endif %}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        </a>
+                    </span>
+                    {% endif %}
+                    {% if search_query %}
+                    <span class="filter-badge">
+                        Search: "{{ search_query }}"
+                        <a href="{% url 'blog' %}{% if category_filter %}?category={{ category_filter }}{% endif %}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        </a>
+                    </span>
+                    {% endif %}
+                    <a href="{% url 'blog' %}" class="clear-filters">Clear all filters</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="news-main">
+        <main class="news-content">
+            <!-- Featured Article -->
+            {% if featured_blog %}
+            <section class="featured-article">
+                <div class="featured-card">
+                    <div class="featured-image-wrap">
+                        {% if featured_blog.featured_image_url %}
+                        <img src="{{ featured_blog.featured_image_url }}" alt="{{ featured_blog.title }}" class="featured-image">
+                        {% else %}
+                        <div class="featured-image-placeholder">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                        </div>
+                        {% endif %}
+                        <span class="featured-badge">Featured</span>
+                    </div>
+                    <div class="featured-content">
+                        <span class="featured-category">{{ featured_blog.category|default:"General" }}</span>
+                        <h2 class="featured-title">
+                            <a href="{% url 'blog_detail' featured_blog.slug %}">{{ featured_blog.title }}</a>
+                        </h2>
+                        {% if featured_blog.excerpt %}
+                        <p class="featured-excerpt">{{ featured_blog.excerpt }}</p>
+                        {% endif %}
+                        <div class="featured-meta">
+                            <span class="featured-meta-item">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                {{ featured_blog.reading_time|default:5 }} min read
+                            </span>
+                            {% if featured_blog.published_at %}
+                            <span class="featured-meta-item">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                {{ featured_blog.published_at|date:"M d, Y" }}
+                            </span>
+                            {% endif %}
+                        </div>
+                        <a href="{% url 'blog_detail' featured_blog.slug %}" class="featured-link">
+                            Read Full Article
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                        </a>
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            <!-- Articles Grid -->
+            {% if blogs %}
+            <section class="articles-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        {% if search_query %}Search Results{% elif category_filter %}{{ category_filter|title }}{% else %}Latest Articles{% endif %}
+                    </h2>
+                    <span class="articles-count">{{ blogs|length }} article{{ blogs|length|pluralize }}</span>
+                </div>
+                <div class="articles-grid">
+                    {% for blog in blogs %}
+                    <article class="article-card">
+                        <div class="article-image-wrap">
+                            {% if blog.featured_image_url %}
+                            <img src="{{ blog.featured_image_url }}" alt="{{ blog.title }}" class="article-image">
+                            {% else %}
+                            <div class="article-image-placeholder">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                            </div>
+                            {% endif %}
+                            <span class="article-category">{{ blog.category|default:"General" }}</span>
+                        </div>
+                        <div class="article-body">
+                            <h3 class="article-title">
+                                <a href="{% url 'blog_detail' blog.slug %}">{{ blog.title }}</a>
+                            </h3>
+                            {% if blog.excerpt %}
+                            <p class="article-excerpt">{{ blog.excerpt }}</p>
+                            {% endif %}
+                            <div class="article-footer">
+                                <div class="article-meta">
+                                    {% if blog.published_at %}
+                                    <span>{{ blog.published_at|date:"M d" }}</span>
+                                    <span>•</span>
+                                    {% endif %}
+                                    <span>{{ blog.reading_time|default:5 }} min</span>
+                                </div>
+                                <a href="{% url 'blog_detail' blog.slug %}" class="article-link">
+                                    Read
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+            </section>
+            {% elif not featured_blog %}
+            <!-- Empty State -->
+            <div class="empty-state">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+                <h2>{% if search_query or category_filter %}No Results Found{% else %}No Articles Yet{% endif %}</h2>
+                <p>{% if search_query %}No articles match your search "{{ search_query }}". Try different keywords.{% elif category_filter %}No articles in the {{ category_filter }} category yet.{% else %}Check back soon for the latest insights and updates from the Ratel Movement.{% endif %}</p>
+                {% if search_query or category_filter %}
+                <a href="{% url 'blog' %}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                    View All Articles
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </main>
+
+        <!-- Sidebar -->
+        <aside class="news-sidebar">
+            <!-- Categories Widget -->
+            {% if all_categories %}
+            <div class="sidebar-widget">
+                <div class="widget-header">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                    Categories
+                </div>
+                <div class="widget-body">
+                    <ul class="category-list">
+                        <li class="category-item">
+                            <a href="{% url 'blog' %}{% if search_query %}?q={{ search_query }}{% endif %}" class="category-link {% if not category_filter %}active{% endif %}">
+                                All Categories
+                                <span class="category-count">{% widthratio blogs|length 1 1 as total %}{% if featured_blog %}{{ blogs|length|add:1 }}{% else %}{{ blogs|length }}{% endif %}</span>
+                            </a>
+                        </li>
+                        {% for cat, count in all_categories %}
+                        <li class="category-item">
+                            <a href="{% url 'blog' %}?category={{ cat }}{% if search_query %}&q={{ search_query }}{% endif %}" class="category-link {% if category_filter == cat %}active{% endif %}">
+                                {{ cat|title }}
+                                <span class="category-count">{{ count }}</span>
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Trending Widget -->
+            {% if trending_blogs %}
+            <div class="sidebar-widget">
+                <div class="widget-header">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                    Trending Now
+                </div>
+                <div class="widget-body">
+                    <ul class="trending-list">
+                        {% for item in trending_blogs %}
+                        <li class="trending-item">
+                            <span class="trending-number">{{ forloop.counter }}</span>
+                            <div class="trending-content">
+                                <h4 class="trending-title">
+                                    <a href="{% url 'blog_detail' item.slug %}">{{ item.title }}</a>
+                                </h4>
+                                <span class="trending-meta">
+                                    {{ item.view_count|default:0 }} views
+                                    {% if item.published_at %}• {{ item.published_at|date:"M d" }}{% endif %}
+                                </span>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Tags Widget -->
+            {% if all_tags %}
+            <div class="sidebar-widget">
+                <div class="widget-header">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                    Popular Tags
+                </div>
+                <div class="widget-body">
+                    <div class="tags-cloud">
+                        {% for tag in all_tags %}
+                        <a href="{% url 'blog' %}?q={{ tag }}" class="tag-link">{{ tag }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Newsletter Widget -->
+            <div class="sidebar-widget newsletter-widget">
+                <div class="widget-header">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                    Newsletter
+                </div>
+                <div class="newsletter-content">
+                    <p>Get the latest articles and updates delivered straight to your inbox.</p>
+                    <form class="newsletter-form" onsubmit="event.preventDefault(); alert('Newsletter signup coming soon!');">
+                        <input type="email" placeholder="Enter your email" required>
+                        <button type="submit">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+{% endblock %}
