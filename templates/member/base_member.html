@@ -189,18 +189,16 @@
         <footer class="md-footer">
             <div class="md-footer-inner">
                 <div class="md-footer-left">
-                    <span>&copy; 2026, made with</span>
-                    <span class="md-footer-heart">&hearts;</span>
-                    <span>by</span>
-                    <a href="{% url 'index' %}" class="md-footer-link">Ratel Movement</a>
+                    <span>&copy; <span id="footerYear"></span>, <a href="{% url 'index' %}" class="md-footer-link">Ratel Movement</a></span>
+                    <span style="margin-left: 4px;">Powered by <a href="https://metascholar.academicdigital.space/" target="_blank" rel="noopener" class="md-footer-link">Metascholar Consult Limited</a></span>
                 </div>
                 <div class="md-footer-right">
                     <a href="{% url 'index' %}">Home</a>
-                    <a href="{% url 'about' %}">About Us</a>
                     <a href="{% url 'contact' %}">Contact</a>
                 </div>
             </div>
         </footer>
+        <script>document.getElementById('footerYear').textContent = new Date().getFullYear();</script>
 
     </div>
 

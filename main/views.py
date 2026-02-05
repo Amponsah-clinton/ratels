@@ -5692,6 +5692,14 @@ def member_resources(request):
         )
         resp.raise_for_status()
         resources = resp.json()
+
+        # Normalize file URLs and thumbnail URLs
+        storage_base = f"{base_url}/storage/v1/object/public/resources/"
+        for resource in resources:
+            if resource.get("file_url") and not str(resource["file_url"]).startswith("http"):
+                resource["file_url"] = storage_base + str(resource["file_url"]).lstrip("/")
+            if resource.get("thumbnail_url") and not str(resource["thumbnail_url"]).startswith("http"):
+                resource["thumbnail_url"] = storage_base + str(resource["thumbnail_url"]).lstrip("/")
     except Exception as e:
         print(f"[Member Resources] Error: {e}")
 
@@ -6152,15 +6160,60 @@ def dashboard_payments(request):
     # CSV export (both tabs)
     if request.GET.get("format") == "csv":
         import csv
-        import io
+        from datetime import datetime as dt_export
         response = HttpResponse(content_type="text/csv")
-        response["Content-Disposition"] = 'attachment; filename="payments_export.csv"'
+        export_date = dt_export.now().strftime("%Y-%m-%d")
+        response["Content-Disposition"] = f'attachment; filename="RATEL_Payments_{export_date}.csv"'
         writer = csv.writer(response)
-        writer.writerow(["Type", "Date", "Name/Donor", "Email", "Amount", "Currency", "Reference", "Method", "Status", "Period/Notes"])
+
+        # Header row
+        writer.writerow(["Type", "Date", "Name", "Email", "Amount", "Currency", "Reference", "Method", "Status", "Period"])
+
+        # Combine all transactions
+        all_transactions = []
         for p in donations_list:
-            writer.writerow(["Donation", p["created_fmt"], p["donor_name"], p["donor_email"], p["amount"], p["currency"], p["payment_reference"], p["payment_method"], p["status"], ""])
+            all_transactions.append({
+                "type": "Donation",
+                "date": p["created_at"],
+                "date_fmt": p["created_fmt"],
+                "name": p["donor_name"],
+                "email": p["donor_email"],
+                "amount": p["amount"],
+                "currency": p["currency"],
+                "reference": p["payment_reference"],
+                "method": p["payment_method"],
+                "status": p["status"],
+                "period": "",
+            })
         for p in payments:
-            writer.writerow(["Membership", p["created_fmt"], p["member_name"], p["member_email"], p["amount_paid"], p["currency"], p["payment_reference"], p["payment_method"], p["status"], f"{p['start_date_fmt']} – {p['end_date_fmt']}"])
+            all_transactions.append({
+                "type": "Membership Renewal",
+                "date": p["created_at"],
+                "date_fmt": p["created_fmt"],
+                "name": p["member_name"],
+                "email": p["member_email"],
+                "amount": p["amount_paid"],
+                "currency": p["currency"],
+                "reference": p["payment_reference"],
+                "method": p["payment_method"],
+                "status": p["status"],
+                "period": f"{p['start_date_fmt']} to {p['end_date_fmt']}",
+            })
+
+        # Sort by date descending (newest first)
+        all_transactions.sort(key=lambda x: x["date"] or "", reverse=True)
+
+        # Write all transactions
+        for t in all_transactions:
+            writer.writerow([t["type"], t["date_fmt"], t["name"], t["email"], f"{t['amount']:.2f}", t["currency"], t["reference"], t["method"], t["status"], t["period"]])
+
+        # Totals section
+        writer.writerow([])
+        writer.writerow(["TOTALS", "", "", "", "", "", "", "", "", ""])
+        writer.writerow([f"Donations ({len(donations_list)})", "", "", "", f"{donations_total:.2f}", donation_currency, "", "", "", ""])
+        writer.writerow([f"Membership Renewals ({len(payments)})", "", "", "", f"{total_amount:.2f}", currency, "", "", "", ""])
+        writer.writerow([f"Grand Total ({len(all_transactions)})", "", "", "", f"{donations_total + total_amount:.2f}", "", "", "", "", ""])
+
         return response
 
     grand_total_donations_ghs = donations_total
@@ -6644,15 +6697,41 @@ def member_subscription_invoice_pdf(request, subscription_id):
         sub = context["subscription"]
         months = sub["months_subscribed"]
         months_label = "month" if months == 1 else "months"
+
+        # Cell styles for table content
+        cell_style = ParagraphStyle(
+            name="CellStyle",
+            parent=styles["Normal"],
+            fontSize=10,
+        )
+        cell_small_style = ParagraphStyle(
+            name="CellSmallStyle",
+            parent=styles["Normal"],
+            fontSize=8,
+            textColor=colors.HexColor("#6b7280"),
+        )
+        cell_center_style = ParagraphStyle(
+            name="CellCenterStyle",
+            parent=styles["Normal"],
+            fontSize=10,
+            alignment=TA_CENTER,
+        )
+        cell_right_style = ParagraphStyle(
+            name="CellRightStyle",
+            parent=styles["Normal"],
+            fontSize=10,
+            alignment=TA_RIGHT,
+        )
+
         items_data = [
             ["Description", "Period", "Duration", "Amount"],
             [
-                f"Membership Subscription<br/><font size=8 color='#6b7280'>Payment via {sub['payment_method']}</font>",
-                f"{sub['start_date']}<br/>to {sub['end_date']}",
-                f"<b>{months}</b><br/><font size=8 color='#6b7280'>{months_label}</font>",
-                f"GHS {sub['amount_paid']}",
+                Paragraph(f"Membership Subscription<br/><font size=8 color='#6b7280'>Payment via {sub['payment_method']}</font>", cell_style),
+                Paragraph(f"{sub['start_date']}<br/>to {sub['end_date']}", cell_style),
+                Paragraph(f"<b>{months}</b><br/><font size=8 color='#6b7280'>{months_label}</font>", cell_center_style),
+                Paragraph(f"GHS {sub['amount_paid']}", cell_right_style),
             ],
-            ["TOTAL PAID", "", "", f"GHS {sub['amount_paid']}"],
+            [Paragraph("<b>TOTAL PAID</b>", cell_style), "", "", Paragraph(f"<b>GHS {sub['amount_paid']}</b>", cell_right_style)],
         ]
         items_table = Table(
             items_data,
