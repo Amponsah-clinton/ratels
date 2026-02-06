@@ -220,20 +220,37 @@ def index(request):
             r = requests.get(f"{base_url}/rest/v1/members?select=id&status=eq.active", headers={**headers, "Prefer": "count=exact"}, timeout=10)
             stat_members = int(r.headers.get("content-range", "0/0").split("/")[-1]) if r.status_code == 200 else 0
 
-            # Cases resolved (solved or completed)
+            # Cases resolved (solved or completed) — base of 40 + actual DB count
             r = requests.get(f"{base_url}/rest/v1/cases?select=id&status=in.(solved,completed)", headers={**headers, "Prefer": "count=exact"}, timeout=10)
-            stat_cases_resolved = int(r.headers.get("content-range", "0/0").split("/")[-1]) if r.status_code == 200 else 0
+            stat_cases_resolved = 40 + (int(r.headers.get("content-range", "0/0").split("/")[-1]) if r.status_code == 200 else 0)
 
-            # Total blog views
+            # Total views: blog views + page visit counter
             r = requests.get(f"{base_url}/rest/v1/blogs?is_published=eq.true&select=view_count", headers=headers, timeout=10)
-            stat_total_views = sum(b.get("view_count", 0) or 0 for b in r.json()) if r.status_code == 200 else 0
+            blog_views = sum(b.get("view_count", 0) or 0 for b in r.json()) if r.status_code == 200 else 0
+
+            # Increment persistent page view counter (site_statistics table)
+            page_views = 0
+            try:
+                pv_headers = {**headers, "Content-Type": "application/json", "Prefer": "return=representation"}
+                r = requests.get(f"{base_url}/rest/v1/site_statistics?key=eq.total_page_views&select=*", headers=headers, timeout=10)
+                if r.status_code == 200 and r.json():
+                    row = r.json()[0]
+                    page_views = (row.get("value", 0) or 0) + 1
+                    requests.patch(f"{base_url}/rest/v1/site_statistics?key=eq.total_page_views", headers=pv_headers, json={"value": page_views}, timeout=10)
+                else:
+                    page_views = 1
+                    requests.post(f"{base_url}/rest/v1/site_statistics", headers=pv_headers, json={"key": "total_page_views", "value": 1}, timeout=10)
+            except Exception:
+                pass
+
+            stat_total_views = blog_views + page_views
 
             # Total published blog posts
             r = requests.get(f"{base_url}/rest/v1/blogs?is_published=eq.true&select=id", headers={**headers, "Prefer": "count=exact"}, timeout=10)
             stat_blog_posts = int(r.headers.get("content-range", "0/0").split("/")[-1]) if r.status_code == 200 else 0
         except Exception:
             stat_members = 0
-            stat_cases_resolved = 0
+            stat_cases_resolved = 40
             stat_total_views = 0
             stat_blog_posts = 0
 
