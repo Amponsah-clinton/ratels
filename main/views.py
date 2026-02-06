@@ -214,6 +214,29 @@ def index(request):
         except Exception:
             pass
 
+        # Website statistics for landing page counters
+        try:
+            # Total active members
+            r = requests.get(f"{base_url}/rest/v1/members?select=id&status=eq.active", headers={**headers, "Prefer": "count=exact"}, timeout=10)
+            stat_members = int(r.headers.get("content-range", "0/0").split("/")[-1]) if r.status_code == 200 else 0
+
+            # Cases resolved (solved or completed)
+            r = requests.get(f"{base_url}/rest/v1/cases?select=id&status=in.(solved,completed)", headers={**headers, "Prefer": "count=exact"}, timeout=10)
+            stat_cases_resolved = int(r.headers.get("content-range", "0/0").split("/")[-1]) if r.status_code == 200 else 0
+
+            # Total blog views
+            r = requests.get(f"{base_url}/rest/v1/blogs?is_published=eq.true&select=view_count", headers=headers, timeout=10)
+            stat_total_views = sum(b.get("view_count", 0) or 0 for b in r.json()) if r.status_code == 200 else 0
+
+            # Total published blog posts
+            r = requests.get(f"{base_url}/rest/v1/blogs?is_published=eq.true&select=id", headers={**headers, "Prefer": "count=exact"}, timeout=10)
+            stat_blog_posts = int(r.headers.get("content-range", "0/0").split("/")[-1]) if r.status_code == 200 else 0
+        except Exception:
+            stat_members = 0
+            stat_cases_resolved = 0
+            stat_total_views = 0
+            stat_blog_posts = 0
+
     except Exception as e:
         print(f"[Index] Error fetching site content: {e}")
         youtube_links = []
@@ -221,6 +244,10 @@ def index(request):
         featured_cases = []
         latest_blogs = []
         featured_members = []
+        stat_members = 0
+        stat_cases_resolved = 0
+        stat_total_views = 0
+        stat_blog_posts = 0
 
     return render(request, "index.html", {
         "sections": sections,
@@ -235,6 +262,10 @@ def index(request):
         "featured_cases": featured_cases,
         "latest_blogs": latest_blogs,
         "featured_members": featured_members,
+        "stat_members": stat_members,
+        "stat_cases_resolved": stat_cases_resolved,
+        "stat_total_views": stat_total_views,
+        "stat_blog_posts": stat_blog_posts,
     })
 
 

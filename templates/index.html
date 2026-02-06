@@ -1923,6 +1923,92 @@ html, body {
     </div>
 </section>
 
+<!-- Website Statistics Section -->
+<section id="site-stats" style="padding: 60px 0; background: #fff;">
+    <div style="max-width: 1100px; margin: 0 auto; padding: 0 20px;">
+        <div style="text-align: center; margin-bottom: 40px;">
+            <p style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: #64748b; margin: 0 0 8px 0;">Our Impact</p>
+            <h2 style="font-size: 28px; font-weight: 700; color: #0f172a; margin: 0;">The Movement in Numbers</h2>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;">
+            <!-- Members -->
+            <div style="text-align: center; padding: 32px 16px; border: 1px solid #e2e8f0; border-radius: 12px;">
+                <div style="width: 48px; height: 48px; margin: 0 auto 16px; background: #f1f5f9; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <div class="stat-number" data-target="{{ stat_members }}" style="font-size: 36px; font-weight: 800; color: #0f172a; line-height: 1;">0</div>
+                <div style="font-size: 13px; font-weight: 600; color: #64748b; margin-top: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Active Members</div>
+            </div>
+            <!-- Total Views -->
+            <div style="text-align: center; padding: 32px 16px; border: 1px solid #e2e8f0; border-radius: 12px;">
+                <div style="width: 48px; height: 48px; margin: 0 auto 16px; background: #f1f5f9; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                </div>
+                <div class="stat-number" data-target="{{ stat_total_views }}" style="font-size: 36px; font-weight: 800; color: #0f172a; line-height: 1;">0</div>
+                <div style="font-size: 13px; font-weight: 600; color: #64748b; margin-top: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Total Views</div>
+            </div>
+            <!-- Cases Resolved -->
+            <div style="text-align: center; padding: 32px 16px; border: 1px solid #e2e8f0; border-radius: 12px;">
+                <div style="width: 48px; height: 48px; margin: 0 auto 16px; background: #f1f5f9; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                </div>
+                <div class="stat-number" data-target="{{ stat_cases_resolved }}" style="font-size: 36px; font-weight: 800; color: #0f172a; line-height: 1;">0</div>
+                <div style="font-size: 13px; font-weight: 600; color: #64748b; margin-top: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Cases Resolved</div>
+            </div>
+            <!-- Blog Posts -->
+            <div style="text-align: center; padding: 32px 16px; border: 1px solid #e2e8f0; border-radius: 12px;">
+                <div style="width: 48px; height: 48px; margin: 0 auto 16px; background: #f1f5f9; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>
+                </div>
+                <div class="stat-number" data-target="{{ stat_blog_posts }}" style="font-size: 36px; font-weight: 800; color: #0f172a; line-height: 1;">0</div>
+                <div style="font-size: 13px; font-weight: 600; color: #64748b; margin-top: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Published Articles</div>
+            </div>
+        </div>
+    </div>
+</section>
+<style>
+    @media (max-width: 768px) {
+        #site-stats .stat-number { font-size: 28px !important; }
+        #site-stats > div > div:last-child { grid-template-columns: repeat(2, 1fr) !important; gap: 16px !important; }
+    }
+    @media (max-width: 480px) {
+        #site-stats > div > div:last-child { grid-template-columns: 1fr !important; }
+    }
+</style>
+<script>
+(function() {
+    function animateCounters() {
+        document.querySelectorAll('.stat-number').forEach(function(el) {
+            if (el.dataset.animated) return;
+            var rect = el.getBoundingClientRect();
+            if (rect.top < window.innerHeight && rect.bottom > 0) {
+                el.dataset.animated = '1';
+                var target = parseInt(el.dataset.target) || 0;
+                if (target === 0) { el.textContent = '0'; return; }
+                var duration = 2000;
+                var start = 0;
+                var startTime = null;
+                function step(timestamp) {
+                    if (!startTime) startTime = timestamp;
+                    var progress = Math.min((timestamp - startTime) / duration, 1);
+                    var eased = 1 - Math.pow(1 - progress, 3);
+                    var current = Math.floor(eased * target);
+                    el.textContent = current.toLocaleString();
+                    if (progress < 1) {
+                        requestAnimationFrame(step);
+                    } else {
+                        el.textContent = target.toLocaleString();
+                    }
+                }
+                requestAnimationFrame(step);
+            }
+        });
+    }
+    window.addEventListener('scroll', animateCounters);
+    window.addEventListener('load', animateCounters);
+})();
+</script>
+
 <!-- YouTube Section -->
 {% if youtube_links %}
 <section class="youtube-ig-section" id="youtube-section">
